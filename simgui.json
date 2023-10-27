@@ -7,8 +7,40 @@
     },
     "windows": {
       "/SmartDashboard/Field": {
+        "Robot": {
+          "length": 0.8999999761581421,
+          "width": 0.8999999761581421
+        },
+        "image": "C:\\Users\\Ari\\Downloads\\PathPlanner-Windows-v2024.0.0-beta-2\\data\\flutter_assets\\images\\field23.png",
+        "width": 16.799999237060547,
         "window": {
           "visible": true
+        }
+      },
+      "/SmartDashboard/SendableChooser[0]": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "SmartDashboard": {
+        "Field": {
+          "[...]##v_/SmartDashboard/Field/Robot": {
+            "open": true
+          },
+          "open": true
+        },
+        "[...]##v_/SmartDashboard/Limelight Pose": {
+          "open": true
+        },
+        "open": true
+      },
+      "photonvision": {
+        "Camera1": {
+          "open": true
         }
       }
     }

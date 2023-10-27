@@ -6,21 +6,20 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
-import frc.robot.commands.SwerveDrivebase.ZeroGyroscope;
-// import frc.robot.commands.SwerveDrivebase.CreateAuto;
 import frc.robot.commands.SwerveDrivebase.TeleopSwerve;
+import frc.robot.subsystems.APTag;
 import frc.robot.subsystems.SwerveDrive;
 
-import static frc.robot.Constants.*;
+import static frc.robot.utilities.Constants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -48,30 +47,21 @@ public class RobotContainer {
 
   // SUBSYSTEMS \\
   public static final SwerveDrive m_drivebase = new SwerveDrive(FRONT_LEFT_MODULE, FRONT_RIGHT_MODULE, BACK_LEFT_MODULE, BACK_RIGHT_MODULE);
-
-  // DELCARE AUTO PLAYS \\
-  private final Command play1;
-  // play2;
+  public static final APTag m_apTag = new APTag();
 
   // SENDABLE CHOOSER \\
-  public static SendableChooser<Command> m_auto_chooser;
+  public static SendableChooser<Command> m_auto_chooser = new SendableChooser<>();;
 
   public RobotContainer() {
 
     // NAMED COMMANDS FOR AUTO \\
-    
-
-    play1 = new WaitCommand(1);
-
-    // play2 = new PathPlannerAuto("TestAuto");
-
-    // play2 = new CreateAuto("TestAuto");
-
-    m_auto_chooser = new SendableChooser<>();
+    // you would never do this while following a path, its just to show how to implement
+    NamedCommands.registerCommand("Zero Yaw", new InstantCommand(() -> m_drivebase.zeroGyroscope()));
 
     // SET AUTO CHOOSER PLAYS \\
-    m_auto_chooser.setDefaultOption("Do Nothing", play1);
-    // m_auto_chooser.addOption("Test", play2);
+    m_auto_chooser.setDefaultOption("Do Nothing", new WaitCommand(1));
+    m_auto_chooser.addOption("C1 3 Piece Auto", new PathPlannerAuto("C1 3 Piece Auto"));
+    m_auto_chooser.addOption("C1 2 Piece Balance Auto", new PathPlannerAuto("C1 2 Piece Balance Auto"));
 
     SmartDashboard.putData(m_auto_chooser);
 
@@ -84,8 +74,6 @@ public class RobotContainer {
       rotationAxis, 
       true, 
       REGULAR_SPEED));
-
-
 
     configureButtonBindings();
   }
@@ -111,26 +99,27 @@ public class RobotContainer {
       true, 
       REGULAR_SPEED));
 
-    m_driverController.back().onTrue(new ZeroGyroscope(m_drivebase));
+    m_driverController.back().onTrue(new InstantCommand(() -> m_drivebase.zeroGyroscope()));
 
-    // m_driverController.a().onTrue(AutoBuilder.pathfindToPose(
-    //   new Pose2d(5, 10, Rotation2d.fromDegrees(180)),
-    //   new PathConstraints(3, 4, Units.degreesToRadians(540), Units.degreesToRadians(720)),
-    //   0.0, // Goal end velocity in meters/sec
-    //   0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
-    // ));
+    // Example of an automatic path generated to score in the B2 zone
+    m_driverController.a().onTrue(AutoBuilder.pathfindToPose(
+      new Pose2d(1.8252, 2.779, Rotation2d.fromDegrees(180)),
+      new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
+      0.0,
+      0.0
+    ));
+
+    // Example of an automatic path generated to pick up from the human player
+    m_driverController.b().onTrue(AutoBuilder.pathfindToPose(
+      new Pose2d(16.06056, 6.270, Rotation2d.fromDegrees(0)),
+      new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
+      0.0,
+      0.0
+    ));
   
-
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
   public Command getAutonomousCommand() {
-    // return m_auto_chooser.getSelected();
-    return new PathPlannerAuto("TestAuto");
-
+    return m_auto_chooser.getSelected();
   }
 }

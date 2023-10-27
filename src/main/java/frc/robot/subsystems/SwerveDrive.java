@@ -17,23 +17,16 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.ctre.phoenix.sensors.Pigeon2;
-import com.ctre.phoenix.unmanaged.Unmanaged;
+import static frc.robot.utilities.Constants.*;
+
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
-import static frc.robot.Constants.*;
-
-import java.util.List;
-
 import frc.robot.utilities.GeometryUtils;
-import frc.robot.utilities.OdometryUtility;
 import frc.robot.utilities.SwerveModuleConstants;
 
 public class SwerveDrive extends SubsystemBase {
@@ -51,14 +44,9 @@ public class SwerveDrive extends SubsystemBase {
     //link to import navX vendordeps
   private final AHRS m_navx = new AHRS(SPI.Port.kMXP, (byte)50);
 
-  private Pigeon2 m_pigeon = new Pigeon2(13, "rio"); // TODO pass in id and canbus CAN.pigeon);
-
-
   public final Field2d m_field = new Field2d();
 
   private SwerveDriveOdometry m_odometry;
-
-  private OdometryUtility m_aprilCamera;
 
   private static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0; // Last year 11.5?
   private static final boolean invertGyro = false;
@@ -106,17 +94,15 @@ public class SwerveDrive extends SubsystemBase {
                 new Pose2d());
     
         m_navx.zeroYaw();
-        m_pigeon.setYaw(0);
+        m_simYaw = 0;
 
         SmartDashboard.putData("Field", m_field);
-        
-        m_aprilCamera = new OdometryUtility(kDriveKinematics, getHeadingRotation2d(), getModulePositions(), getPoseMeters());
 
         robotRelativeChassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
         AutoBuilder.configureHolonomic(
           this::getPoseMeters, // Robot pose supplier
-          this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+          this::updateOdometryWithPose, // Method to reset odometry (will be called if your auto has a starting pose)
           this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
           this::drive, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
           new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
@@ -128,10 +114,6 @@ public class SwerveDrive extends SubsystemBase {
           ),
           this // Reference to this subsystem to set requirements
       );
-  }
-
-  public Pose2d getPose() {
-    return m_aprilCamera.getPose();
   }
 
   public void zeroGyroscope() {
@@ -156,7 +138,6 @@ public class SwerveDrive extends SubsystemBase {
     setSwerveModuleStates(moduleStates, isOpenLoop);
     chassisSpeeds = correctForDynamics(chassisSpeeds);
 
-
     robotRelativeChassisSpeeds = correctForDynamics(new ChassisSpeeds(throttle, strafe, rotation));
   }
   
@@ -175,20 +156,6 @@ public class SwerveDrive extends SubsystemBase {
       module.setDesiredState(states[i], isOpenLoop);
     }
   } 
-
-  // public void setGoToPose(Pose2d targetPose, PathConstraints constraints){
-  //   Command goToPose = AutoBuilder.pathfindToPose(
-  //     targetPose,
-  //     constraints,
-  //     0.0, // Goal end velocity in meters/sec
-  //     0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
-  // );
-
-// }
-
-// public Command getGoToPose() {
-//   return goToPose;
-// }
 
   public Rotation2d getHeadingRotation2d() {
     return getYaw();
@@ -224,24 +191,14 @@ public class SwerveDrive extends SubsystemBase {
     m_odometry.update(getHeadingRotation2d(), getModulePositions());
   }
 
-  public void updateOdometryWithVision(Pose2d estimatedPose) {
-    if(estimatedPose.equals(new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0.0)))){
-      m_odometry.resetPosition(getHeadingRotation2d(), getModulePositions(), estimatedPose);
-    }
-    else{
-      
-    }
-	}
+  public void updateOdometryWithPose(Pose2d initialPose) {
+    m_odometry.resetPosition(getYaw(), getModulePositions(), initialPose);
+  }
 
   public static SwerveDriveKinematics getSwerveKinematics() {
     return kDriveKinematics;
   }
 
-  public void resetOdometry(Pose2d initialPose) {
-    // resets the position of swerveEstimatorPoses
-    m_aprilCamera.resetPosition(getYaw(), getModulePositions(), initialPose);
-    m_odometry.resetPosition(getYaw(), getModulePositions(), initialPose);
-  }
 
    /**
    * Correction for swerve second order dynamics issue. Borrowed from 254:
@@ -269,29 +226,15 @@ public class SwerveDrive extends SubsystemBase {
     if (RobotBase.isReal()) {
       return Rotation2d.fromDegrees(-(m_navx.getYaw() + 180));
     } else {
-      double[] ypr = new double[3];
-      m_pigeon.getYawPitchRoll(ypr);
-      return (invertGyro) ? Rotation2d.fromDegrees(360 - ypr[0]) : Rotation2d.fromDegrees(ypr[0]);
+      return (invertGyro) ? Rotation2d.fromDegrees(360 - Units.radiansToDegrees(m_simYaw)) : Rotation2d.fromDegrees(Units.radiansToDegrees(m_simYaw));
     }
-    
-  }
-
-  public float getYawDegrees(){
-    return m_navx.getYaw();
-  }
-
-  public Rotation2d getPitch() {
-    double[] ypr = new double[3];
-    ypr[0] = m_navx.getYaw();
-    ypr[1] = m_navx.getRoll();
-    ypr[2] = m_navx.getPitch();
-    return (invertGyro) ? Rotation2d.fromDegrees(360 - ypr[1]) : Rotation2d.fromDegrees(ypr[1]);
   }
 
   public void setSwerveModuleStates(SwerveModuleState[] states) {
     setSwerveModuleStates(states, false);
   }
 
+  // Only used for pathplanner, for some reason they need a chassis speeds supplier
   public ChassisSpeeds getChassisSpeeds() {
     return robotRelativeChassisSpeeds;
   }
@@ -305,30 +248,17 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
-  /**
-   * Sets the origin for April Tags to be used by robot not using FMS ie practice or simulation
-   */
-  public void setOriginBasedOnAlliance() {
-    m_aprilCamera.setOriginBasedOnAlliance();
-  }
-
-
-
   @Override
   public void periodic() {
     updateOdometry();
 
     m_field.setRobotPose(m_odometry.getPoseMeters());
-    SmartDashboard.putNumber("gyro rotation degrees", m_navx.getYaw());
-    m_aprilCamera.updateCameraPos(getHeadingRotation2d(), getModulePositions(), getPoseMeters());
+    SmartDashboard.putNumber("gyro rotation degrees", Units.radiansToDegrees(m_simYaw));
   }
 
   @Override
   public void simulationPeriodic() {
     ChassisSpeeds chassisSpeed = kDriveKinematics.toChassisSpeeds(getModuleStates());
     m_simYaw += chassisSpeed.omegaRadiansPerSecond * 0.02;
-
-    Unmanaged.feedEnable(20);
-    m_pigeon.getSimCollection().setRawHeading(-Units.radiansToDegrees(m_simYaw));
   }
 }

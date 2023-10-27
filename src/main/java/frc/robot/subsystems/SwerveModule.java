@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.utilities.Constants.*;
+
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
@@ -21,8 +23,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.RevUtils;
 import frc.robot.utilities.SwerveModuleConstants;
-
-import static frc.robot.Constants.*;
 
 public class SwerveModule extends SubsystemBase {
   private final int POS_SLOT = 0;

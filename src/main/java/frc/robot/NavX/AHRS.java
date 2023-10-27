@@ -12,7 +12,7 @@ package frc.robot.NavX;
 
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
+// import edu.wpi.first.wpilibj.interfaces.Gyro;
 import frc.robot.NavX.AHRSProtocol.*;
 import frc.robot.NavX.IMUProtocol.*;
 import edu.wpi.first.util.sendable.Sendable;
@@ -21,7 +21,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 
-import edu.wpi.first.hal.SimDevice;
+// import edu.wpi.first.hal.SimDevice;
 
 /**
  * The AHRS class provides an interface to AHRS capabilities
@@ -41,7 +41,7 @@ import edu.wpi.first.hal.SimDevice;
  * @author Scott
  */
 
-public class AHRS implements Sendable, Gyro {
+public class AHRS implements Sendable {
 
     /**
      * Identifies one of the three sensing axes on the navX sensor board.  Note that these axes are
@@ -194,7 +194,7 @@ public class AHRS implements Sendable, Gyro {
     private boolean logging_enabled;
 
     /* SimDevice Variables */
-    private SimDevice m_simDevice;     
+    // private SimDevice m_simDevice;     
 
     /***********************************************************/
     /* Public Interface Implementation                         */
@@ -918,7 +918,7 @@ public class AHRS implements Sendable, Gyro {
         this.logging_enabled = false;
 
         // Construct SimDevice (only succeeds in simulation environments)
-        m_simDevice = SimDevice.create("navX-Sensor", 0);     
+        // m_simDevice = SimDevice.create("navX-Sensor", 0);     
     }
 
     /**
@@ -1630,23 +1630,23 @@ public class AHRS implements Sendable, Gyro {
     /***********************************************************/
     /* AutoCloseable Interface Implementation                  */
     /***********************************************************/
-	@Override
-	public void close() {
-        SendableRegistry.remove(this);
-        if (io != null) {
-            io.stop();			
-        }
-        /* Note:  Currently this method does not release the underlying port resource. */
-        if (m_simDevice != null) {
-            m_simDevice.close();
-            m_simDevice = null;
-        }
-    }
+	// @Override
+	// public void close() {
+    //     SendableRegistry.remove(this);
+    //     if (io != null) {
+    //         io.stop();			
+    //     }
+    //     /* Note:  Currently this method does not release the underlying port resource. */
+    //     if (m_simDevice != null) {
+    //         m_simDevice.close();
+    //         m_simDevice = null;
+    //     }
+    // }
 
-    /************************************************************/
-    /* Gyro interface Implementation                            */
-    /************************************************************/
-    @Override
-    public void calibrate() {        
-    }    
+    // /************************************************************/
+    // /* Gyro interface Implementation                            */
+    // /************************************************************/
+    // @Override
+    // public void calibrate() {        
+    // }    
 }
