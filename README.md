@@ -8,6 +8,7 @@
 * Sendable Chooser for changing auto plays on the fly
 * Tunable PID for auto and for teleop Swerve
 * April Tag support and the ability to adjust odometry based on April Tags
+* Field2d simulation capabilities
 
 #### TODO
 * Before you can use you have to tune the teleop swerve PID that can be found in the RevUtils.java file.
