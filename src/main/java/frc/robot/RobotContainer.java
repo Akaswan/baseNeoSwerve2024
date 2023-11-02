@@ -8,6 +8,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,8 +47,12 @@ public class RobotContainer {
   // CONTROLLERS \\
   CommandXboxController m_driverController = new CommandXboxController(kDriverControllerPort);
 
+  // SHUFFLEBOARD TABS \\
+  public static ShuffleboardTab mainTab = Shuffleboard.getTab("Main");
+  public static ShuffleboardTab infoTab = Shuffleboard.getTab("Info");
+
   // SUBSYSTEMS \\
-  public static final SwerveDrive m_drivebase = new SwerveDrive(FRONT_LEFT_MODULE, FRONT_RIGHT_MODULE, BACK_LEFT_MODULE, BACK_RIGHT_MODULE);
+  public static final SwerveDrive m_drivebase = new SwerveDrive(FRONT_LEFT_MODULE, FRONT_RIGHT_MODULE, BACK_LEFT_MODULE, BACK_RIGHT_MODULE, true);
   public static final APTag m_apTag = new APTag();
 
   // SENDABLE CHOOSER \\
@@ -63,7 +69,7 @@ public class RobotContainer {
     m_auto_chooser.addOption("C1 3 Piece Auto", new PathPlannerAuto("C1 3 Piece Auto"));
     m_auto_chooser.addOption("C1 2 Piece Balance Auto", new PathPlannerAuto("C1 2 Piece Balance Auto"));
 
-    SmartDashboard.putData(m_auto_chooser);
+    mainTab.add("Auto Picker", m_auto_chooser);
 
     // CONFIGURE DEFAULT COMMANDS \\
     m_drivebase.setDefaultCommand(new TeleopSwerve(

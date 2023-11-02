@@ -6,20 +6,29 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
+import frc.robot.RobotContainer;
 import frc.robot.NavX.*;
-
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.utilities.Constants.*;
+
+import java.util.Map;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -46,7 +55,19 @@ public class SwerveDrive extends SubsystemBase {
 
   public final Field2d m_field = new Field2d();
 
+  public static ShuffleboardTab tuningTab = Shuffleboard.getTab("Tuning");
+
+  private SimpleWidget m_gyroWidget;
+
+  private GenericEntry driveRampRateEntry;
+  public static double driveRampRateTuning;
+
+  public static PIDController dummyDriveController = new PIDController(0, 0, 0);
+  public static PIDController dummyTurnController = new PIDController(0, 0, 0);
+
   private SwerveDriveOdometry m_odometry;
+
+  private boolean m_tuning;
 
   private static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0; // Last year 11.5?
   private static final boolean invertGyro = false;
@@ -59,6 +80,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private ChassisSpeeds robotRelativeChassisSpeeds;
   
+  
 
 
   /**
@@ -70,15 +92,17 @@ public class SwerveDrive extends SubsystemBase {
    * @param frontRightModuleConstants
    * @param backLeftModuleConstants
    * @param backRightModuleConstants
+   * @param m_tuning     Decide whether to tune the angle offset and PID of the modules
    */
   public SwerveDrive(SwerveModuleConstants frontLeftModuleConstants, SwerveModuleConstants frontRightModuleConstants,
-      SwerveModuleConstants backLeftModuleConstants, SwerveModuleConstants backRightModuleConstants) {
+      SwerveModuleConstants backLeftModuleConstants, SwerveModuleConstants backRightModuleConstants, boolean tuning) {
 
+    m_tuning = tuning;    
     mSwerveMods = new SwerveModule[] {
-        new SwerveModule(0, frontLeftModuleConstants),
-        new SwerveModule(1, frontRightModuleConstants),
-        new SwerveModule(2, backLeftModuleConstants),
-        new SwerveModule(3, backRightModuleConstants)
+        new SwerveModule(0, frontLeftModuleConstants, m_tuning),
+        new SwerveModule(1, frontRightModuleConstants, m_tuning),
+        new SwerveModule(2, backLeftModuleConstants, m_tuning),
+        new SwerveModule(3, backRightModuleConstants, m_tuning)
     };
 
         /* By pausing init for a second before setting module offsets, we avoid a bug with inverting motors.
@@ -96,9 +120,24 @@ public class SwerveDrive extends SubsystemBase {
         m_navx.zeroYaw();
         m_simYaw = 0;
 
-        SmartDashboard.putData("Field", m_field);
+        RobotContainer.infoTab.add("Field", m_field)
+          .withPosition(0, 0)
+          .withSize(5, 3);
+        m_gyroWidget = RobotContainer.infoTab.add("Robot Rotation", RobotBase.isReal() ? getYaw() : Units.radiansToDegrees(m_simYaw))
+          .withWidget(BuiltInWidgets.kGyro)
+          .withPosition(0, 4);
 
         robotRelativeChassisSpeeds = new ChassisSpeeds(0, 0, 0);
+
+        if (m_tuning) {
+          tuningTab.add("Drive Motor PID", dummyDriveController);
+          tuningTab.add("Turn Motor PID", dummyTurnController);
+          driveRampRateEntry = tuningTab.add("Drive Ramp Rate", 0)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0))
+                .getEntry();
+          driveRampRateTuning = driveRampRateEntry.getDouble(0);
+        }
 
         AutoBuilder.configureHolonomic(
           this::getPoseMeters, // Robot pose supplier
@@ -167,6 +206,14 @@ public class SwerveDrive extends SubsystemBase {
 
   public SwerveModule getSwerveModule(int moduleNumber) {
     return mSwerveMods[moduleNumber];
+  }
+
+  public PIDController getDummyDriveController() {
+    return dummyDriveController;
+  }
+
+    public PIDController getDummyTurnController() {
+    return dummyTurnController;
   }
 
   public SwerveModuleState[] getModuleStates() {
@@ -251,9 +298,13 @@ public class SwerveDrive extends SubsystemBase {
   @Override
   public void periodic() {
     updateOdometry();
+    if (m_tuning) {
+      driveRampRateTuning = driveRampRateEntry.getDouble(0);
+    }
+
+    m_gyroWidget.getEntry().setDouble(getYaw().getDegrees());
 
     m_field.setRobotPose(m_odometry.getPoseMeters());
-    SmartDashboard.putNumber("gyro rotation degrees", Units.radiansToDegrees(m_simYaw));
   }
 
   @Override

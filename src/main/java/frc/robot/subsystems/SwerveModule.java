@@ -6,21 +6,29 @@ package frc.robot.subsystems;
 
 import static frc.robot.utilities.Constants.*;
 
+import java.util.Map;
+
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.utilities.RevUtils;
 import frc.robot.utilities.SwerveModuleConstants;
 
@@ -42,6 +50,7 @@ public class SwerveModule extends SubsystemBase {
   private double m_simDriveEncoderPosition;
   private double m_simDriveEncoderVelocity;
 
+  private GenericEntry angleOffsetEntry;
   private double m_angleOffset;
 
   private final SparkMaxPIDController m_driveController;
@@ -50,6 +59,11 @@ public class SwerveModule extends SubsystemBase {
   double m_currentAngle;
   double m_lastAngle;
 
+  private SimpleWidget m_moduleAngleWidget;
+  private SimpleWidget m_moduleSpeedWidget;
+
+  private boolean m_tuning;
+
   private int m_moduleNumber;
 
   /**
@@ -57,9 +71,12 @@ public class SwerveModule extends SubsystemBase {
    *
    * @param moduleNumber The module number
    * @param swerveModuleConstants     Swerve modules constants to setup swerve module
+   * @param tuning     Decide whether to tune the angle offset and PID of the module
    */
-  public SwerveModule(int moduleNumber, SwerveModuleConstants swerveModuleConstants) {
+  public SwerveModule(int moduleNumber, SwerveModuleConstants swerveModuleConstants, boolean tuning) {
     m_moduleNumber = moduleNumber;
+
+    m_tuning = tuning;
 
     m_driveMotor = new CANSparkMax(swerveModuleConstants.driveMotorChannel, CANSparkMaxLowLevel.MotorType.kBrushless);
     m_turningMotor = new CANSparkMax(swerveModuleConstants.turningMotorChannel, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -68,12 +85,12 @@ public class SwerveModule extends SubsystemBase {
     m_angleOffset = swerveModuleConstants.angleOffset;
 
     m_driveMotor.restoreFactoryDefaults();
-    RevUtils.setDriveMotorConfig(m_driveMotor, false); // Make smartDashboardTuning true to tune PID values in smartdashboard. Once you are happy with values, change them in the RevUtils file.
+    RevUtils.setDriveMotorConfig(m_driveMotor, m_tuning); // Make smartDashboardTuning true to tune PID values in smartdashboard. Once you are happy with values, change them in the RevUtils file.
     m_driveMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
     m_driveMotor.setInverted(true);// MK4i drive motor is inverted
 
     m_turningMotor.restoreFactoryDefaults();
-    RevUtils.setTurnMotorConfig(m_turningMotor, false); // Make smartDashboardTuning true to tune PID values in smartdashboard. Once you are happy with values, change them in the RevUtils file.
+    RevUtils.setTurnMotorConfig(m_turningMotor, m_tuning); // Make smartDashboardTuning true to tune PID values in smartdashboard. Once you are happy with values, change them in the RevUtils file.
     m_turningMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
     m_turningMotor.setSmartCurrentLimit(25);
@@ -93,6 +110,21 @@ public class SwerveModule extends SubsystemBase {
 
     m_driveController = m_driveMotor.getPIDController();
     m_turnController = m_turningMotor.getPIDController();
+
+    if (m_tuning) {
+      angleOffsetEntry = SwerveDrive.tuningTab.add("Angle Offset " + m_moduleNumber, m_angleOffset)
+      .getEntry();
+    }
+
+    m_moduleAngleWidget = RobotContainer.infoTab.add("Module Angle " + m_moduleNumber, getHeadingDegrees())
+      .withWidget(BuiltInWidgets.kGyro)
+      .withPosition(5 + m_moduleNumber * 2, 2);
+
+    m_moduleSpeedWidget = RobotContainer.infoTab.add("Module Speed " + m_moduleNumber, Units.metersToFeet(getDriveMetersPerSecond()))
+      .withWidget(BuiltInWidgets.kNumberBar)
+      .withProperties(Map.of("min", -16, "max", 16))
+      .withPosition(5 + m_moduleNumber * 2, 4)
+      .withSize(2, 2);
   }
 
   /**
@@ -160,7 +192,7 @@ public class SwerveModule extends SubsystemBase {
           CANSparkMax.ControlType.kVelocity,
           DRIVE_PID_SLOT);
     }
-
+    
     double angle = (Math.abs(desiredState.speedMetersPerSecond) <= (MAX_METERS_PER_SECOND * 0.01)) // Prevent rotating module if speed is less than 1%. Prevents Jittering.
         ? m_lastAngle
         : desiredState.angle.getDegrees(); 
@@ -168,15 +200,34 @@ public class SwerveModule extends SubsystemBase {
     m_turnController.setReference(angle, CANSparkMax.ControlType.kPosition, POS_SLOT);
     m_lastAngle = angle;
 
-    SmartDashboard.putNumber(m_moduleNumber + " Speed", Units.metersToFeet(desiredState.speedMetersPerSecond));
-    SmartDashboard.putNumber(m_moduleNumber + " Angle", angle);
-
     if (RobotBase.isSimulation()) {
       simUpdateDrivePosition(desiredState);
       // simTurnPosition(angle); 
       m_currentAngle = angle;
 
     }
+  }
+
+  @Override
+  public void periodic() {
+    if (m_tuning) {
+      m_angleOffset = angleOffsetEntry.getDouble(m_angleOffset);
+
+      m_driveController.setP(SwerveDrive.dummyDriveController.getP());
+      m_driveController.setI(SwerveDrive.dummyDriveController.getI());
+      m_driveController.setD(SwerveDrive.dummyDriveController.getD());
+      m_driveController.setFF(SwerveDrive.dummyDriveController.getSetpoint());
+      m_driveMotor.setOpenLoopRampRate(SwerveDrive.driveRampRateTuning);
+
+      m_turnController.setP(SwerveDrive.dummyTurnController.getP());
+      m_turnController.setI(SwerveDrive.dummyTurnController.getI());
+      m_turnController.setD(SwerveDrive.dummyTurnController.getD());
+      m_turnController.setFF(SwerveDrive.dummyTurnController.getSetpoint());
+    }
+    m_moduleAngleWidget.getEntry().setDouble(getHeadingDegrees());
+    m_moduleSpeedWidget.getEntry().setDouble(Units.metersToFeet(getDriveMetersPerSecond()));
+
+
   }
 
   private void simUpdateDrivePosition(SwerveModuleState state) {
