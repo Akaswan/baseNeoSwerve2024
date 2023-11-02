@@ -5,7 +5,6 @@ import com.revrobotics.CANSparkMaxLowLevel;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public final class RevUtils {
 
@@ -14,10 +13,9 @@ public final class RevUtils {
    * 
    * 
    * @param motorController the motor controller to tune
-   * @param smartDashboardTuning make this true in order to tune PID values in smart dashboard
    * 
    */
-  public static void setDriveMotorConfig(CANSparkMax motorController, boolean smartDashboardTuning) {
+  public static void setDriveMotorConfig(CANSparkMax motorController) {
 
     motorController.getPIDController().setFF(0.15751);
     motorController.getPIDController().setP(0.23983);
@@ -38,10 +36,9 @@ public final class RevUtils {
    * 
    * 
    * @param motorController the motor controller to tune
-   * @param smartDashboardTuning make this true in order to tune PID values in smart dashboard
    * 
    */
-  public static void setTurnMotorConfig(CANSparkMax motorController, boolean smartDashboardTuning) {
+  public static void setTurnMotorConfig(CANSparkMax motorController) {
 
     motorController.getPIDController().setFF(0);
     motorController.getPIDController().setP(0.01);

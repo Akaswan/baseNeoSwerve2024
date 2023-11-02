@@ -14,7 +14,6 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -23,10 +22,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
-import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.utilities.RevUtils;
@@ -85,12 +81,12 @@ public class SwerveModule extends SubsystemBase {
     m_angleOffset = swerveModuleConstants.angleOffset;
 
     m_driveMotor.restoreFactoryDefaults();
-    RevUtils.setDriveMotorConfig(m_driveMotor, m_tuning); // Make smartDashboardTuning true to tune PID values in smartdashboard. Once you are happy with values, change them in the RevUtils file.
+    RevUtils.setDriveMotorConfig(m_driveMotor);
     m_driveMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
     m_driveMotor.setInverted(true);// MK4i drive motor is inverted
 
     m_turningMotor.restoreFactoryDefaults();
-    RevUtils.setTurnMotorConfig(m_turningMotor, m_tuning); // Make smartDashboardTuning true to tune PID values in smartdashboard. Once you are happy with values, change them in the RevUtils file.
+    RevUtils.setTurnMotorConfig(m_turningMotor);
     m_turningMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
     m_turningMotor.setSmartCurrentLimit(25);
@@ -112,7 +108,7 @@ public class SwerveModule extends SubsystemBase {
     m_turnController = m_turningMotor.getPIDController();
 
     if (m_tuning) {
-      angleOffsetEntry = SwerveDrive.tuningTab.add("Angle Offset " + m_moduleNumber, m_angleOffset)
+      angleOffsetEntry = RobotContainer.tuningTab.add("Angle Offset " + m_moduleNumber, m_angleOffset)
       .getEntry();
     }
 

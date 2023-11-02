@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class APTag extends SubsystemBase {
@@ -82,7 +81,7 @@ public class APTag extends SubsystemBase {
     m_visA = currentData.getEntry("ta");
     m_poseArr = currentData.getEntry("botpose");
 
-    SmartDashboard.putNumberArray("Limelight Pose", getBotPose());
+    // SmartDashboard.putNumberArray("Limelight Pose", getBotPose());
 
     // Uncomment this if you want the robots odometry to be changed by the limelight
     // RobotContainer.m_swerveDrive.resetOdometry(getPose2d());

@@ -16,14 +16,10 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.utilities.Constants.*;
@@ -54,8 +50,6 @@ public class SwerveDrive extends SubsystemBase {
   private final AHRS m_navx = new AHRS(SPI.Port.kMXP, (byte)50);
 
   public final Field2d m_field = new Field2d();
-
-  public static ShuffleboardTab tuningTab = Shuffleboard.getTab("Tuning");
 
   private SimpleWidget m_gyroWidget;
 
@@ -113,7 +107,7 @@ public class SwerveDrive extends SubsystemBase {
         
         m_odometry = new SwerveDriveOdometry(
                 kDriveKinematics,
-                getHeadingRotation2d(),
+                getYaw(),
                 getModulePositions(),
                 new Pose2d());
     
@@ -130,9 +124,9 @@ public class SwerveDrive extends SubsystemBase {
         robotRelativeChassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
         if (m_tuning) {
-          tuningTab.add("Drive Motor PID", dummyDriveController);
-          tuningTab.add("Turn Motor PID", dummyTurnController);
-          driveRampRateEntry = tuningTab.add("Drive Ramp Rate", 0)
+          RobotContainer.tuningTab.add("Drive Motor PID", dummyDriveController);
+          RobotContainer.tuningTab.add("Turn Motor PID", dummyTurnController);
+          driveRampRateEntry = RobotContainer.tuningTab.add("Drive Ramp Rate", 0)
                 .withWidget(BuiltInWidgets.kNumberSlider)
                 .withProperties(Map.of("min", 0))
                 .getEntry();
@@ -170,7 +164,7 @@ public class SwerveDrive extends SubsystemBase {
     rotation = rotation * kMaxRotationRadiansPerSecond;
     
     ChassisSpeeds chassisSpeeds = isFieldRelative
-      ? ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getHeadingRotation2d())
+      ? ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getYaw())
       : new ChassisSpeeds(throttle, strafe, rotation);
 
     moduleStates = kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
@@ -196,24 +190,12 @@ public class SwerveDrive extends SubsystemBase {
     }
   } 
 
-  public Rotation2d getHeadingRotation2d() {
-    return getYaw();
-  }
-
   public Pose2d getPoseMeters() {
     return m_odometry.getPoseMeters();
   }
 
   public SwerveModule getSwerveModule(int moduleNumber) {
     return mSwerveMods[moduleNumber];
-  }
-
-  public PIDController getDummyDriveController() {
-    return dummyDriveController;
-  }
-
-    public PIDController getDummyTurnController() {
-    return dummyTurnController;
   }
 
   public SwerveModuleState[] getModuleStates() {
@@ -235,7 +217,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void updateOdometry() {
-    m_odometry.update(getHeadingRotation2d(), getModulePositions());
+    m_odometry.update(getYaw(), getModulePositions());
   }
 
   public void updateOdometryWithPose(Pose2d initialPose) {
