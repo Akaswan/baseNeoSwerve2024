@@ -58,8 +58,6 @@ public class SwerveModule extends SubsystemBase {
   private SimpleWidget m_moduleAngleWidget;
   private SimpleWidget m_moduleSpeedWidget;
 
-  private boolean m_tuning;
-
   private int m_moduleNumber;
 
   /**
@@ -69,10 +67,8 @@ public class SwerveModule extends SubsystemBase {
    * @param swerveModuleConstants     Swerve modules constants to setup swerve module
    * @param tuning     Decide whether to tune the angle offset and PID of the module
    */
-  public SwerveModule(int moduleNumber, SwerveModuleConstants swerveModuleConstants, boolean tuning) {
+  public SwerveModule(int moduleNumber, SwerveModuleConstants swerveModuleConstants) {
     m_moduleNumber = moduleNumber;
-
-    m_tuning = tuning;
 
     m_driveMotor = new CANSparkMax(swerveModuleConstants.driveMotorChannel, CANSparkMaxLowLevel.MotorType.kBrushless);
     m_turningMotor = new CANSparkMax(swerveModuleConstants.turningMotorChannel, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -107,20 +103,22 @@ public class SwerveModule extends SubsystemBase {
     m_driveController = m_driveMotor.getPIDController();
     m_turnController = m_turningMotor.getPIDController();
 
-    if (m_tuning) {
+    if (TUNING) {
       angleOffsetEntry = RobotContainer.tuningTab.add("Angle Offset " + m_moduleNumber, m_angleOffset)
       .getEntry();
     }
 
-    m_moduleAngleWidget = RobotContainer.infoTab.add("Module Angle " + m_moduleNumber, getHeadingDegrees())
-      .withWidget(BuiltInWidgets.kGyro)
-      .withPosition(5 + m_moduleNumber * 2, 2);
+    if (INFO) {
+      m_moduleAngleWidget = RobotContainer.infoTab.add("Module Angle " + m_moduleNumber, getHeadingDegrees())
+        .withWidget(BuiltInWidgets.kGyro)
+        .withPosition(5 + m_moduleNumber * 2, 2);
 
-    m_moduleSpeedWidget = RobotContainer.infoTab.add("Module Speed " + m_moduleNumber, Units.metersToFeet(getDriveMetersPerSecond()))
-      .withWidget(BuiltInWidgets.kNumberBar)
-      .withProperties(Map.of("min", -16, "max", 16))
-      .withPosition(5 + m_moduleNumber * 2, 4)
-      .withSize(2, 2);
+      m_moduleSpeedWidget = RobotContainer.infoTab.add("Module Speed " + m_moduleNumber, Units.metersToFeet(getDriveMetersPerSecond()))
+        .withWidget(BuiltInWidgets.kNumberBar)
+        .withProperties(Map.of("min", -16, "max", 16))
+        .withPosition(5 + m_moduleNumber * 2, 4)
+        .withSize(2, 2);
+    }
   }
 
   /**
@@ -206,7 +204,7 @@ public class SwerveModule extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (m_tuning) {
+    if (TUNING) {
       m_angleOffset = angleOffsetEntry.getDouble(m_angleOffset);
 
       m_driveController.setP(SwerveDrive.dummyDriveController.getP());
@@ -220,10 +218,11 @@ public class SwerveModule extends SubsystemBase {
       m_turnController.setD(SwerveDrive.dummyTurnController.getD());
       m_turnController.setFF(SwerveDrive.dummyTurnController.getSetpoint());
     }
-    m_moduleAngleWidget.getEntry().setDouble(getHeadingDegrees());
-    m_moduleSpeedWidget.getEntry().setDouble(Units.metersToFeet(getDriveMetersPerSecond()));
 
-
+    if (INFO) {
+      m_moduleAngleWidget.getEntry().setDouble(getHeadingDegrees());
+      m_moduleSpeedWidget.getEntry().setDouble(Units.metersToFeet(getDriveMetersPerSecond()));
+    }
   }
 
   private void simUpdateDrivePosition(SwerveModuleState state) {

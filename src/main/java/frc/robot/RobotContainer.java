@@ -46,11 +46,11 @@ public class RobotContainer {
 
   // SHUFFLEBOARD TABS \\
   public static ShuffleboardTab mainTab = Shuffleboard.getTab("Main");
-  public static ShuffleboardTab infoTab = Shuffleboard.getTab("Info");
-  public static ShuffleboardTab tuningTab;
+  public static ShuffleboardTab infoTab = INFO ? Shuffleboard.getTab("Info") : null;
+  public static ShuffleboardTab tuningTab = TUNING ? Shuffleboard.getTab("Tuning") : null;
 
   // SUBSYSTEMS \\
-  public static final SwerveDrive m_drivebase = new SwerveDrive(FRONT_LEFT_MODULE, FRONT_RIGHT_MODULE, BACK_LEFT_MODULE, BACK_RIGHT_MODULE, TUNING);
+  public static final SwerveDrive m_drivebase = new SwerveDrive(FRONT_LEFT_MODULE, FRONT_RIGHT_MODULE, BACK_LEFT_MODULE, BACK_RIGHT_MODULE);
   public static final APTag m_apTag = new APTag();
 
   // SENDABLE CHOOSER \\
@@ -58,19 +58,15 @@ public class RobotContainer {
 
   public RobotContainer() {
 
-    if (TUNING) {
-      tuningTab = Shuffleboard.getTab("Tuning");
-    } else {
-      tuningTab = null;
-    }
-
     // NAMED COMMANDS FOR AUTO \\
     // you would never do this while following a path, its just to show how to implement
     NamedCommands.registerCommand("Zero Yaw", new InstantCommand(() -> m_drivebase.zeroGyroscope()));
 
     // SET AUTO CHOOSER PLAYS \\
 
-    mainTab.add("Auto Picker", m_auto_chooser);
+    mainTab.add("Auto Picker", m_auto_chooser)
+      .withPosition(0, 0)
+      .withSize(2, 1);
 
     // CONFIGURE DEFAULT COMMANDS \\
     m_drivebase.setDefaultCommand(new TeleopSwerve(

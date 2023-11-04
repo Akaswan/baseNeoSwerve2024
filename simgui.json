@@ -54,7 +54,6 @@
       "/Shuffleboard/Tuning/Drive Motor 3 PID": "PIDController",
       "/Shuffleboard/Tuning/Drive Motor PID": "PIDController",
       "/Shuffleboard/Tuning/Turn Motor PID": "PIDController",
-      "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/SendableChooser[0]": "String Chooser"
     },
     "windows": {

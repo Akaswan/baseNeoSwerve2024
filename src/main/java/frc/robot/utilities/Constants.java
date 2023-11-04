@@ -17,6 +17,8 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
     public static final boolean TUNING = false;
 
+    public static final boolean INFO = true;
+
     // // DRIVEBASE \\ \\
 
     // Make sure to measure these with as much presicion as possible, as it will have great affect on path planner autos and teleop driving

@@ -61,8 +61,6 @@ public class SwerveDrive extends SubsystemBase {
 
   private SwerveDriveOdometry m_odometry;
 
-  private boolean m_tuning;
-
   private static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0; // Last year 11.5?
   private static final boolean invertGyro = false;
 
@@ -70,7 +68,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private SwerveModuleState[] moduleStates;
 
-  private SwerveModule[] mSwerveMods;
+  private SwerveModule[] m_SwerveMods;
 
   private ChassisSpeeds robotRelativeChassisSpeeds;
   
@@ -89,14 +87,13 @@ public class SwerveDrive extends SubsystemBase {
    * @param m_tuning     Decide whether to tune the angle offset and PID of the modules
    */
   public SwerveDrive(SwerveModuleConstants frontLeftModuleConstants, SwerveModuleConstants frontRightModuleConstants,
-      SwerveModuleConstants backLeftModuleConstants, SwerveModuleConstants backRightModuleConstants, boolean tuning) {
+      SwerveModuleConstants backLeftModuleConstants, SwerveModuleConstants backRightModuleConstants) { 
 
-    m_tuning = tuning;    
-    mSwerveMods = new SwerveModule[] {
-        new SwerveModule(0, frontLeftModuleConstants, m_tuning),
-        new SwerveModule(1, frontRightModuleConstants, m_tuning),
-        new SwerveModule(2, backLeftModuleConstants, m_tuning),
-        new SwerveModule(3, backRightModuleConstants, m_tuning)
+    m_SwerveMods = new SwerveModule[] {
+        new SwerveModule(0, frontLeftModuleConstants),
+        new SwerveModule(1, frontRightModuleConstants),
+        new SwerveModule(2, backLeftModuleConstants),
+        new SwerveModule(3, backRightModuleConstants)
     };
 
         /* By pausing init for a second before setting module offsets, we avoid a bug with inverting motors.
@@ -114,16 +111,18 @@ public class SwerveDrive extends SubsystemBase {
         m_navx.zeroYaw();
         m_simYaw = 0;
 
-        RobotContainer.infoTab.add("Field", m_field)
-          .withPosition(0, 0)
-          .withSize(5, 3);
-        m_gyroWidget = RobotContainer.infoTab.add("Robot Rotation", RobotBase.isReal() ? getYaw() : Units.radiansToDegrees(m_simYaw))
-          .withWidget(BuiltInWidgets.kGyro)
-          .withPosition(0, 4);
+        if (INFO) {
+          RobotContainer.infoTab.add("Field", m_field)
+            .withPosition(0, 0)
+            .withSize(5, 3);
+          m_gyroWidget = RobotContainer.infoTab.add("Robot Rotation", RobotBase.isReal() ? getYaw() : Units.radiansToDegrees(m_simYaw))
+            .withWidget(BuiltInWidgets.kGyro)
+            .withPosition(0, 4);
+        }
 
         robotRelativeChassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
-        if (m_tuning) {
+        if (TUNING) {
           RobotContainer.tuningTab.add("Drive Motor PID", dummyDriveController);
           RobotContainer.tuningTab.add("Turn Motor PID", dummyTurnController);
           driveRampRateEntry = RobotContainer.tuningTab.add("Drive Ramp Rate", 0)
@@ -183,8 +182,8 @@ public class SwerveDrive extends SubsystemBase {
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
     SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_METERS_PER_SECOND);
 
-    for (int i = 0; i < mSwerveMods.length; i++) {
-      SwerveModule module = mSwerveMods[i];
+    for (int i = 0; i < m_SwerveMods.length; i++) {
+      SwerveModule module = m_SwerveMods[i];
       states[i] = new SwerveModuleState(states[i].speedMetersPerSecond, states[i].angle);
       module.setDesiredState(states[i], isOpenLoop);
     }
@@ -195,24 +194,24 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public SwerveModule getSwerveModule(int moduleNumber) {
-    return mSwerveMods[moduleNumber];
+    return m_SwerveMods[moduleNumber];
   }
 
   public SwerveModuleState[] getModuleStates() {
     return new SwerveModuleState[] {
-        mSwerveMods[0].getState(),
-        mSwerveMods[1].getState(),
-        mSwerveMods[2].getState(),
-        mSwerveMods[3].getState()
+        m_SwerveMods[0].getState(),
+        m_SwerveMods[1].getState(),
+        m_SwerveMods[2].getState(),
+        m_SwerveMods[3].getState()
     };
   }
 
   public SwerveModulePosition[] getModulePositions() {
     return new SwerveModulePosition[] {
-        mSwerveMods[0].getPosition(),
-        mSwerveMods[1].getPosition(),
-        mSwerveMods[2].getPosition(),
-        mSwerveMods[3].getPosition()
+        m_SwerveMods[0].getPosition(),
+        m_SwerveMods[1].getPosition(),
+        m_SwerveMods[2].getPosition(),
+        m_SwerveMods[3].getPosition()
     };
   }
 
@@ -272,7 +271,7 @@ public class SwerveDrive extends SubsystemBase {
    * Resets each SwerveModule to the absolute position.
    */
   public void resetAngleToAbsolute() {
-    for (SwerveModule mod : mSwerveMods) {
+    for (SwerveModule mod : m_SwerveMods) {
       mod.resetAngleToAbsolute();
     }
   }
@@ -280,11 +279,14 @@ public class SwerveDrive extends SubsystemBase {
   @Override
   public void periodic() {
     updateOdometry();
-    if (m_tuning) {
+    if (TUNING) {
       driveRampRateTuning = driveRampRateEntry.getDouble(0);
     }
 
-    m_gyroWidget.getEntry().setDouble(getYaw().getDegrees());
+    if (INFO) {
+      m_gyroWidget.getEntry().setDouble(getYaw().getDegrees());
+    }
+    
 
     m_field.setRobotPose(m_odometry.getPoseMeters());
   }
