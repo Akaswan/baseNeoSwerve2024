@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.utilities.Constants.*;
@@ -136,7 +137,7 @@ public class SwerveDrive extends SubsystemBase {
           this::getPoseMeters, // Robot pose supplier
           this::updateOdometryWithPose, // Method to reset odometry (will be called if your auto has a starting pose)
           this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-          this::drive, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+          this::autoDrive, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
           new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
               new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
               new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
@@ -173,9 +174,9 @@ public class SwerveDrive extends SubsystemBase {
     robotRelativeChassisSpeeds = correctForDynamics(new ChassisSpeeds(throttle, strafe, rotation));
   }
   
-  public void drive(ChassisSpeeds speeds){
+  public void autoDrive(ChassisSpeeds speeds){
     moduleStates = kDriveKinematics.toSwerveModuleStates(speeds);
-    setSwerveModuleStates(moduleStates, true);
+    setSwerveModuleStates(moduleStates, false);
     speeds = correctForDynamics(speeds);
   }
 
@@ -258,6 +259,20 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
+  public double getYawDegrees() {
+    return getYaw().getDegrees();
+  }
+  
+  public double getAdjustedYawDegrees() {
+    return getYawDegrees() % 360 < 0 ? (getYawDegrees() % 360) + 360.0 : (getYawDegrees() % 360);
+  }
+
+  public double getAdjustedYawDegrees(double addedValue) {
+    double numTo180 = 180 - addedValue;
+
+    return (getYawDegrees() + numTo180) % 360 < 0 ? ((getYawDegrees() + numTo180) % 360) + 360.0 : ((getYawDegrees() + numTo180) % 360);
+  }
+
   public void setSwerveModuleStates(SwerveModuleState[] states) {
     setSwerveModuleStates(states, false);
   }
@@ -289,6 +304,8 @@ public class SwerveDrive extends SubsystemBase {
     
 
     m_field.setRobotPose(m_odometry.getPoseMeters());
+
+    SmartDashboard.putNumber("New Angle", getAdjustedYawDegrees(90));
   }
 
   @Override

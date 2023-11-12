@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import frc.robot.commands.SwerveDrivebase.TeleopSwerve;
+import frc.robot.commands.SwerveDrivebase.TurnToAngle;
 import frc.robot.subsystems.APTag;
 import frc.robot.subsystems.SwerveDrive;
 
@@ -39,10 +40,10 @@ public class RobotContainer {
   private final int rotationAxis = XboxController.Axis.kRightX.value;
 
   // CONTROLLER PORTS \\
-  public static final int kDriverControllerPort = 0;
+  public static final int DriverControllerPort = 0;
 
   // CONTROLLERS \\
-  CommandXboxController m_driverController = new CommandXboxController(kDriverControllerPort);
+  CommandXboxController driverController = new CommandXboxController(DriverControllerPort);
 
   // SHUFFLEBOARD TABS \\
   public static ShuffleboardTab mainTab = Shuffleboard.getTab("Main");
@@ -50,28 +51,28 @@ public class RobotContainer {
   public static ShuffleboardTab tuningTab = TUNING ? Shuffleboard.getTab("Tuning") : null;
 
   // SUBSYSTEMS \\
-  public static final SwerveDrive m_drivebase = new SwerveDrive(FRONT_LEFT_MODULE, FRONT_RIGHT_MODULE, BACK_LEFT_MODULE, BACK_RIGHT_MODULE);
+  public static final SwerveDrive m_driveBase = new SwerveDrive(FRONT_LEFT_MODULE, FRONT_RIGHT_MODULE, BACK_LEFT_MODULE, BACK_RIGHT_MODULE);
   public static final APTag m_apTag = new APTag();
 
   // SENDABLE CHOOSER \\
-  public static SendableChooser<Command> m_auto_chooser = AutoBuilder.buildAutoChooser();
+  public static SendableChooser<Command> auto_chooser = AutoBuilder.buildAutoChooser();
 
   public RobotContainer() {
 
     // NAMED COMMANDS FOR AUTO \\
     // you would never do this while following a path, its just to show how to implement
-    NamedCommands.registerCommand("Zero Yaw", new InstantCommand(() -> m_drivebase.zeroGyroscope()));
+    NamedCommands.registerCommand("Zero Yaw", new InstantCommand(() -> m_driveBase.zeroGyroscope()));
 
     // SET AUTO CHOOSER PLAYS \\
 
-    mainTab.add("Auto Picker", m_auto_chooser)
+    mainTab.add("Auto Picker", auto_chooser)
       .withPosition(0, 0)
       .withSize(2, 1);
 
     // CONFIGURE DEFAULT COMMANDS \\
-    m_drivebase.setDefaultCommand(new TeleopSwerve(
-      m_drivebase, 
-      m_driverController, 
+    m_driveBase.setDefaultCommand(new TeleopSwerve(
+      m_driveBase, 
+      driverController, 
       translationAxis, 
       strafeAxis, 
       rotationAxis, 
@@ -84,28 +85,28 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     // XBOX 0
-    m_driverController.leftBumper().onTrue(new TeleopSwerve(
-      m_drivebase, 
-      m_driverController,
+    driverController.leftBumper().onTrue(new TeleopSwerve(
+      m_driveBase, 
+      driverController,
       translationAxis, 
       strafeAxis, 
       rotationAxis, 
       true,  
       SLOW_SPEED));
 
-    m_driverController.leftBumper().onFalse(new TeleopSwerve(
-      m_drivebase, 
-      m_driverController, 
+    driverController.leftBumper().onFalse(new TeleopSwerve(
+      m_driveBase, 
+      driverController, 
       translationAxis, 
       strafeAxis, 
       rotationAxis, 
       true, 
       REGULAR_SPEED));
 
-    m_driverController.back().onTrue(new InstantCommand(() -> m_drivebase.zeroGyroscope()));
+    driverController.back().onTrue(new InstantCommand(() -> m_driveBase.zeroGyroscope()));
 
     // Example of an automatic path generated to score in the B2 zone
-    m_driverController.a().onTrue(AutoBuilder.pathfindToPose(
+    driverController.a().onTrue(AutoBuilder.pathfindToPose(
       new Pose2d(1.8252, 2.779, Rotation2d.fromDegrees(180)),
       new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
       0.0,
@@ -113,16 +114,18 @@ public class RobotContainer {
     ));
 
     // Example of an automatic path generated to pick up from the human player
-    m_driverController.b().onTrue(AutoBuilder.pathfindToPose(
+    driverController.b().onTrue(AutoBuilder.pathfindToPose(
       new Pose2d(16.06056, 6.270, Rotation2d.fromDegrees(0)),
       new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
       0.0,
       0.0
     ));
+
+    driverController.x().onTrue(new TurnToAngle(m_driveBase, 90));
   
   }
 
   public Command getAutonomousCommand() {
-    return m_auto_chooser.getSelected();
+    return auto_chooser.getSelected();
   }
 }

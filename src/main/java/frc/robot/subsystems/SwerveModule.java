@@ -223,6 +223,7 @@ public class SwerveModule extends SubsystemBase {
       m_moduleAngleWidget.getEntry().setDouble(getHeadingDegrees());
       m_moduleSpeedWidget.getEntry().setDouble(Units.metersToFeet(getDriveMetersPerSecond()));
     }
+
   }
 
   private void simUpdateDrivePosition(SwerveModuleState state) {
