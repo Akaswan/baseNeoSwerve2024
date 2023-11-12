@@ -14,10 +14,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-
+import frc.robot.StateMachine.ArmState;
 import frc.robot.commands.SwerveDrivebase.TeleopSwerve;
 import frc.robot.commands.SwerveDrivebase.TurnToAngle;
 import frc.robot.subsystems.APTag;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 
 import static frc.robot.utilities.Constants.*;
@@ -53,6 +54,7 @@ public class RobotContainer {
   // SUBSYSTEMS \\
   public static final SwerveDrive m_driveBase = new SwerveDrive(FRONT_LEFT_MODULE, FRONT_RIGHT_MODULE, BACK_LEFT_MODULE, BACK_RIGHT_MODULE);
   public static final APTag m_apTag = new APTag();
+  public static final Arm m_arm = new Arm(ArmState.IN);
 
   // SENDABLE CHOOSER \\
   public static SendableChooser<Command> auto_chooser = AutoBuilder.buildAutoChooser();
@@ -105,23 +107,26 @@ public class RobotContainer {
 
     driverController.back().onTrue(new InstantCommand(() -> m_driveBase.zeroGyroscope()));
 
-    // Example of an automatic path generated to score in the B2 zone
-    driverController.a().onTrue(AutoBuilder.pathfindToPose(
-      new Pose2d(1.8252, 2.779, Rotation2d.fromDegrees(180)),
-      new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
-      0.0,
-      0.0
-    ));
+    // // Example of an automatic path generated to score in the B2 zone
+    // driverController.a().onTrue(AutoBuilder.pathfindToPose(
+    //   new Pose2d(1.8252, 2.779, Rotation2d.fromDegrees(180)),
+    //   new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
+    //   0.0,
+    //   0.0
+    // ));
 
-    // Example of an automatic path generated to pick up from the human player
-    driverController.b().onTrue(AutoBuilder.pathfindToPose(
-      new Pose2d(16.06056, 6.270, Rotation2d.fromDegrees(0)),
-      new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
-      0.0,
-      0.0
-    ));
+    // // Example of an automatic path generated to pick up from the human player
+    // driverController.b().onTrue(AutoBuilder.pathfindToPose(
+    //   new Pose2d(16.06056, 6.270, Rotation2d.fromDegrees(0)),
+    //   new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
+    //   0.0,
+    //   0.0
+    // ));
 
-    driverController.x().onTrue(new TurnToAngle(m_driveBase, 30));
+    // driverController.x().onTrue(new TurnToAngle(m_driveBase, 30));
+
+    driverController.a().onTrue(new InstantCommand(() -> m_arm.setState(ArmState.IN)));
+    driverController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmState.OUT)));
   
   }
 
