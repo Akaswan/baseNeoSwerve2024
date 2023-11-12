@@ -121,7 +121,7 @@ public class RobotContainer {
       0.0
     ));
 
-    driverController.x().onTrue(new TurnToAngle(m_driveBase, 90));
+    driverController.x().onTrue(new TurnToAngle(m_driveBase, 30));
   
   }
 

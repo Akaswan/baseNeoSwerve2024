@@ -16,6 +16,14 @@ public class TurnToAngle extends Command {
   private double m_targetAngle;
   private double deadBand = .5;
 
+    /**
+     * <h3>TurnToAngle</h3>
+     * 
+     * Turns to a specified angle using a pid controller
+     * 
+     * @param m_drivebase        The swerve drive that moves the robot
+     * @param targetAngle        Target angle to turn to  
+     */
   public TurnToAngle(SwerveDrive drivebase, double targetAngle) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_driveBase = drivebase;
