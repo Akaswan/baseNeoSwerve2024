@@ -105,28 +105,30 @@ public class RobotContainer {
       true, 
       REGULAR_SPEED));
 
-    driverController.back().onTrue(new InstantCommand(() -> m_driveBase.zeroGyroscope()));
+    driverController.back().onTrue(new InstantCommand(m_driveBase::zeroGyroscope));
 
-    // // Example of an automatic path generated to score in the B2 zone
-    // driverController.a().onTrue(AutoBuilder.pathfindToPose(
-    //   new Pose2d(1.8252, 2.779, Rotation2d.fromDegrees(180)),
-    //   new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
-    //   0.0,
-    //   0.0
-    // ));
+    // Example of an automatic path generated to score in the B2 zone
+    driverController.a().onTrue(AutoBuilder.pathfindToPose(
+      new Pose2d(1.8252, 2.779, Rotation2d.fromDegrees(180)),
+      new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
+      0.0,
+      0.0
+    ));
 
-    // // Example of an automatic path generated to pick up from the human player
-    // driverController.b().onTrue(AutoBuilder.pathfindToPose(
-    //   new Pose2d(16.06056, 6.270, Rotation2d.fromDegrees(0)),
-    //   new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
-    //   0.0,
-    //   0.0
-    // ));
+    // Example of an automatic path generated to pick up from the human player
+    driverController.b().onTrue(AutoBuilder.pathfindToPose(
+      new Pose2d(16.06056, 6.270, Rotation2d.fromDegrees(0)),
+      new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
+      0.0,
+      0.0
+    ));
 
-    // driverController.x().onTrue(new TurnToAngle(m_driveBase, 30));
+    driverController.x().onTrue(new TurnToAngle(m_driveBase, 30));
 
-    driverController.a().onTrue(new InstantCommand(() -> m_arm.setState(ArmState.IN)));
-    driverController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmState.OUT)));
+    // driverController.a().onTrue(new InstantCommand(() -> m_arm.setState(ArmState.IN)));
+    // driverController.x().onTrue(new InstantCommand(() -> m_arm.setState(ArmState.LOW)));
+    // driverController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmState.MEDIUM)));
+    // driverController.y().onTrue(new InstantCommand(() -> m_arm.setState(ArmState.HIGH)));
   
   }
 

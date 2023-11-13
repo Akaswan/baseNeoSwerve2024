@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.SPI;
 import frc.robot.RobotContainer;
 import frc.robot.NavX.*;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -60,8 +61,6 @@ public class SwerveDrive extends SubsystemBase {
   public static PIDController dummyDriveController = new PIDController(0, 0, 0);
   public static PIDController dummyTurnController = new PIDController(0, 0, 0);
 
-  private SwerveDriveOdometry m_odometry;
-
   private static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0; // Last year 11.5?
   private static final boolean invertGyro = false;
 
@@ -72,6 +71,8 @@ public class SwerveDrive extends SubsystemBase {
   private SwerveModule[] m_SwerveMods;
 
   private ChassisSpeeds robotRelativeChassisSpeeds;
+
+  private SwerveDrivePoseEstimator poseEstimator;
   
   
 
@@ -103,11 +104,11 @@ public class SwerveDrive extends SubsystemBase {
         Timer.delay(1.0);
         resetAngleToAbsolute();
         
-        m_odometry = new SwerveDriveOdometry(
-                kDriveKinematics,
-                getYaw(),
-                getModulePositions(),
-                new Pose2d());
+        poseEstimator = new SwerveDrivePoseEstimator(
+          kDriveKinematics, 
+          getYaw(), 
+          getModulePositions(), 
+          new Pose2d());
     
         m_navx.zeroYaw();
         m_simYaw = 0;
@@ -135,7 +136,7 @@ public class SwerveDrive extends SubsystemBase {
 
         AutoBuilder.configureHolonomic(
           this::getPoseMeters, // Robot pose supplier
-          this::updateOdometryWithPose, // Method to reset odometry (will be called if your auto has a starting pose)
+          this::updateEstimatorWithPose, // Method to reset odometry (will be called if your auto has a starting pose)
           this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
           this::autoDrive, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
           new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
@@ -191,7 +192,7 @@ public class SwerveDrive extends SubsystemBase {
   } 
 
   public Pose2d getPoseMeters() {
-    return m_odometry.getPoseMeters();
+    return poseEstimator.getEstimatedPosition();
   }
 
   public SwerveModule getSwerveModule(int moduleNumber) {
@@ -216,12 +217,8 @@ public class SwerveDrive extends SubsystemBase {
     };
   }
 
-  public void updateOdometry() {
-    m_odometry.update(getYaw(), getModulePositions());
-  }
-
-  public void updateOdometryWithPose(Pose2d initialPose) {
-    m_odometry.resetPosition(getYaw(), getModulePositions(), initialPose);
+  public void updateEstimatorWithPose(Pose2d updatedPose) {
+    poseEstimator.resetPosition(getYaw(), getModulePositions(), updatedPose);
   }
 
   public static SwerveDriveKinematics getSwerveKinematics() {
@@ -293,7 +290,12 @@ public class SwerveDrive extends SubsystemBase {
 
   @Override
   public void periodic() {
-    updateOdometry();
+    poseEstimator.update(getYaw(), getModulePositions());
+
+    if (RobotBase.isReal() && poseEstimator.getEstimatedPosition().getTranslation().getDistance(RobotContainer.m_apTag.getPose2d().getTranslation()) <= 1.0) {
+      poseEstimator.addVisionMeasurement(RobotContainer.m_apTag.getPose2d(), Timer.getFPGATimestamp());
+    }
+
     if (TUNING) {
       driveRampRateTuning = driveRampRateEntry.getDouble(0);
     }
@@ -303,7 +305,7 @@ public class SwerveDrive extends SubsystemBase {
     }
     
 
-    m_field.setRobotPose(m_odometry.getPoseMeters());
+    m_field.setRobotPose(poseEstimator.getEstimatedPosition());
 
     SmartDashboard.putNumber("New Angle", getAdjustedYawDegrees(90));
   }
