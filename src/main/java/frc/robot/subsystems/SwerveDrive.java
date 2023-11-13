@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
 import frc.robot.RobotContainer;
 import frc.robot.NavX.*;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -108,7 +109,9 @@ public class SwerveDrive extends SubsystemBase {
           kDriveKinematics, 
           getYaw(), 
           getModulePositions(), 
-          new Pose2d());
+          new Pose2d(),
+          VecBuilder.fill(0.1, 0.1, 0.1),
+          VecBuilder.fill(0.9, 0.9, 0.9));
     
         m_navx.zeroYaw();
         m_simYaw = 0;
