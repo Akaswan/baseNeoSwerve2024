@@ -296,7 +296,7 @@ public class SwerveDrive extends SubsystemBase {
     poseEstimator.update(getYaw(), getModulePositions());
 
     if (RobotBase.isReal() && poseEstimator.getEstimatedPosition().getTranslation().getDistance(RobotContainer.m_apTag.getPose2d().getTranslation()) <= 1.0) {
-      poseEstimator.addVisionMeasurement(RobotContainer.m_apTag.getPose2d(), Timer.getFPGATimestamp());
+      poseEstimator.addVisionMeasurement(RobotContainer.m_apTag.getPose2d(), Timer.getFPGATimestamp() - (RobotContainer.m_apTag.getBotPose()[6] / 1000.0));
     }
 
     if (TUNING) {
