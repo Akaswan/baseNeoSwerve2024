@@ -15,10 +15,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.StateMachine.MechStateMachine;
-import frc.robot.StateMachine.MechStates.ArmState;
 import frc.robot.StateMachine.MechStates.MechState;
+import frc.robot.StateMachine.MechStates.ShoulderState;
 
-public class Arm extends SubsystemBase implements MechStateMachine{
+public class Shoulder extends SubsystemBase implements MechStateMachine{
   /** Creates a new Arm. */
   private StateMachineInputs inputs = new StateMachineInputs();
   private Map<MechState, Runnable> stateMap;
@@ -29,7 +29,7 @@ public class Arm extends SubsystemBase implements MechStateMachine{
 
   private double intendedPosition;
 
-  public Arm(ArmState defaultState) {
+  public Shoulder(ShoulderState defaultState) {
     inputs.state = defaultState;
     inputs.previousState = inputs.state;
 
@@ -53,10 +53,12 @@ public class Arm extends SubsystemBase implements MechStateMachine{
   public void initializeStateMap() {
     stateMap = new HashMap<>();
 
-    stateMap.put(ArmState.IN, () -> intendedPosition = ArmState.IN.getPosition());
-    stateMap.put(ArmState.LOW, () -> intendedPosition = ArmState.LOW.getPosition());
-    stateMap.put(ArmState.MID, () -> intendedPosition = ArmState.MID.getPosition());
-    stateMap.put(ArmState.HIGH, () -> intendedPosition = ArmState.HIGH.getPosition());
+    stateMap.put(ShoulderState.IN, () -> intendedPosition = 0);
+    stateMap.put(ShoulderState.LOW, () -> intendedPosition = 10);
+    stateMap.put(ShoulderState.MID_CONE, () -> intendedPosition = 20);
+    stateMap.put(ShoulderState.MID_CUBE, () -> intendedPosition = 15);
+    stateMap.put(ShoulderState.HIGH_CONE, () -> intendedPosition = 30);
+    stateMap.put(ShoulderState.HIGH_CUBE, () -> intendedPosition = 25);
   }
 
   @Override
