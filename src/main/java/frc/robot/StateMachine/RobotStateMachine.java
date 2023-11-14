@@ -55,7 +55,6 @@ public class RobotStateMachine extends SubsystemBase {
     SequentialCommandGroup group = new SequentialCommandGroup();
 
     if (m_previousState != m_state) {
-      handleStateAction();
       for (int i : order) {
         group.addCommands(new SetMechState(m_mechStateMachines[i], m_mechStateMachines[i].getState()));
       }
@@ -63,6 +62,7 @@ public class RobotStateMachine extends SubsystemBase {
   }
 
   public SequentialCommandGroup setRobotState(RobotState state) {
+    System.out.println("Penisdhauosdhlasjkdhajksdh");
     m_previousState = m_state;
     m_state = state;
 
@@ -70,9 +70,11 @@ public class RobotStateMachine extends SubsystemBase {
 
     if (m_previousState != m_state) {
       for (MechStateMachine mech : m_mechStateMachines) {
-        group.addCommands(new SetMechState(mech, mech.getState()));
+        group.addCommands(new SetMechState(mech, mech.getType() == StateMachineTypes.ARM ? getState().getArmState() : getState().getShoulderState()));
       }
     }
+
+    
     return group;
   }
 

@@ -15,6 +15,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.StateMachine.MechStateMachine;
+import frc.robot.StateMachine.StateMachineTypes;
 import frc.robot.StateMachine.MechStates.ArmState;
 import frc.robot.StateMachine.MechStates.MechState;
 
@@ -27,6 +28,10 @@ public class Arm extends SubsystemBase implements MechStateMachine{
   private ProfiledPIDController armPID;
   private RelativeEncoder armEncoder;
 
+  private double simPosition;
+
+  
+
   private double intendedPosition;
 
   public Arm(ArmState defaultState) {
@@ -38,7 +43,7 @@ public class Arm extends SubsystemBase implements MechStateMachine{
     armMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
     armMotor.setSmartCurrentLimit(60, 35);
 
-    armPID = new ProfiledPIDController(.1, 0, 0, new TrapezoidProfile.Constraints(1, 1));
+    armPID = new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(1, 1));
     armPID.setTolerance(.1);
 
     armEncoder = armMotor.getEncoder();
@@ -69,9 +74,9 @@ public class Arm extends SubsystemBase implements MechStateMachine{
     inputs.previousState = inputs.state;
     inputs.state = state;
 
-    // if (inputs.previousState != inputs.state) {
-    //   handleStateAction();
-    // }
+    if (inputs.previousState != inputs.state) {
+      handleStateAction();
+    }
   }
 
   @Override
@@ -91,13 +96,22 @@ public class Arm extends SubsystemBase implements MechStateMachine{
 
   @Override
   public boolean atSetPoint() {
-    return Math.abs(getPosition() - intendedPosition) <= .1;
+    // return Math.abs(getPosition() - intendedPosition) <= .1;
+    return Math.abs(simPosition - intendedPosition) <= .1;
+  }
+
+  @Override
+  public StateMachineTypes getType() {
+    return StateMachineTypes.ARM;
   }
 
   @Override
   public void periodic() {
-    armMotor.set(armPID.calculate(armEncoder.getPosition(), intendedPosition));
+    // armMotor.set(armPID.calculate(armEncoder.getPosition(), intendedPosition));
 
-    SmartDashboard.putNumber("Intended Position", intendedPosition);
+    simPosition += armPID.calculate(simPosition, intendedPosition);
+
+    SmartDashboard.putNumber("Arm Intended Position", intendedPosition);
+    SmartDashboard.putNumber("Arm Sim Position", simPosition);
   }
 }

@@ -19,6 +19,8 @@ public interface MechStateMachine {
 
     boolean atSetPoint();
 
+    StateMachineTypes getType();
+
     class StateMachineInputs {
         public MechState state;
         public MechState previousState;

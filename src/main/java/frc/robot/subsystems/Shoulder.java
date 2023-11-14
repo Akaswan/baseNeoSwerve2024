@@ -15,6 +15,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.StateMachine.MechStateMachine;
+import frc.robot.StateMachine.StateMachineTypes;
 import frc.robot.StateMachine.MechStates.MechState;
 import frc.robot.StateMachine.MechStates.ShoulderState;
 
@@ -23,9 +24,11 @@ public class Shoulder extends SubsystemBase implements MechStateMachine{
   private StateMachineInputs inputs = new StateMachineInputs();
   private Map<MechState, Runnable> stateMap;
 
-  private CANSparkMax armMotor;
-  private ProfiledPIDController armPID;
-  private RelativeEncoder armEncoder;
+  private CANSparkMax shoulderMotor;
+  private ProfiledPIDController shoulderPID;
+  private RelativeEncoder shoulderEncoder;
+
+  private double simPosition;
 
   private double intendedPosition;
 
@@ -33,18 +36,18 @@ public class Shoulder extends SubsystemBase implements MechStateMachine{
     inputs.state = defaultState;
     inputs.previousState = inputs.state;
 
-    armMotor = new CANSparkMax(0, CANSparkMax.MotorType.kBrushless);
-    armMotor.restoreFactoryDefaults();
-    armMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-    armMotor.setSmartCurrentLimit(60, 35);
+    shoulderMotor = new CANSparkMax(1, CANSparkMax.MotorType.kBrushless);
+    shoulderMotor.restoreFactoryDefaults();
+    shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    shoulderMotor.setSmartCurrentLimit(60, 35);
 
-    armPID = new ProfiledPIDController(.1, 0, 0, new TrapezoidProfile.Constraints(1, 1));
-    armPID.setTolerance(.1);
+    shoulderPID = new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(1, 1));
+    shoulderPID.setTolerance(.1);
 
-    armEncoder = armMotor.getEncoder();
-    armEncoder.setPosition(0);
+    shoulderEncoder = shoulderMotor.getEncoder();
+    shoulderEncoder.setPosition(0);
 
-    intendedPosition = armEncoder.getPosition();
+    intendedPosition = shoulderEncoder.getPosition();
 
     initializeStateMap();
   }
@@ -71,9 +74,9 @@ public class Shoulder extends SubsystemBase implements MechStateMachine{
     inputs.previousState = inputs.state;
     inputs.state = state;
 
-    // if (inputs.previousState != inputs.state) {
-    //   handleStateAction();
-    // }
+    if (inputs.previousState != inputs.state) {
+      handleStateAction();
+    }
   }
 
   @Override
@@ -88,18 +91,27 @@ public class Shoulder extends SubsystemBase implements MechStateMachine{
 
   @Override
   public double getPosition() {
-    return armEncoder.getPosition();
+    return shoulderEncoder.getPosition();
   }
 
   @Override
   public boolean atSetPoint() {
-    return Math.abs(getPosition() - intendedPosition) <= .1;
+    // return Math.abs(getPosition() - intendedPosition) <= .1;
+    return Math.abs(simPosition - intendedPosition) <= .1;
+  }
+
+  @Override
+  public StateMachineTypes getType() {
+    return StateMachineTypes.SHOULDER;
   }
 
   @Override
   public void periodic() {
-    armMotor.set(armPID.calculate(armEncoder.getPosition(), intendedPosition));
+    // shoulderMotor.set(shoulderPID.calculate(shoulderEncoder.getPosition(), intendedPosition));
 
-    SmartDashboard.putNumber("Intended Position", intendedPosition);
+    simPosition += shoulderPID.calculate(simPosition, intendedPosition);
+
+    SmartDashboard.putNumber("Shoulder Intended Position", intendedPosition);
+    SmartDashboard.putNumber("Shoulder Sim Position", simPosition);
   }
 }
