@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotContainer;
 import frc.robot.StateMachine.MechStateMachine;
 import frc.robot.StateMachine.MechStates.MechState;
 
@@ -18,6 +19,8 @@ public class SetMechState extends Command {
   public SetMechState(MechStateMachine stateMachine, MechState state) {
     m_stateMachine = stateMachine;
     m_state = state;
+
+    addRequirements(RobotContainer.m_shoulder, RobotContainer.m_arm);
   }
 
   // Called when the command is initially scheduled.

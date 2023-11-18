@@ -54,6 +54,10 @@ public class Arm extends SubsystemBase implements MechStateMachine{
     initializeStateMap();
   }
 
+  public double getSimPos() {
+    return simPosition;
+  }
+
   @Override
   public void initializeStateMap() {
     stateMap = new HashMap<>();

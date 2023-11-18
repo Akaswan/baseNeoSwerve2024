@@ -8,6 +8,7 @@ import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.StateMachine.RobotState;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -31,6 +32,9 @@ public class Robot extends TimedRobot {
 
     for (int port = 5800; port <= 5807; port++) {
       PortForwarder.add(port, "limelight.local", port);
+    
+    RobotContainer.m_machine.setRobotState(RobotState.IN);
+    RobotContainer.m_machine.setRobotState(RobotState.IN);
   }
   }
 
@@ -74,7 +78,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    
+
+    // RobotContainer.m_driveBase.updateEstimatorWithPose(new Pose2d(3.88, 2.13, new Rotation2d(Math.toRadians(180))));
   }
 
   /** This function is called periodically during operator control. */

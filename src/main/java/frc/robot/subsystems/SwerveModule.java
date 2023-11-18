@@ -23,6 +23,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.utilities.RevUtils;
@@ -231,5 +232,7 @@ public class SwerveModule extends SubsystemBase {
     double distancePer20Ms = m_simDriveEncoderVelocity / 50.0;
 
     m_simDriveEncoderPosition += distancePer20Ms;
+
+    SmartDashboard.putNumber("Module encoder pos" + m_moduleNumber, m_simDriveEncoderPosition);
   }
 }

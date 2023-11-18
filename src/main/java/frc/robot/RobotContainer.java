@@ -4,28 +4,19 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.StateMachine.MechStateMachine;
 import frc.robot.StateMachine.RobotState;
 import frc.robot.StateMachine.RobotStateMachine;
 import frc.robot.StateMachine.MechStates.ArmState;
 import frc.robot.StateMachine.MechStates.ShoulderState;
-import frc.robot.commands.SetMechState;
 import frc.robot.commands.SwerveDrivebase.TeleopSwerve;
-import frc.robot.commands.SwerveDrivebase.TurnToAngle;
 import frc.robot.subsystems.APTag;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Shoulder;
@@ -35,7 +26,6 @@ import static frc.robot.utilities.Constants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathConstraints;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -140,9 +130,6 @@ public class RobotContainer {
 
     // driverController.x().onTrue(new TurnToAngle(m_driveBase, 30));
 
-    // driverController.a().onTrue(m_machine.setRobotState(RobotState.IN));
-    // driverController.x().onTrue(m_machine.setRobotState(RobotState.LOW));
-
 
     // driverController.b().onTrue(new SetMechState(m_arm, ArmState.MID));
     // driverController.y().onTrue(new SetMechState(m_arm, ArmState.HIGH));
@@ -157,12 +144,16 @@ public class RobotContainer {
 
   public void periodic() {
     if (testcontroller.getAButtonPressed()) {
-      m_machine.setRobotState(RobotState.IN).schedule();
-      System.out.println("ASKJDHKLSJADHJASHD");
+      m_machine.setRobotState(RobotState.IN, new int[]{1, 0}).schedule();
     }
     if (testcontroller.getXButtonPressed()) {
       m_machine.setRobotState(RobotState.LOW).schedule();
-      System.out.println("ASKJDHKLSJADHJASHD");
+    }
+    if (testcontroller.getBButtonPressed()) {
+      m_machine.setRobotState(RobotState.MID_CUBE).schedule();
+    }
+    if (testcontroller.getYButtonPressed()) {
+      m_machine.setRobotState(RobotState.MID_CONE).schedule();
     }
   }
 }

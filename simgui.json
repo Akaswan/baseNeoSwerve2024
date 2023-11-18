@@ -90,6 +90,11 @@
           "width": 0.8999999761581421
         },
         "width": 16.799999237060547
+      },
+      "/SmartDashboard/Mech2d": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
