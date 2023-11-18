@@ -2,6 +2,7 @@ package frc.robot.commands.SwerveDrivebase;
 
 import frc.robot.subsystems.SwerveDrive;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -59,9 +60,18 @@ public class TeleopSwerve extends Command {
         double rAxis;
         double m_rotation;
 
-        double yAxis = -m_controller.getHID().getRawAxis(m_translationAxis);
-        double xAxis = -m_controller.getHID().getRawAxis(m_strafeAxis);
-            rAxis = -m_controller.getHID().getRawAxis(m_rotationAxis);
+        double xAxis;
+        double yAxis;
+
+        // if (RobotBase.isReal()) {
+        yAxis = -m_controller.getHID().getRawAxis(m_translationAxis);
+        xAxis = -m_controller.getHID().getRawAxis(m_strafeAxis);
+        // } else {
+        //     xAxis = -m_controller.getHID().getRawAxis(m_translationAxis);
+        //     yAxis = m_controller.getHID().getRawAxis(m_strafeAxis);
+        // }
+
+        rAxis = -m_controller.getHID().getRawAxis(m_rotationAxis);
 
         // Applies a deadband to the values
         yAxis = MathUtil.applyDeadband(yAxis, STICK_DEAD_BAND);

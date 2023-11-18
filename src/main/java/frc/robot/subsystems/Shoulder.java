@@ -56,12 +56,12 @@ public class Shoulder extends SubsystemBase implements MechStateMachine{
   public void initializeStateMap() {
     stateMap = new HashMap<>();
 
-    stateMap.put(ShoulderState.IN, () -> intendedPosition = 0);
-    stateMap.put(ShoulderState.LOW, () -> intendedPosition = 10);
-    stateMap.put(ShoulderState.MID_CONE, () -> intendedPosition = 20);
-    stateMap.put(ShoulderState.MID_CUBE, () -> intendedPosition = 15);
-    stateMap.put(ShoulderState.HIGH_CONE, () -> intendedPosition = 30);
-    stateMap.put(ShoulderState.HIGH_CUBE, () -> intendedPosition = 25);
+    stateMap.put(ShoulderState.IN, () -> intendedPosition = ShoulderState.IN.getPosition());
+    stateMap.put(ShoulderState.LOW, () -> intendedPosition = ShoulderState.LOW.getPosition());
+    stateMap.put(ShoulderState.MID_CONE, () -> intendedPosition = ShoulderState.MID_CONE.getPosition());
+    stateMap.put(ShoulderState.MID_CUBE, () -> intendedPosition = ShoulderState.MID_CUBE.getPosition());
+    stateMap.put(ShoulderState.HIGH_CONE, () -> intendedPosition = ShoulderState.HIGH_CONE.getPosition());
+    stateMap.put(ShoulderState.HIGH_CUBE, () -> intendedPosition = ShoulderState.HIGH_CUBE.getPosition());
   }
 
   @Override

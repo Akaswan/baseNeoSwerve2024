@@ -2,11 +2,11 @@ package frc.robot.StateMachine.MechStates;
 
 public enum ShoulderState implements MechState{
     IN(0),
-    LOW(10),
-    MID_CUBE(20),
-    MID_CONE(30),
-    HIGH_CUBE(40),
-    HIGH_CONE(50);
+    LOW(3),
+    MID_CUBE(6),
+    MID_CONE(9),
+    HIGH_CUBE(12),
+    HIGH_CONE(15);
 
     private final int position;
 

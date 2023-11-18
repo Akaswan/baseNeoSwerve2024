@@ -4,9 +4,12 @@
 
 package frc.robot.StateMachine;
 
+import java.sql.Driver;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
@@ -23,48 +26,52 @@ public class RobotStateMachine extends SubsystemBase {
   private RobotState m_previousState;
   private RobotState m_state;
 
-  public RobotStateMachine(MechStateMachine[] mechStateMachines, RobotState defaultState) {
+  public RobotStateMachine(MechStateMachine[] mechStateMachines, RobotState initialState) {
     m_mechStateMachines = mechStateMachines;
-    m_state = defaultState;
-    m_previousState = m_state;
+    m_state = initialState;
+    m_previousState = initialState;
 
-    initializeStateMap();
+    // initializeStateMap();
   }
 
-  public void initializeStateMap() {
-    stateMap = new HashMap<>();
+  // public void initializeStateMap() {
+  //   stateMap = new HashMap<>();
 
-    stateMap.put(RobotState.IN, () -> {m_mechStateMachines[0].setState(ShoulderState.IN); m_mechStateMachines[1].setState(ArmState.IN);});
-    stateMap.put(RobotState.LOW, () -> {m_mechStateMachines[0].setState(ShoulderState.LOW); m_mechStateMachines[1].setState(ArmState.LOW);});
-    // stateMap.put(RobotState.MID_CONE, () -> intendedPosition = ArmState.MID.getPosition());
-    // stateMap.put(RobotState.HIGH_CONE, () -> intendedPosition = ArmState.HIGH.getPosition());
-  }
+  //   stateMap.put(RobotState.IN, () -> {m_mechStateMachines[0].setState(ShoulderState.IN); m_mechStateMachines[1].setState(ArmState.IN);});
+  //   stateMap.put(RobotState.LOW, () -> {m_mechStateMachines[0].setState(ShoulderState.LOW); m_mechStateMachines[1].setState(ArmState.LOW);});
+  //   // stateMap.put(RobotState.MID_CONE, () -> intendedPosition = ArmState.MID.getPosition());
+  //   // stateMap.put(RobotState.HIGH_CONE, () -> intendedPosition = ArmState.HIGH.getPosition());
+  // }
 
-  public void handleStateAction() {
-    stateMap.get(getState()).run();
-  }
+  // public void handleStateAction() {
+  //   stateMap.get(getState()).run();
+  // }
 
   public RobotState getState() {
     return m_state;
   }
 
-  public void setRobotState(RobotState state, int[] order) {
-    m_previousState = m_state;
-    m_state = state;
+  // public void setRobotState(RobotState state, int[] order) {
+  //   m_previousState = m_state;
+  //   m_state = state;
 
-    SequentialCommandGroup group = new SequentialCommandGroup();
+  //   SequentialCommandGroup group = new SequentialCommandGroup();
 
-    if (m_previousState != m_state) {
-      for (int i : order) {
-        group.addCommands(new SetMechState(m_mechStateMachines[i], m_mechStateMachines[i].getState()));
-      }
-    }
-  }
+  //   if (m_previousState != m_state) {
+  //     for (int i : order) {
+  //       group.addCommands(new SetMechState(m_mechStateMachines[i], m_mechStateMachines[i].getState()));
+  //     }
+  //   }
+  // }
 
   public SequentialCommandGroup setRobotState(RobotState state) {
-    System.out.println("Penisdhauosdhlasjkdhajksdh");
-    m_previousState = m_state;
-    m_state = state;
+
+    if (DriverStation.isEnabled()) {
+      m_previousState = m_state;
+      m_state = state;
+    }
+
+
 
     SequentialCommandGroup group = new SequentialCommandGroup();
 
@@ -80,6 +87,12 @@ public class RobotStateMachine extends SubsystemBase {
 
   @Override
   public void periodic() {
-    
+    // System.out.println(m_previousState.getStringState() + " " + m_state.getStringState());
+    SmartDashboard.putString("Previous Robot State", m_previousState.getStringState());
+    SmartDashboard.putString("Robot State", m_state.getStringState());
+
+    if (DriverStation.isEnabled()) {
+      System.out.println("ASKDHKLASJDHLASJDHKLJA");
+    }
   }
 }

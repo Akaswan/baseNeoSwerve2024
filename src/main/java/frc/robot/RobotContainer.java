@@ -7,7 +7,9 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -15,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.StateMachine.MechStateMachine;
 import frc.robot.StateMachine.RobotState;
 import frc.robot.StateMachine.RobotStateMachine;
@@ -51,7 +54,8 @@ public class RobotContainer {
   public static final int DriverControllerPort = 0;
 
   // CONTROLLERS \\
-  CommandXboxController driverController = new CommandXboxController(DriverControllerPort);
+  CommandXboxController driverController = new CommandXboxController(0);
+  XboxController testcontroller = new XboxController(0);
 
   // SHUFFLEBOARD TABS \\
   public static ShuffleboardTab mainTab = Shuffleboard.getTab("Main");
@@ -136,10 +140,12 @@ public class RobotContainer {
 
     // driverController.x().onTrue(new TurnToAngle(m_driveBase, 30));
 
-    driverController.a().onTrue(m_machine.setRobotState(RobotState.IN));
-    driverController.x().onTrue(m_machine.setRobotState(RobotState.LOW));
-    driverController.b().onTrue(new SetMechState(m_arm, ArmState.MID));
-    driverController.y().onTrue(new SetMechState(m_arm, ArmState.HIGH));
+    // driverController.a().onTrue(m_machine.setRobotState(RobotState.IN));
+    // driverController.x().onTrue(m_machine.setRobotState(RobotState.LOW));
+
+
+    // driverController.b().onTrue(new SetMechState(m_arm, ArmState.MID));
+    // driverController.y().onTrue(new SetMechState(m_arm, ArmState.HIGH));
 
     // driverController.y().onTrue(new SequentialCommandGroup(null));
   
@@ -147,5 +153,16 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return auto_chooser.getSelected();
+  }
+
+  public void periodic() {
+    if (testcontroller.getAButtonPressed()) {
+      m_machine.setRobotState(RobotState.IN).schedule();
+      System.out.println("ASKJDHKLSJADHJASHD");
+    }
+    if (testcontroller.getXButtonPressed()) {
+      m_machine.setRobotState(RobotState.LOW).schedule();
+      System.out.println("ASKJDHKLSJADHJASHD");
+    }
   }
 }
