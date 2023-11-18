@@ -16,6 +16,7 @@ import frc.robot.StateMachine.RobotState;
 import frc.robot.StateMachine.RobotStateMachine;
 import frc.robot.StateMachine.MechStates.ArmState;
 import frc.robot.StateMachine.MechStates.ShoulderState;
+import frc.robot.commands.ManualShoulderControl;
 import frc.robot.commands.SwerveDrivebase.TeleopSwerve;
 import frc.robot.subsystems.APTag;
 import frc.robot.subsystems.Arm;
@@ -86,6 +87,8 @@ public class RobotContainer {
       true, 
       REGULAR_SPEED));
 
+    m_shoulder.setDefaultCommand(new ManualShoulderControl(m_shoulder, driverController, .75));
+
     configureButtonBindings();
   }
 
@@ -144,16 +147,16 @@ public class RobotContainer {
 
   public void periodic() {
     if (testcontroller.getAButtonPressed()) {
-      m_machine.setRobotState(RobotState.IN, new int[]{1, 0}).schedule();
+      m_machine.setRobotStateCommand(RobotState.IN).schedule();
     }
     if (testcontroller.getXButtonPressed()) {
-      m_machine.setRobotState(RobotState.LOW).schedule();
+      m_machine.setRobotStateCommand(RobotState.LOW).schedule();
     }
     if (testcontroller.getBButtonPressed()) {
-      m_machine.setRobotState(RobotState.MID_CUBE).schedule();
+      m_machine.setRobotStateCommand(RobotState.MID_CUBE).schedule();
     }
     if (testcontroller.getYButtonPressed()) {
-      m_machine.setRobotState(RobotState.MID_CONE).schedule();
+      m_machine.setRobotStateCommand(RobotState.MID_CONE).schedule();
     }
   }
 }

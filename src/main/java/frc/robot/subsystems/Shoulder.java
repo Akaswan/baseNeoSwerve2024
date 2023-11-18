@@ -16,9 +16,12 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.StateMachine.MechStateMachine;
+import frc.robot.StateMachine.RobotState;
 import frc.robot.StateMachine.StateMachineTypes;
 import frc.robot.StateMachine.MechStates.MechState;
 import frc.robot.StateMachine.MechStates.ShoulderState;
@@ -36,8 +39,9 @@ public class Shoulder extends SubsystemBase implements MechStateMachine{
 
   private double intendedPosition;
 
-  Mechanism2d mech = new Mechanism2d(3, 3);
-  MechanismRoot2d root = mech.getRoot("SuperStructure", 3, 0);
+  Mechanism2d mech = new Mechanism2d(4, 3);
+  MechanismRoot2d root = mech.getRoot("SuperStructure", 3.5, 0);
+  MechanismLigament2d structure;
   MechanismLigament2d mechShoulder;
 
   public Shoulder(ShoulderState defaultState) {
@@ -49,7 +53,7 @@ public class Shoulder extends SubsystemBase implements MechStateMachine{
     shoulderMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
     shoulderMotor.setSmartCurrentLimit(60, 35);
 
-    shoulderPID = new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(1, 1));
+    shoulderPID = new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(50, 45));
     shoulderPID.setTolerance(.1);
 
     shoulderEncoder = shoulderMotor.getEncoder();
@@ -57,7 +61,8 @@ public class Shoulder extends SubsystemBase implements MechStateMachine{
 
     intendedPosition = shoulderEncoder.getPosition();
 
-    mechShoulder = root.append(new MechanismLigament2d("shoulder", 2, 90));
+    structure = root.append(new MechanismLigament2d("structure", 1, 90, 30, new Color8Bit(Color.kPurple)));
+    mechShoulder = structure.append(new MechanismLigament2d("shoulder", 0, 0));
     
     SmartDashboard.putData("Mech2d", mech);
 
@@ -82,13 +87,22 @@ public class Shoulder extends SubsystemBase implements MechStateMachine{
   }
 
   @Override
-  public void setState(MechState state) {
+  public void setState(MechState state, boolean action) {
     inputs.previousState = inputs.state;
     inputs.state = state;
 
-    if (inputs.previousState != inputs.state) {
+    if (inputs.previousState != inputs.state && action) {
       handleStateAction();
     }
+  }
+
+  @Override
+  public void setIntendedPosition(double intendedPosition) {
+    this.intendedPosition = intendedPosition;
+  }
+
+  public void addIntendedPosition(double intendedPosition) {
+    this.intendedPosition += intendedPosition;
   }
 
   @Override
@@ -117,6 +131,10 @@ public class Shoulder extends SubsystemBase implements MechStateMachine{
     return StateMachineTypes.SHOULDER;
   }
 
+  public double getSimPos() {
+    return simPosition;
+  }
+
   @Override
   public void periodic() {
     // shoulderMotor.set(shoulderPID.calculate(shoulderEncoder.getPosition(), intendedPosition));
@@ -126,7 +144,7 @@ public class Shoulder extends SubsystemBase implements MechStateMachine{
     SmartDashboard.putNumber("Shoulder Intended Position", intendedPosition);
     SmartDashboard.putNumber("Shoulder Sim Position", simPosition);
 
-    mechShoulder.setAngle(-((simPosition * 5) + 180));
-    mechShoulder.setLength((RobotContainer.m_arm.getSimPos() / 4) + .25);
+    mechShoulder.setAngle(-((simPosition * 10) - 135));
+    mechShoulder.setLength((RobotContainer.m_arm.getSimPos() / 5) + .25);
   }
 }

@@ -7,6 +7,7 @@ package frc.robot.StateMachine;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.commands.SetMechState;
 
 public class RobotStateMachine extends SubsystemBase {
@@ -38,10 +39,17 @@ public class RobotStateMachine extends SubsystemBase {
     return m_mechStateMachines;
   }  
 
-  public SequentialCommandGroup setRobotState(RobotState state, int[] order) {
+  public SequentialCommandGroup setRobotStateCommand(RobotState state) {
     m_previousState = m_state;
     m_state = state;
+    int[] order;
 
+    if (m_state.getShoulderState().getPosition() < RobotContainer.m_shoulder.getSimPos()) {
+      order = new int[]{1, 0};
+    } else {
+      order = new int[]{0, 1};
+    }
+    
     SequentialCommandGroup group = new SequentialCommandGroup();
 
     if (m_previousState != m_state) {
@@ -53,21 +61,10 @@ public class RobotStateMachine extends SubsystemBase {
     return group;
   }
 
-  public SequentialCommandGroup setRobotState(RobotState state) {
+  public void setRobotState(RobotState state) {
     m_previousState = m_state;
     m_state = state;
-
-    SequentialCommandGroup group = new SequentialCommandGroup();
-
-    if (m_previousState != m_state) {
-      for (int i = 0; i < m_mechStateMachines.length; i++) {
-        group.addCommands(new SetMechState(m_mechStateMachines[i], getState().getMechStates()[i]));
-      }
-    }
-    
-    return group;
   }
-
 
   @Override
   public void periodic() {

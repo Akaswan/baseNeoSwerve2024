@@ -5,6 +5,7 @@ import frc.robot.StateMachine.MechStates.MechState;
 import frc.robot.StateMachine.MechStates.ShoulderState;
 
 public enum RobotState {
+    MANUAL((ShoulderState.MANUAL), (ArmState.MANUAL), ("Manual")),
     IN((ShoulderState.IN), (ArmState.IN), ("In")),
     LOW((ShoulderState.LOW), (ArmState.LOW), ("Low")),
     MID_CONE((ShoulderState.MID_CONE), (ArmState.MID), ("Mid Cone")),

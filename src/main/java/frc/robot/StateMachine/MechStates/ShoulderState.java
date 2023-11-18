@@ -1,6 +1,9 @@
 package frc.robot.StateMachine.MechStates;
 
+import frc.robot.RobotContainer;
+
 public enum ShoulderState implements MechState{
+    MANUAL(0),
     IN(0),
     LOW(3),
     MID_CUBE(6),
@@ -8,14 +11,14 @@ public enum ShoulderState implements MechState{
     HIGH_CUBE(12),
     HIGH_CONE(15);
 
-    private final int position;
+    private final double position;
 
-    ShoulderState(int position) {
+    ShoulderState(double position) {
         this.position = position;
     }
 
     @Override
-    public int getPosition() {
+    public double getPosition() {
         return position;
     }
 }
