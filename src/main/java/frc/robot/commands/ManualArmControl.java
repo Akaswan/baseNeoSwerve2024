@@ -5,32 +5,30 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.RobotContainer;
 import frc.robot.StateMachine.RobotState;
 import frc.robot.StateMachine.MechStates.ShoulderState;
-import frc.robot.subsystems.Shoulder;
+import frc.robot.subsystems.Arm;
 
-public class ManualShoulderControl extends Command {
+public class ManualArmControl extends Command {
 
-  private Shoulder m_shoulder;
-  private CommandXboxController m_controller;
+  private Arm m_arm;
   private final double STICK_DEAD_BAND = 0.1;
   public double m_axis;
 
   /** Creates a new ManualMechControl. */
-  public ManualShoulderControl(Shoulder shoulder, CommandXboxController controller) {
-    m_shoulder = shoulder;
-    m_controller = controller;
+  public ManualArmControl(Arm arm, double axis) {
+    m_arm = arm;
+    m_axis = axis;
 
-    addRequirements(m_shoulder);
+    addRequirements(m_arm);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_shoulder.setState(ShoulderState.MANUAL, false);
+    m_arm.setState(ShoulderState.MANUAL, false);
     RobotContainer.m_machine.setRobotState(RobotState.MANUAL);
     
   }
@@ -38,10 +36,8 @@ public class ManualShoulderControl extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double axis = m_controller.getRightTriggerAxis() - m_controller.getLeftTriggerAxis();
-
-    if (Math.abs(axis) > STICK_DEAD_BAND) {
-      m_shoulder.addIntendedPosition(axis);
+    if (Math.abs(m_axis) > STICK_DEAD_BAND) {
+      m_arm.addIntendedPosition(m_axis);
     }
   }
 

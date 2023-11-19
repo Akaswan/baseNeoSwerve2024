@@ -43,7 +43,7 @@ public class Arm extends SubsystemBase implements MechStateMachine{
     armMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
     armMotor.setSmartCurrentLimit(60, 35);
 
-    armPID = new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(50, 45));
+    armPID = new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(100, 95));
     armPID.setTolerance(.1);
 
     armEncoder = armMotor.getEncoder();
@@ -93,6 +93,10 @@ public class Arm extends SubsystemBase implements MechStateMachine{
   @Override
   public Map<MechState, Runnable> getStateMap() {
     return stateMap;
+  }
+
+  public void addIntendedPosition(double intendedPosition) {
+    this.intendedPosition += intendedPosition;
   }
 
   @Override

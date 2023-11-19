@@ -16,6 +16,7 @@ import frc.robot.StateMachine.RobotState;
 import frc.robot.StateMachine.RobotStateMachine;
 import frc.robot.StateMachine.MechStates.ArmState;
 import frc.robot.StateMachine.MechStates.ShoulderState;
+import frc.robot.commands.ManualArmControl;
 import frc.robot.commands.ManualShoulderControl;
 import frc.robot.commands.SwerveDrivebase.TeleopSwerve;
 import frc.robot.subsystems.APTag;
@@ -87,8 +88,6 @@ public class RobotContainer {
       true, 
       REGULAR_SPEED));
 
-    m_shoulder.setDefaultCommand(new ManualShoulderControl(m_shoulder, driverController, .75));
-
     configureButtonBindings();
   }
 
@@ -136,6 +135,11 @@ public class RobotContainer {
 
     // driverController.b().onTrue(new SetMechState(m_arm, ArmState.MID));
     // driverController.y().onTrue(new SetMechState(m_arm, ArmState.HIGH));
+
+    driverController.rightBumper().whileTrue(new ManualArmControl(m_arm, .5));
+    driverController.leftBumper().whileTrue(new ManualArmControl(m_arm, -.5));
+    driverController.rightTrigger(0.1).whileTrue(new ManualShoulderControl(m_shoulder, driverController));
+    driverController.leftTrigger(0.1).whileTrue(new ManualShoulderControl(m_shoulder, driverController));
 
     // driverController.y().onTrue(new SequentialCommandGroup(null));
   

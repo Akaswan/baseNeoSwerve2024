@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.StateMachine.MechStateMachine;
-import frc.robot.StateMachine.RobotState;
 import frc.robot.StateMachine.StateMachineTypes;
 import frc.robot.StateMachine.MechStates.MechState;
 import frc.robot.StateMachine.MechStates.ShoulderState;

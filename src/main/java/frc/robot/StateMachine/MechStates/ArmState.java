@@ -1,7 +1,5 @@
 package frc.robot.StateMachine.MechStates;
 
-import frc.robot.RobotContainer;
-
 public enum ArmState implements MechState {
     MANUAL(0),
     IN(0),
