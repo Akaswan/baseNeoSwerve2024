@@ -3,9 +3,9 @@ package frc.robot.StateMachine.MechStates;
 public enum ArmState implements MechState {
     MANUAL(0),
     IN(0),
-    LOW(5),
-    MID(10),
-    HIGH(15);
+    LOW(3.5),
+    MID(4),
+    HIGH(7);
 
     private final double position;
 

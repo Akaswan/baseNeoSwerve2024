@@ -157,10 +157,10 @@ public class RobotContainer {
       m_machine.setRobotStateCommand(RobotState.LOW).schedule();
     }
     if (testcontroller.getBButtonPressed()) {
-      m_machine.setRobotStateCommand(RobotState.MID_CUBE).schedule();
+      m_machine.setRobotStateCommand(RobotState.MID_CONE).schedule();
     }
     if (testcontroller.getYButtonPressed()) {
-      m_machine.setRobotStateCommand(RobotState.MID_CONE).schedule();
+      m_machine.setRobotStateCommand(RobotState.HIGH_CONE).schedule();
     }
   }
 }

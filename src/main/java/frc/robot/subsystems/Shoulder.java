@@ -38,8 +38,14 @@ public class Shoulder extends SubsystemBase implements MechStateMachine{
 
   private double intendedPosition;
 
-  Mechanism2d mech = new Mechanism2d(4, 3);
-  MechanismRoot2d root = mech.getRoot("SuperStructure", 3.5, 0);
+  Mechanism2d mech = new Mechanism2d(3, 3);
+  MechanismRoot2d root = mech.getRoot("SuperStructure", 2.5, 0);
+  MechanismRoot2d lowRoot = mech.getRoot("lowroot", 0, .3);
+  MechanismRoot2d midRoot = mech.getRoot("midroot", 0, .85);
+  MechanismRoot2d highRoot = mech.getRoot("highroot", 0, 1.4);
+  MechanismLigament2d Low;
+  MechanismLigament2d Mid;
+  MechanismLigament2d High;
   MechanismLigament2d structure;
   MechanismLigament2d mechShoulder;
 
@@ -62,6 +68,9 @@ public class Shoulder extends SubsystemBase implements MechStateMachine{
 
     structure = root.append(new MechanismLigament2d("structure", 1, 90, 30, new Color8Bit(Color.kPurple)));
     mechShoulder = structure.append(new MechanismLigament2d("shoulder", 0, 0));
+    Low = lowRoot.append(new MechanismLigament2d("Low", 1.8, 0, 150, new Color8Bit(Color.kBlueViolet)));
+    Mid = midRoot.append(new MechanismLigament2d("Mid", 1.2, 0, 150, new Color8Bit(Color.kBlueViolet)));
+    High = highRoot.append(new MechanismLigament2d("High", .6, 0, 150, new Color8Bit(Color.kBlueViolet)));
     
     SmartDashboard.putData("Mech2d", mech);
 
