@@ -20,7 +20,6 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.utilities.RevUtils;
@@ -64,7 +63,6 @@ public class SwerveModule extends SubsystemBase {
    *
    * @param moduleNumber The module number
    * @param swerveModuleConstants Swerve modules constants to setup swerve module
-   * @param tuning Decide whether to tune the angle offset and PID of the module
    */
   public SwerveModule(int moduleNumber, SwerveModuleConstants swerveModuleConstants) {
     m_moduleNumber = moduleNumber;
@@ -105,27 +103,6 @@ public class SwerveModule extends SubsystemBase {
 
     m_driveController = m_driveMotor.getPIDController();
     m_turnController = m_turningMotor.getPIDController();
-
-    if (TUNING) {
-      angleOffsetEntry =
-          RobotContainer.tuningTab.add("Angle Offset " + m_moduleNumber, m_angleOffset).getEntry();
-    }
-
-    if (INFO) {
-      m_moduleAngleWidget =
-          RobotContainer.infoTab
-              .add("Module Angle " + m_moduleNumber, getHeadingDegrees())
-              .withWidget(BuiltInWidgets.kGyro)
-              .withPosition(5 + m_moduleNumber * 2, 2);
-
-      m_moduleSpeedWidget =
-          RobotContainer.infoTab
-              .add("Module Speed " + m_moduleNumber, Units.metersToFeet(getDriveMetersPerSecond()))
-              .withWidget(BuiltInWidgets.kNumberBar)
-              .withProperties(Map.of("min", -16, "max", 16))
-              .withPosition(5 + m_moduleNumber * 2, 4)
-              .withSize(2, 2);
-    }
   }
 
   /**
@@ -205,34 +182,53 @@ public class SwerveModule extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
-    if (TUNING) {
-      m_angleOffset = angleOffsetEntry.getDouble(m_angleOffset);
-
-      m_driveController.setP(SwerveDrive.dummyDriveController.getP());
-      m_driveController.setI(SwerveDrive.dummyDriveController.getI());
-      m_driveController.setD(SwerveDrive.dummyDriveController.getD());
-      m_driveController.setFF(SwerveDrive.dummyDriveController.getSetpoint());
-      m_driveMotor.setOpenLoopRampRate(SwerveDrive.driveRampRateTuning);
-
-      m_turnController.setP(SwerveDrive.dummyTurnController.getP());
-      m_turnController.setI(SwerveDrive.dummyTurnController.getI());
-      m_turnController.setD(SwerveDrive.dummyTurnController.getD());
-      m_turnController.setFF(SwerveDrive.dummyTurnController.getSetpoint());
-    }
-
-    if (INFO) {
-      m_moduleAngleWidget.getEntry().setDouble(getHeadingDegrees());
-      m_moduleSpeedWidget.getEntry().setDouble(Units.metersToFeet(getDriveMetersPerSecond()));
-    }
-  }
+  public void periodic() {}
 
   private void simUpdateDrivePosition(SwerveModuleState state) {
     m_simDriveEncoderVelocity = state.speedMetersPerSecond;
     double distancePer20Ms = m_simDriveEncoderVelocity / 50.0;
 
     m_simDriveEncoderPosition += distancePer20Ms;
+  }
 
-    SmartDashboard.putNumber("Module encoder pos" + m_moduleNumber, m_simDriveEncoderPosition);
+  public void tuningInit() {
+    angleOffsetEntry =
+        RobotContainer.tuningTab.add("Angle Offset " + m_moduleNumber, m_angleOffset).getEntry();
+  }
+
+  public void testPeriodic() {
+    m_angleOffset = angleOffsetEntry.getDouble(m_angleOffset);
+
+    m_driveController.setP(RobotContainer.m_driveBase.bufferDriveController.getP());
+    m_driveController.setI(RobotContainer.m_driveBase.bufferDriveController.getI());
+    m_driveController.setD(RobotContainer.m_driveBase.bufferDriveController.getD());
+    m_driveController.setFF(RobotContainer.m_driveBase.bufferDriveController.getSetpoint());
+    m_driveMotor.setOpenLoopRampRate(RobotContainer.m_driveBase.driveRampRateTuning);
+
+    m_turnController.setP(RobotContainer.m_driveBase.bufferTurnController.getP());
+    m_turnController.setI(RobotContainer.m_driveBase.bufferTurnController.getI());
+    m_turnController.setD(RobotContainer.m_driveBase.bufferTurnController.getD());
+    m_turnController.setFF(RobotContainer.m_driveBase.bufferTurnController.getSetpoint());
+  }
+
+  public void infoInit() {
+    m_moduleAngleWidget =
+        RobotContainer.infoTab
+            .add("Module Angle " + m_moduleNumber, getHeadingDegrees())
+            .withWidget(BuiltInWidgets.kGyro)
+            .withPosition(5 + m_moduleNumber * 2, 2);
+
+    m_moduleSpeedWidget =
+        RobotContainer.infoTab
+            .add("Module Speed " + m_moduleNumber, Units.metersToFeet(getDriveMetersPerSecond()))
+            .withWidget(BuiltInWidgets.kNumberBar)
+            .withProperties(Map.of("min", -16, "max", 16))
+            .withPosition(5 + m_moduleNumber * 2, 4)
+            .withSize(2, 2);
+  }
+
+  public void infoPeriodic() {
+    m_moduleAngleWidget.getEntry().setDouble(getHeadingDegrees());
+    m_moduleSpeedWidget.getEntry().setDouble(Units.metersToFeet(getDriveMetersPerSecond()));
   }
 }

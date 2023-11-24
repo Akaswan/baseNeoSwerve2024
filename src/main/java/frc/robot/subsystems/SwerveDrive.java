@@ -6,7 +6,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.*;
 
-import com.kauailabs.navx.frc.AHRS;
+import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -23,13 +24,10 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.utilities.GeometryUtils;
@@ -50,24 +48,20 @@ public class SwerveDrive extends SubsystemBase {
   public static final SwerveDriveKinematics kDriveKinematics =
       new SwerveDriveKinematics(kModuleTranslations);
 
-  // https://github.com/Thunderstamps/navx2workaround.git
-  // link to import navX vendordeps
-  private final AHRS m_navx = new AHRS(SPI.Port.kMXP, (byte) 50);
+  private final Pigeon2 m_pigeon = new Pigeon2(0);
 
   public final Field2d m_field = new Field2d();
 
   private SimpleWidget m_gyroWidget;
 
   private GenericEntry driveRampRateEntry;
-  public static double driveRampRateTuning;
+  public double driveRampRateTuning;
 
-  public static PIDController dummyDriveController = new PIDController(0, 0, 0);
-  public static PIDController dummyTurnController = new PIDController(0, 0, 0);
+  public PIDController bufferDriveController = new PIDController(0, 0, 0);
+  public PIDController bufferTurnController = new PIDController(0, 0, 0);
 
   private static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0; // Last year 11.5?
   private static final boolean invertGyro = false;
-
-  private double m_simYaw;
 
   private SwerveModuleState[] moduleStates;
 
@@ -88,7 +82,6 @@ public class SwerveDrive extends SubsystemBase {
    * @param frontRightModuleConstants
    * @param backLeftModuleConstants
    * @param backRightModuleConstants
-   * @param m_tuning Decide whether to tune the angle offset and PID of the modules
    */
   public SwerveDrive(
       SwerveModuleConstants frontLeftModuleConstants,
@@ -119,33 +112,18 @@ public class SwerveDrive extends SubsystemBase {
             VecBuilder.fill(0.1, 0.1, 0.1),
             VecBuilder.fill(0.9, 0.9, 0.9));
 
-    m_navx.zeroYaw();
-    m_simYaw = 0;
+    m_pigeon.setYaw(0);
 
     if (INFO) {
       RobotContainer.infoTab.add("Field", m_field).withPosition(0, 0).withSize(5, 3);
       m_gyroWidget =
           RobotContainer.infoTab
-              .add(
-                  "Robot Rotation",
-                  RobotBase.isReal() ? getYaw() : Units.radiansToDegrees(m_simYaw))
+              .add("Robot Rotation", getYaw().getDegrees())
               .withWidget(BuiltInWidgets.kGyro)
               .withPosition(0, 4);
     }
 
     robotRelativeChassisSpeeds = new ChassisSpeeds(0, 0, 0);
-
-    if (TUNING) {
-      RobotContainer.tuningTab.add("Drive Motor PID", dummyDriveController);
-      RobotContainer.tuningTab.add("Turn Motor PID", dummyTurnController);
-      driveRampRateEntry =
-          RobotContainer.tuningTab
-              .add("Drive Ramp Rate", 0)
-              .withWidget(BuiltInWidgets.kNumberSlider)
-              .withProperties(Map.of("min", 0))
-              .getEntry();
-      driveRampRateTuning = driveRampRateEntry.getDouble(0);
-    }
 
     AutoBuilder.configureHolonomic(
         this::getPoseMeters, // Robot pose supplier
@@ -178,7 +156,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void zeroGyroscope() {
-    m_navx.zeroYaw();
+    m_pigeon.setYaw(0);
   }
 
   public void drive(double throttle, double strafe, double rotation, boolean isOpenLoop) {
@@ -274,17 +252,13 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public Rotation2d getYaw() {
-    if (RobotBase.isReal()) {
-      return Rotation2d.fromDegrees(-(m_navx.getYaw() + 180));
-    } else {
-      return (invertGyro)
-          ? Rotation2d.fromDegrees(360 - Units.radiansToDegrees(m_simYaw))
-          : Rotation2d.fromDegrees(Units.radiansToDegrees(m_simYaw));
-    }
+    return (invertGyro)
+        ? Rotation2d.fromDegrees(360 - m_pigeon.getYaw())
+        : Rotation2d.fromDegrees(m_pigeon.getYaw());
   }
 
   public double getYawDegrees() {
-    return getYaw().getDegrees();
+    return Math.IEEEremainder(m_pigeon.getYaw(), 360);
   }
 
   public double getAdjustedYawDegrees() {
@@ -336,46 +310,74 @@ public class SwerveDrive extends SubsystemBase {
   public void periodic() {
     poseEstimator.update(getYaw(), getModulePositions());
 
-    if (RobotBase.isReal()
-        && poseEstimator
-                .getEstimatedPosition()
-                .getTranslation()
-                .getDistance(RobotContainer.m_apTag.getPose2d().getTranslation())
-            <= 1.0) {
+    Logger.recordOutput("Drive/Gyro Connected", m_pigeon.getLastError().equals(ErrorCode.OK));
+    Logger.recordOutput("Drive/Gyro", getYawDegrees());
+    Logger.recordOutput("Drive/SwerveStates", AKitStates(getModuleStates()));
+    Logger.recordOutput("Drive/Pose", AKitOdometry(getPoseMeters()));
+
+    m_field.setRobotPose(poseEstimator.getEstimatedPosition());
+  }
+
+  public void realPeriodic() {
+    if (poseEstimator
+            .getEstimatedPosition()
+            .getTranslation()
+            .getDistance(RobotContainer.m_apTag.getPose2d().getTranslation())
+        <= 1.0) {
       poseEstimator.addVisionMeasurement(
           RobotContainer.m_apTag.getPose2d(),
           Timer.getFPGATimestamp() - (RobotContainer.m_apTag.getBotPose()[6] / 1000.0));
       Logger.recordOutput("Drive/APTagPose", AKitOdometry(getPoseMeters()));
     }
-    if (!RobotBase.isReal()) {
-      Logger.recordOutput(
-          "Drive/APTagPose",
-          AKitOdometry(
-              new Pose2d(
-                  getPoseMeters().getX() - .2,
-                  getPoseMeters().getY() - .5,
-                  Rotation2d.fromDegrees(getYawDegrees() - 20))));
-    }
-
-    Logger.recordOutput("Drive/Gyro", getYawDegrees());
-    Logger.recordOutput("Drive/SwerveStates", AKitStates(getModuleStates()));
-    Logger.recordOutput("Drive/Pose", AKitOdometry(getPoseMeters()));
-    if (TUNING) {
-      driveRampRateTuning = driveRampRateEntry.getDouble(0);
-    }
-
-    if (INFO) {
-      m_gyroWidget.getEntry().setDouble(getYaw().getDegrees());
-    }
-
-    m_field.setRobotPose(poseEstimator.getEstimatedPosition());
-
-    SmartDashboard.putNumber("New Angle", getAdjustedYawDegrees(90));
   }
 
   @Override
   public void simulationPeriodic() {
-    ChassisSpeeds chassisSpeed = kDriveKinematics.toChassisSpeeds(getModuleStates());
-    m_simYaw += chassisSpeed.omegaRadiansPerSecond * 0.02;
+    m_pigeon.addYaw(
+        Units.radiansToDegrees(
+            kDriveKinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond * 0.02));
+    Logger.recordOutput(
+        "Drive/APTagPose",
+        AKitOdometry(new Pose2d(getPoseMeters().getX(), getPoseMeters().getY(), getYaw())));
+  }
+
+  public void tuningPeriodic() {
+    driveRampRateTuning = driveRampRateEntry.getDouble(0);
+
+    for (SwerveModule module : m_SwerveMods) {
+      module.testPeriodic();
+    }
+  }
+
+  public void tuningInit() {
+    RobotContainer.tuningTab.add("Drive Motor PID", bufferDriveController);
+    RobotContainer.tuningTab.add("Turn Motor PID", bufferTurnController);
+    driveRampRateEntry =
+        RobotContainer.tuningTab
+            .add("Drive Ramp Rate", 0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0))
+            .getEntry();
+    driveRampRateTuning = driveRampRateEntry.getDouble(0);
+
+    for (SwerveModule module : m_SwerveMods) {
+      module.tuningInit();
+    }
+  }
+
+  public void infoInit() {
+    m_gyroWidget.getEntry().setDouble(getYaw().getDegrees());
+
+    for (SwerveModule module : m_SwerveMods) {
+      module.infoInit();
+    }
+  }
+
+  public void infoPeriodic() {
+    m_gyroWidget.getEntry().setDouble(getYaw().getDegrees());
+
+    for (SwerveModule module : m_SwerveMods) {
+      module.infoPeriodic();
+    }
   }
 }

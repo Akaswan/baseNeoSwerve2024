@@ -88,6 +88,14 @@ public class Robot extends LoggedRobot {
 
     m_robotContainer = new RobotContainer();
 
+    if (Constants.TUNING) {
+      m_robotContainer.tuningInit();
+    }
+
+    if (Constants.INFO) {
+      m_robotContainer.infoInit();
+    }
+
     for (int port = 5800; port <= 5807; port++) {
       PortForwarder.add(port, "limelight.local", port);
     }
@@ -122,6 +130,14 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
     m_robotContainer.periodic();
+
+    if (Constants.TUNING) {
+      m_robotContainer.tuningPeriodic();
+    }
+
+    if (Constants.INFO) {
+      m_robotContainer.infoPeriodic();
+    }
   }
 
   /** This function is called once when the robot is disabled. */

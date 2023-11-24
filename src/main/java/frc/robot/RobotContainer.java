@@ -8,23 +8,19 @@ import static frc.robot.Constants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.StateMachine.MechStateMachine;
-import frc.robot.StateMachine.MechStates.ArmState;
-import frc.robot.StateMachine.MechStates.ShoulderState;
-import frc.robot.StateMachine.RobotState;
-import frc.robot.StateMachine.RobotStateMachine;
-import frc.robot.commands.ManualArmControl;
-import frc.robot.commands.ManualShoulderControl;
 import frc.robot.commands.SwerveDrivebase.TeleopSwerve;
+import frc.robot.commands.SwerveDrivebase.TurnToAngle;
 import frc.robot.subsystems.APTag;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Shoulder;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.utilities.LoggedDashboardChooser;
 
@@ -35,7 +31,6 @@ import frc.robot.utilities.LoggedDashboardChooser;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
   // SWERVE CONTROLS \\
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
@@ -57,16 +52,15 @@ public class RobotContainer {
   public static final SwerveDrive m_driveBase =
       new SwerveDrive(FRONT_LEFT_MODULE, FRONT_RIGHT_MODULE, BACK_LEFT_MODULE, BACK_RIGHT_MODULE);
   public static final APTag m_apTag = new APTag();
-  public static final Arm m_arm = new Arm(ArmState.IN);
-  public static final Shoulder m_shoulder = new Shoulder(ShoulderState.IN);
 
   // ROBOT STATE MACHINE \\
-  public static final RobotStateMachine m_machine =
-      new RobotStateMachine(new MechStateMachine[] {m_shoulder, m_arm}, RobotState.IN);
+  // public static final RobotStateMachine m_machine =
+  //     new RobotStateMachine();
 
   // SENDABLE CHOOSER \\
   public static LoggedDashboardChooser<Command> autoChooser =
-      new LoggedDashboardChooser<>("Auto Picker", AutoBuilder.buildAutoChooser(), mainTab, 0, 0, 2, 1);
+      new LoggedDashboardChooser<>(
+          "Auto Picker", AutoBuilder.buildAutoChooser(), mainTab, 0, 0, 2, 1);
 
   public RobotContainer() {
 
@@ -117,56 +111,48 @@ public class RobotContainer {
 
     driverController.back().onTrue(new InstantCommand(m_driveBase::zeroGyroscope));
 
-    // // Example of an automatic path generated to score in the B2 zone
-    // driverController.a().onTrue(AutoBuilder.pathfindToPose(
-    //   new Pose2d(1.8252, 2.779, Rotation2d.fromDegrees(180)),
-    //   new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
-    //   0.0,
-    //   0.0
-    // ));
-
-    // // Example of an automatic path generated to pick up from the human player
-    // driverController.b().onTrue(AutoBuilder.pathfindToPose(
-    //   new Pose2d(16.06056, 6.270, Rotation2d.fromDegrees(0)),
-    //   new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
-    //   0.0,
-    //   0.0
-    // ));
-
-    // driverController.x().onTrue(new TurnToAngle(m_driveBase, 30));
-
-    // driverController.b().onTrue(new SetMechState(m_arm, ArmState.MID));
-    // driverController.y().onTrue(new SetMechState(m_arm, ArmState.HIGH));
-
-    driverController.rightBumper().whileTrue(new ManualArmControl(m_arm, .5));
-    driverController.leftBumper().whileTrue(new ManualArmControl(m_arm, -.5));
+    // Example of an automatic path generated to score in the B2 zone
     driverController
-        .rightTrigger(0.1)
-        .whileTrue(new ManualShoulderControl(m_shoulder, driverController));
+        .a()
+        .onTrue(
+            AutoBuilder.pathfindToPose(
+                new Pose2d(1.8252, 2.779, Rotation2d.fromDegrees(180)),
+                new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
+                0.0,
+                0.0));
+
+    // Example of an automatic path generated to pick up from the human player
     driverController
-        .leftTrigger(0.1)
-        .whileTrue(new ManualShoulderControl(m_shoulder, driverController));
+        .b()
+        .onTrue(
+            AutoBuilder.pathfindToPose(
+                new Pose2d(16.06056, 6.270, Rotation2d.fromDegrees(0)),
+                new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
+                0.0,
+                0.0));
 
-    // driverController.y().onTrue(new SequentialCommandGroup(null));
-
+    driverController.x().onTrue(new TurnToAngle(m_driveBase, 30));
   }
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
 
-  public void periodic() {
-    if (testcontroller.getAButtonPressed()) {
-      m_machine.setRobotStateCommand(RobotState.IN).schedule();
-    }
-    if (testcontroller.getXButtonPressed()) {
-      m_machine.setRobotStateCommand(RobotState.LOW).schedule();
-    }
-    if (testcontroller.getBButtonPressed()) {
-      m_machine.setRobotStateCommand(RobotState.MID_CONE).schedule();
-    }
-    if (testcontroller.getYButtonPressed()) {
-      m_machine.setRobotStateCommand(RobotState.HIGH_CONE).schedule();
-    }
+  public void periodic() {}
+
+  public void tuningInit() {
+    m_driveBase.tuningInit();
+  }
+
+  public void tuningPeriodic() {
+    m_driveBase.tuningPeriodic();
+  }
+
+  public void infoInit() {
+    m_driveBase.infoInit();
+  }
+
+  public void infoPeriodic() {
+    m_driveBase.infoPeriodic();
   }
 }

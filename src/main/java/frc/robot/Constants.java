@@ -16,11 +16,11 @@ import frc.robot.utilities.SwerveModuleConstants;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Mode currentMode = Mode.REAL;
-
-  public static final boolean TUNING = false;
+  public static final Mode currentMode = Mode.SIM;
 
   public static final boolean INFO = true;
+
+  public static final boolean TUNING = false;
 
   // // DRIVEBASE \\ \\
 

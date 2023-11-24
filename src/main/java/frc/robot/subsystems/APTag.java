@@ -78,10 +78,5 @@ public class APTag extends SubsystemBase {
     m_visY = currentData.getEntry("ty");
     m_visA = currentData.getEntry("ta");
     m_poseArr = currentData.getEntry("botpose");
-
-    // SmartDashboard.putNumberArray("Limelight Pose", getBotPose());
-
-    // Uncomment this if you want the robots odometry to be changed by the limelight
-    // RobotContainer.m_swerveDrive.resetOdometry(getPose2d());
   }
 }

@@ -58,7 +58,7 @@ public class LoggedDashboardChooser<V> implements LoggedDashboardInput {
       int width,
       int height) {
     this.key = key;
-    tab.add(key, chooser).withPosition(column, row).withSize(width, height);
+    tab.add(key, sendableChooser).withPosition(column, row).withSize(width, height);
     periodic();
     Logger.registerDashboardInput(this);
 
