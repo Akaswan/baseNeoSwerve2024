@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -33,8 +32,6 @@ public class Shoulder extends SubsystemBase implements MechStateMachine {
   private CANSparkMax shoulderMotor;
   private ProfiledPIDController shoulderPID;
   private RelativeEncoder shoulderEncoder;
-
-  private ArmFeedforward armFF;
 
   private double simPosition;
 

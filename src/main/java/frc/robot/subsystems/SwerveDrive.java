@@ -345,12 +345,21 @@ public class SwerveDrive extends SubsystemBase {
       poseEstimator.addVisionMeasurement(
           RobotContainer.m_apTag.getPose2d(),
           Timer.getFPGATimestamp() - (RobotContainer.m_apTag.getBotPose()[6] / 1000.0));
+      Logger.recordOutput("Drive/APTagPose", AKitOdometry(getPoseMeters()));
+    }
+    if (!RobotBase.isReal()) {
+      Logger.recordOutput(
+          "Drive/APTagPose",
+          AKitOdometry(
+              new Pose2d(
+                  getPoseMeters().getX() - .2,
+                  getPoseMeters().getY() - .5,
+                  Rotation2d.fromDegrees(getYawDegrees() - 20))));
     }
 
     Logger.recordOutput("Drive/Gyro", getYawDegrees());
     Logger.recordOutput("Drive/SwerveStates", AKitStates(getModuleStates()));
     Logger.recordOutput("Drive/Pose", AKitOdometry(getPoseMeters()));
-
     if (TUNING) {
       driveRampRateTuning = driveRampRateEntry.getDouble(0);
     }

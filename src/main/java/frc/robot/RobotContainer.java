@@ -11,7 +11,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -27,6 +26,7 @@ import frc.robot.subsystems.APTag;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Shoulder;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.utilities.LoggedDashboardChooser;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -65,7 +65,8 @@ public class RobotContainer {
       new RobotStateMachine(new MechStateMachine[] {m_shoulder, m_arm}, RobotState.IN);
 
   // SENDABLE CHOOSER \\
-  public static SendableChooser<Command> auto_chooser = AutoBuilder.buildAutoChooser();
+  public static LoggedDashboardChooser<Command> autoChooser =
+      new LoggedDashboardChooser<>("Auto Picker", AutoBuilder.buildAutoChooser(), mainTab, 0, 0, 2, 1);
 
   public RobotContainer() {
 
@@ -73,10 +74,6 @@ public class RobotContainer {
     // you would never do this while following a path, its just to show how to implement
     NamedCommands.registerCommand(
         "Zero Yaw", new InstantCommand(() -> m_driveBase.zeroGyroscope()));
-
-    // SET AUTO CHOOSER PLAYS \\
-
-    mainTab.add("Auto Picker", auto_chooser).withPosition(0, 0).withSize(2, 1);
 
     // CONFIGURE DEFAULT COMMANDS \\
     m_driveBase.setDefaultCommand(
@@ -155,7 +152,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return auto_chooser.getSelected();
+    return autoChooser.get();
   }
 
   public void periodic() {
