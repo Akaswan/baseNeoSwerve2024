@@ -20,7 +20,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.SwerveDrive;
+import frc.robot.utilities.GeometryUtils;
 import frc.robot.utilities.LocalADStarAK;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -69,10 +69,6 @@ public class Robot extends LoggedRobot {
         (activePath) -> {
           Logger.recordOutput(
               "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
-        });
-    PathPlannerLogging.setLogTargetPoseCallback(
-        (targetPose) -> {
-          Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
 
     // Set up data receivers & replay source
@@ -129,7 +125,7 @@ public class Robot extends LoggedRobot {
   public void autonomousInit() {
     RobotContainer.m_driveBase.setTrajectory(
         RobotContainer.autoChooser.getString() != "None"
-            ? SwerveDrive.PPAutoToTraj(RobotContainer.autoChooser.getString())
+            ? GeometryUtils.PPAutoToTraj(RobotContainer.autoChooser.getString())
             : new Trajectory());
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -152,8 +148,6 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    m_robotContainer.periodic();
-
     if (Constants.TUNING) {
       m_robotContainer.tuningPeriodic();
     }

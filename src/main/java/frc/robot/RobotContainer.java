@@ -138,8 +138,6 @@ public class RobotContainer {
     return autoChooser.get();
   }
 
-  public void periodic() {}
-
   public void tuningInit() {
     m_driveBase.tuningInit();
   }

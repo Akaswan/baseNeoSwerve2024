@@ -1,9 +1,17 @@
 package frc.robot.utilities;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPoint;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.Trajectory.State;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GeometryUtils {
   private static final double kEps = 1E-9;
@@ -49,5 +57,64 @@ public class GeometryUtils {
             .getTranslation()
             .rotateBy(new Rotation2d(halftheta_by_tan_of_halfdtheta, -half_dtheta));
     return new Twist2d(translation_part.getX(), translation_part.getY(), dtheta);
+  }
+
+  public static double[] AKitStates(SwerveModuleState[] states) {
+    double[] output = new double[8];
+    for (int i = 0; i < states.length; i++) {
+      output[i * 2] = states[i].angle.getRadians();
+      output[i * 2 + 1] = states[i].speedMetersPerSecond;
+    }
+    return output;
+  }
+
+  public static double[] AKitOdometry(Pose2d pose) {
+    double[] output = new double[3];
+    output[0] = pose.getX();
+    output[1] = pose.getY();
+    output[2] = pose.getRotation().getRadians();
+    return output;
+  }
+
+  public static double[] AKitTrajectory(Trajectory traj) {
+    double[] output = new double[traj.getStates().size() * 3];
+
+    for (int i = 0; i < traj.getStates().size() * 3; i += 3) {
+      output[i] = traj.getStates().get((i / 3)).poseMeters.getX();
+      output[i + 1] = traj.getStates().get((i / 3)).poseMeters.getY();
+      output[i + 2] = traj.getStates().get((i / 3)).poseMeters.getRotation().getRadians();
+    }
+
+    return output;
+  }
+
+  public static Trajectory PPAutoToTraj(String auto) {
+    List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile(auto);
+    List<State> states = new ArrayList<>();
+
+    for (PathPlannerPath path : paths) {
+      for (PathPoint point : path.getAllPathPoints()) {
+        states.add(
+            new State(
+                0,
+                0,
+                0,
+                new Pose2d(
+                    point.position,
+                    point.holonomicRotation != null ? point.holonomicRotation : new Rotation2d(0)),
+                0));
+      }
+    }
+    return new Trajectory(states);
+  }
+
+  public static double[] getPoseError(Pose2d pose1, Pose2d pose2) {
+    double[] output = new double[3];
+
+    output[0] = pose1.getX() - pose2.getX();
+    output[1] = pose1.getY() - pose2.getY();
+    output[2] = pose1.getRotation().getRadians() - pose2.getRotation().getRadians();
+
+    return output;
   }
 }

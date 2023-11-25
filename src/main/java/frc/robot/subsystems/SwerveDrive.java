@@ -9,11 +9,11 @@ import static frc.robot.Constants.*;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -53,6 +53,8 @@ public class SwerveDrive extends SubsystemBase {
       new SwerveDriveKinematics(kModuleTranslations);
 
   private final Pigeon2 m_pigeon = new Pigeon2(0);
+
+  private Pose2d targetPPPose = new Pose2d(0, 0, new Rotation2d(0));
 
   public final Field2d m_field = new Field2d();
 
@@ -131,6 +133,11 @@ public class SwerveDrive extends SubsystemBase {
 
     robotRelativeChassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
+    PathPlannerLogging.setLogTargetPoseCallback(
+        (targetPose) -> {
+          targetPPPose = targetPose;
+        });
+
     AutoBuilder.configureHolonomic(
         this::getPoseMeters, // Robot pose supplier
         this::updateEstimatorWithPose, // Method to reset odometry (will be called if your auto has
@@ -169,7 +176,7 @@ public class SwerveDrive extends SubsystemBase {
     setSwerveModuleStates(moduleStates, isOpenLoop);
     chassisSpeeds = correctForDynamics(chassisSpeeds);
 
-    Logger.recordOutput("Drive/SwerveStateSetpoints", AKitStates(moduleStates));
+    Logger.recordOutput("Drive/SwerveStateSetpoints", GeometryUtils.AKitStates(moduleStates));
 
     robotRelativeChassisSpeeds = correctForDynamics(new ChassisSpeeds(throttle, strafe, rotation));
   }
@@ -294,59 +301,9 @@ public class SwerveDrive extends SubsystemBase {
     return new Trajectory(states);
   }
 
-  public static Trajectory PPAutoToTraj(String auto) {
-    List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile(auto);
-    List<State> states = new ArrayList<>();
-
-    for (PathPlannerPath path : paths) {
-      for (PathPoint point : path.getAllPathPoints()) {
-        states.add(
-            new State(
-                0,
-                0,
-                0,
-                new Pose2d(
-                    point.position,
-                    point.holonomicRotation != null ? point.holonomicRotation : new Rotation2d(0)),
-                0));
-      }
-    }
-
-    return new Trajectory(states);
-  }
-
   public void setTrajectory(Trajectory traj) {
     robotTrajectory = traj;
     m_field.getObject("traj").setTrajectory(robotTrajectory);
-  }
-
-  public double[] AKitStates(SwerveModuleState[] states) {
-    double[] output = new double[8];
-    for (int i = 0; i < states.length; i++) {
-      output[i * 2] = states[i].angle.getRadians();
-      output[i * 2 + 1] = states[i].speedMetersPerSecond;
-    }
-    return output;
-  }
-
-  public double[] AKitOdometry(Pose2d pose) {
-    double[] output = new double[3];
-    output[0] = pose.getX();
-    output[1] = pose.getY();
-    output[2] = pose.getRotation().getRadians();
-    return output;
-  }
-
-  public double[] AKitTrajectory(Trajectory traj) {
-    double[] output = new double[traj.getStates().size() * 3];
-
-    for (int i = 0; i < traj.getStates().size() * 3; i += 3) {
-      output[i] = traj.getStates().get((i / 3)).poseMeters.getX();
-      output[i + 1] = traj.getStates().get((i / 3)).poseMeters.getY();
-      output[i + 2] = traj.getStates().get((i / 3)).poseMeters.getRotation().getRadians();
-    }
-
-    return output;
   }
 
   @Override
@@ -355,9 +312,12 @@ public class SwerveDrive extends SubsystemBase {
 
     Logger.recordOutput("Drive/Gyro Connected", m_pigeon.getLastError().equals(ErrorCode.OK));
     Logger.recordOutput("Drive/Gyro", getYaw().getRadians());
-    Logger.recordOutput("Drive/SwerveStates", AKitStates(getModuleStates()));
-    Logger.recordOutput("Drive/Pose", AKitOdometry(getPoseMeters()));
-    Logger.recordOutput("Drive/Trajectory", AKitTrajectory(robotTrajectory));
+    Logger.recordOutput("Drive/SwerveStates", GeometryUtils.AKitStates(getModuleStates()));
+    Logger.recordOutput("Drive/Pose", GeometryUtils.AKitOdometry(getPoseMeters()));
+    Logger.recordOutput("Drive/Trajectory", GeometryUtils.AKitTrajectory(robotTrajectory));
+    Logger.recordOutput("Drive/PathplannerSetpoint", GeometryUtils.AKitOdometry(targetPPPose));
+    Logger.recordOutput(
+        "Drive/PathPlannerError", GeometryUtils.getPoseError(getPoseMeters(), targetPPPose));
 
     m_field.setRobotPose(poseEstimator.getEstimatedPosition());
   }
@@ -371,7 +331,7 @@ public class SwerveDrive extends SubsystemBase {
       poseEstimator.addVisionMeasurement(
           RobotContainer.m_apTag.getPose2d(),
           Timer.getFPGATimestamp() - (RobotContainer.m_apTag.getBotPose()[6] / 1000.0));
-      Logger.recordOutput("Drive/APTagPose", AKitOdometry(getPoseMeters()));
+      Logger.recordOutput("Drive/APTagPose", GeometryUtils.AKitOdometry(getPoseMeters()));
     }
   }
 
@@ -382,7 +342,8 @@ public class SwerveDrive extends SubsystemBase {
             kDriveKinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond * 0.02));
     Logger.recordOutput(
         "Drive/APTagPose",
-        AKitOdometry(new Pose2d(getPoseMeters().getX(), getPoseMeters().getY(), getYaw())));
+        GeometryUtils.AKitOdometry(
+            new Pose2d(getPoseMeters().getX(), getPoseMeters().getY(), getYaw())));
   }
 
   public void tuningPeriodic() {
