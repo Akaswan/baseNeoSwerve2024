@@ -7,7 +7,12 @@ import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinder;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.Trajectory.State;
+import frc.robot.RobotContainer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +22,6 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class LocalADStarAK implements Pathfinder {
   private final ADStarIO io = new ADStarIO();
-
   /**
    * Get if a new path has been calculated since the last time a path was retrieved
    *
@@ -102,6 +106,7 @@ public class LocalADStarAK implements Pathfinder {
     public LocalADStar adStar = new LocalADStar();
     public boolean isNewPathAvailable = false;
     public List<PathPoint> currentPathPoints = Collections.emptyList();
+    public PathPlannerPath lastPath;
 
     @Override
     public void toLog(LogTable table) {
@@ -135,16 +140,45 @@ public class LocalADStarAK implements Pathfinder {
 
     public void updateIsNewPathAvailable() {
       isNewPathAvailable = adStar.isNewPathAvailable();
+
+      if (lastPath != null
+          && currentPathPoints
+                  .get(currentPathPoints.size() - 1)
+                  .position
+                  .getDistance(RobotContainer.m_driveBase.getPoseMeters().getTranslation())
+              <= .1) {
+        RobotContainer.m_driveBase.m_field.getObject("traj").setTrajectory(new Trajectory());
+      }
     }
 
     public void updateCurrentPathPoints(PathConstraints constraints, GoalEndState goalEndState) {
       PathPlannerPath currentPath = adStar.getCurrentPath(constraints, goalEndState);
+      List<State> states = new ArrayList<>();
 
       if (currentPath != null) {
         currentPathPoints = currentPath.getAllPathPoints();
+        if (lastPath != currentPath) {
+          for (PathPoint point : currentPathPoints) {
+            states.add(
+                new State(
+                    0,
+                    0,
+                    0,
+                    new Pose2d(point.position.getX(), point.position.getY(), new Rotation2d(0)),
+                    0));
+            RobotContainer.globalTrajectory = new Trajectory(states);
+            RobotContainer.m_driveBase
+                .m_field
+                .getObject("traj")
+                .setTrajectory(RobotContainer.globalTrajectory);
+          }
+        }
       } else {
         currentPathPoints = Collections.emptyList();
+        RobotContainer.m_driveBase.m_field.getObject("traj").setTrajectory(new Trajectory());
       }
+
+      lastPath = currentPath;
     }
   }
 }

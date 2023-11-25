@@ -278,7 +278,7 @@ public class SwerveDrive extends SubsystemBase {
   public double[] AKitStates(SwerveModuleState[] states) {
     double[] output = new double[8];
     for (int i = 0; i < states.length; i++) {
-      output[i * 2] = states[i].angle.getDegrees();
+      output[i * 2] = states[i].angle.getRadians();
       output[i * 2 + 1] = states[i].speedMetersPerSecond;
     }
     return output;
@@ -288,7 +288,7 @@ public class SwerveDrive extends SubsystemBase {
     double[] output = new double[3];
     output[0] = pose.getX();
     output[1] = pose.getY();
-    output[2] = pose.getRotation().getDegrees();
+    output[2] = pose.getRotation().getRadians();
     return output;
   }
 
@@ -297,7 +297,7 @@ public class SwerveDrive extends SubsystemBase {
     poseEstimator.update(getYaw(), getModulePositions());
 
     Logger.recordOutput("Drive/Gyro Connected", m_pigeon.getLastError().equals(ErrorCode.OK));
-    Logger.recordOutput("Drive/Gyro", getYawDegrees());
+    Logger.recordOutput("Drive/Gyro", getYaw().getRadians());
     Logger.recordOutput("Drive/SwerveStates", AKitStates(getModuleStates()));
     Logger.recordOutput("Drive/Pose", AKitOdometry(getPoseMeters()));
 

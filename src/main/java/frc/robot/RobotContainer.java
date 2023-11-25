@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -56,6 +57,8 @@ public class RobotContainer {
   // ROBOT STATE MACHINE \\
   // public static final RobotStateMachine m_machine =
   //     new RobotStateMachine();
+
+  public static Trajectory globalTrajectory = new Trajectory();
 
   // SENDABLE CHOOSER \\
   public static LoggedDashboardChooser<Command> autoChooser =
