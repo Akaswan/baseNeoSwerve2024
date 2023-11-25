@@ -9,6 +9,9 @@ import static frc.robot.Constants.*;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -20,6 +23,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Timer;
@@ -30,6 +35,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.utilities.GeometryUtils;
 import frc.robot.utilities.SwerveModuleConstants;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 
@@ -50,6 +57,8 @@ public class SwerveDrive extends SubsystemBase {
   public final Field2d m_field = new Field2d();
 
   private SimpleWidget m_gyroWidget;
+
+  public static Trajectory robotTrajectory = new Trajectory();
 
   private GenericEntry driveRampRateEntry;
   public double driveRampRateTuning;
@@ -275,6 +284,42 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
+  public static Trajectory PPPathToTraj(PathPlannerPath path) {
+    List<State> states = new ArrayList<>();
+
+    for (PathPoint point : path.getAllPathPoints()) {
+      states.add(new State(0, 0, 0, new Pose2d(point.position, new Rotation2d(0)), 0));
+    }
+
+    return new Trajectory(states);
+  }
+
+  public static Trajectory PPAutoToTraj(String auto) {
+    List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile(auto);
+    List<State> states = new ArrayList<>();
+
+    for (PathPlannerPath path : paths) {
+      for (PathPoint point : path.getAllPathPoints()) {
+        states.add(
+            new State(
+                0,
+                0,
+                0,
+                new Pose2d(
+                    point.position,
+                    point.holonomicRotation != null ? point.holonomicRotation : new Rotation2d(0)),
+                0));
+      }
+    }
+
+    return new Trajectory(states);
+  }
+
+  public void setTrajectory(Trajectory traj) {
+    robotTrajectory = traj;
+    m_field.getObject("traj").setTrajectory(robotTrajectory);
+  }
+
   public double[] AKitStates(SwerveModuleState[] states) {
     double[] output = new double[8];
     for (int i = 0; i < states.length; i++) {
@@ -292,6 +337,18 @@ public class SwerveDrive extends SubsystemBase {
     return output;
   }
 
+  public double[] AKitTrajectory(Trajectory traj) {
+    double[] output = new double[traj.getStates().size() * 3];
+
+    for (int i = 0; i < traj.getStates().size() * 3; i += 3) {
+      output[i] = traj.getStates().get((i / 3)).poseMeters.getX();
+      output[i + 1] = traj.getStates().get((i / 3)).poseMeters.getY();
+      output[i + 2] = traj.getStates().get((i / 3)).poseMeters.getRotation().getRadians();
+    }
+
+    return output;
+  }
+
   @Override
   public void periodic() {
     poseEstimator.update(getYaw(), getModulePositions());
@@ -300,6 +357,7 @@ public class SwerveDrive extends SubsystemBase {
     Logger.recordOutput("Drive/Gyro", getYaw().getRadians());
     Logger.recordOutput("Drive/SwerveStates", AKitStates(getModuleStates()));
     Logger.recordOutput("Drive/Pose", AKitOdometry(getPoseMeters()));
+    Logger.recordOutput("Drive/Trajectory", AKitTrajectory(robotTrajectory));
 
     m_field.setRobotPose(poseEstimator.getEstimatedPosition());
   }

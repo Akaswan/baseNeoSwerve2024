@@ -7,12 +7,10 @@ import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinder;
 import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.Trajectory.State;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.SwerveDrive;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -147,35 +145,21 @@ public class LocalADStarAK implements Pathfinder {
                   .position
                   .getDistance(RobotContainer.m_driveBase.getPoseMeters().getTranslation())
               <= .1) {
-        RobotContainer.m_driveBase.m_field.getObject("traj").setTrajectory(new Trajectory());
+        RobotContainer.m_driveBase.setTrajectory(new Trajectory());
       }
     }
 
     public void updateCurrentPathPoints(PathConstraints constraints, GoalEndState goalEndState) {
       PathPlannerPath currentPath = adStar.getCurrentPath(constraints, goalEndState);
-      List<State> states = new ArrayList<>();
 
       if (currentPath != null) {
         currentPathPoints = currentPath.getAllPathPoints();
         if (lastPath != currentPath) {
-          for (PathPoint point : currentPathPoints) {
-            states.add(
-                new State(
-                    0,
-                    0,
-                    0,
-                    new Pose2d(point.position.getX(), point.position.getY(), new Rotation2d(0)),
-                    0));
-            RobotContainer.globalTrajectory = new Trajectory(states);
-            RobotContainer.m_driveBase
-                .m_field
-                .getObject("traj")
-                .setTrajectory(RobotContainer.globalTrajectory);
-          }
+          RobotContainer.m_driveBase.setTrajectory(SwerveDrive.PPPathToTraj(currentPath));
         }
       } else {
         currentPathPoints = Collections.emptyList();
-        RobotContainer.m_driveBase.m_field.getObject("traj").setTrajectory(new Trajectory());
+        RobotContainer.m_driveBase.setTrajectory(new Trajectory());
       }
 
       lastPath = currentPath;

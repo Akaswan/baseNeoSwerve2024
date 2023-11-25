@@ -16,9 +16,11 @@ package frc.robot;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.SwerveDrive;
 import frc.robot.utilities.LocalADStarAK;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -125,6 +127,10 @@ public class Robot extends LoggedRobot {
   /** This function is called once when autonomous is enabled. */
   @Override
   public void autonomousInit() {
+    RobotContainer.m_driveBase.setTrajectory(
+        RobotContainer.autoChooser.getString() != "None"
+            ? SwerveDrive.PPAutoToTraj(RobotContainer.autoChooser.getString())
+            : new Trajectory());
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -139,7 +145,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    RobotContainer.m_driveBase.setTrajectory(new Trajectory());
+  }
 
   /** This function is called periodically during operator control. */
   @Override
