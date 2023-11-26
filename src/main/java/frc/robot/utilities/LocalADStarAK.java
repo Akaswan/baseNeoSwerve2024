@@ -143,9 +143,9 @@ public class LocalADStarAK implements Pathfinder {
           && currentPathPoints
                   .get(currentPathPoints.size() - 1)
                   .position
-                  .getDistance(RobotContainer.m_driveBase.getPoseMeters().getTranslation())
+                  .getDistance(RobotContainer.m_drivebase.getPose().getTranslation())
               <= .1) {
-        RobotContainer.m_driveBase.setTrajectory(new Trajectory());
+        RobotContainer.m_drivebase.setTrajectory(new Trajectory());
       }
     }
 
@@ -155,11 +155,11 @@ public class LocalADStarAK implements Pathfinder {
       if (currentPath != null) {
         currentPathPoints = currentPath.getAllPathPoints();
         if (lastPath != currentPath) {
-          RobotContainer.m_driveBase.setTrajectory(SwerveDrive.PPPathToTraj(currentPath));
+          RobotContainer.m_drivebase.setTrajectory(SwerveDrive.PPPathToTraj(currentPath));
         }
       } else {
         currentPathPoints = Collections.emptyList();
-        RobotContainer.m_driveBase.setTrajectory(new Trajectory());
+        RobotContainer.m_drivebase.setTrajectory(new Trajectory());
       }
 
       lastPath = currentPath;

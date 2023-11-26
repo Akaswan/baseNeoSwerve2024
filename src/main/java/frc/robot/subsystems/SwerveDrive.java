@@ -122,15 +122,6 @@ public class SwerveDrive extends SubsystemBase {
 
     m_pigeon.setYaw(0);
 
-    if (INFO) {
-      RobotContainer.infoTab.add("Field", m_field).withPosition(0, 0).withSize(5, 3);
-      m_gyroWidget =
-          RobotContainer.infoTab
-              .add("Robot Rotation", getYaw().getDegrees())
-              .withWidget(BuiltInWidgets.kGyro)
-              .withPosition(0, 4);
-    }
-
     robotRelativeChassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
     PathPlannerLogging.setLogTargetPoseCallback(
@@ -139,7 +130,7 @@ public class SwerveDrive extends SubsystemBase {
         });
 
     AutoBuilder.configureHolonomic(
-        this::getPoseMeters, // Robot pose supplier
+        this::getPose, // Robot pose supplier
         this::updateEstimatorWithPose, // Method to reset odometry (will be called if your auto has
         // a starting pose)
         this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
@@ -197,7 +188,7 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
-  public Pose2d getPoseMeters() {
+  public Pose2d getPose() {
     return poseEstimator.getEstimatedPosition();
   }
 
@@ -310,14 +301,15 @@ public class SwerveDrive extends SubsystemBase {
   public void periodic() {
     poseEstimator.update(getYaw(), getModulePositions());
 
-    Logger.recordOutput("Drive/Gyro Connected", m_pigeon.getLastError().equals(ErrorCode.OK));
-    Logger.recordOutput("Drive/Gyro", getYaw().getRadians());
-    Logger.recordOutput("Drive/SwerveStates", GeometryUtils.AKitStates(getModuleStates()));
-    Logger.recordOutput("Drive/Pose", GeometryUtils.AKitOdometry(getPoseMeters()));
-    Logger.recordOutput("Drive/Trajectory", GeometryUtils.AKitTrajectory(robotTrajectory));
-    Logger.recordOutput("Drive/PathplannerSetpoint", GeometryUtils.AKitOdometry(targetPPPose));
+    Logger.recordOutput("Drivebase/Gyro Connected", m_pigeon.getLastError().equals(ErrorCode.OK));
+    Logger.recordOutput("Drivebase/Gyro", getYaw().getRadians());
+    Logger.recordOutput("Drivebase/SwerveStates", GeometryUtils.AKitStates(getModuleStates()));
+    Logger.recordOutput("Drivebase/Pose", GeometryUtils.AKitOdometry(getPose()));
+    Logger.recordOutput("PathPlanner/Trajectory", GeometryUtils.AKitTrajectory(robotTrajectory));
     Logger.recordOutput(
-        "Drive/PathPlannerError", GeometryUtils.getPoseError(getPoseMeters(), targetPPPose));
+        "PathPlanner/Pathplanner Setpoint", GeometryUtils.AKitOdometry(targetPPPose));
+    Logger.recordOutput(
+        "PathPlanner/PathPlannerError", GeometryUtils.getPoseError(getPose(), targetPPPose));
 
     m_field.setRobotPose(poseEstimator.getEstimatedPosition());
   }
@@ -326,12 +318,11 @@ public class SwerveDrive extends SubsystemBase {
     if (poseEstimator
             .getEstimatedPosition()
             .getTranslation()
-            .getDistance(RobotContainer.m_apTag.getPose2d().getTranslation())
+            .getDistance(RobotContainer.m_limelight.getLimelightPose().getTranslation())
         <= 1.0) {
       poseEstimator.addVisionMeasurement(
-          RobotContainer.m_apTag.getPose2d(),
-          Timer.getFPGATimestamp() - (RobotContainer.m_apTag.getBotPose()[6] / 1000.0));
-      Logger.recordOutput("Drive/APTagPose", GeometryUtils.AKitOdometry(getPoseMeters()));
+          RobotContainer.m_limelight.getLimelightPose(),
+          Timer.getFPGATimestamp() - (RobotContainer.m_limelight.getBotPose()[6] / 1000.0));
     }
   }
 
@@ -340,10 +331,6 @@ public class SwerveDrive extends SubsystemBase {
     m_pigeon.addYaw(
         Units.radiansToDegrees(
             kDriveKinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond * 0.02));
-    Logger.recordOutput(
-        "Drive/APTagPose",
-        GeometryUtils.AKitOdometry(
-            new Pose2d(getPoseMeters().getX(), getPoseMeters().getY(), getYaw())));
   }
 
   public void tuningPeriodic() {
@@ -371,11 +358,17 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void infoInit() {
-    m_gyroWidget.getEntry().setDouble(getYaw().getDegrees());
-
     for (SwerveModule module : m_SwerveMods) {
       module.infoInit();
     }
+
+    RobotContainer.infoTab.add("Field", m_field).withPosition(0, 0).withSize(5, 3);
+    m_gyroWidget =
+        RobotContainer.infoTab
+            .add("Robot Rotation", getYaw().getDegrees())
+            .withWidget(BuiltInWidgets.kGyro)
+            .withPosition(0, 4);
+    m_gyroWidget.getEntry().setDouble(getYaw().getDegrees());
   }
 
   public void infoPeriodic() {

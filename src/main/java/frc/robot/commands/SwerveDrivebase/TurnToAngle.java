@@ -12,7 +12,7 @@ public class TurnToAngle extends Command {
   /** Creates a new TurnToAngle. */
   private PIDController angleController;
 
-  private SwerveDrive m_driveBase;
+  private SwerveDrive m_drivebase;
   private double m_targetAngle;
   private double deadBand = .5;
 
@@ -28,12 +28,12 @@ public class TurnToAngle extends Command {
    */
   public TurnToAngle(SwerveDrive drivebase, double targetAngle) {
     // Use addRequirements() here to declare subsystem dependencies.
-    m_driveBase = drivebase;
+    m_drivebase = drivebase;
     m_targetAngle = targetAngle;
 
     angleController = new PIDController(.1, 0, 0);
 
-    addRequirements(m_driveBase);
+    addRequirements(m_drivebase);
   }
 
   // Called when the command is initially scheduled.
@@ -44,9 +44,9 @@ public class TurnToAngle extends Command {
   @Override
   public void execute() {
     double speeds =
-        angleController.calculate(m_driveBase.getAdjustedYawDegrees(m_targetAngle), 180);
+        angleController.calculate(m_drivebase.getAdjustedYawDegrees(m_targetAngle), 180);
 
-    m_driveBase.drive(0, 0, speeds, false);
+    m_drivebase.drive(0, 0, speeds, false);
   }
 
   // Called once the command ends or is interrupted.
@@ -56,7 +56,7 @@ public class TurnToAngle extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (Math.abs(m_driveBase.getAdjustedYawDegrees() - m_targetAngle) < deadBand) {
+    if (Math.abs(m_drivebase.getAdjustedYawDegrees() - m_targetAngle) < deadBand) {
       return true;
     } else {
       return false;

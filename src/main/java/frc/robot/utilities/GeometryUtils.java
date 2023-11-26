@@ -88,6 +88,17 @@ public class GeometryUtils {
     return output;
   }
 
+  public static double[][] AKitCorner(double[] corners) {
+    double[][] output = new double[2][corners.length / 2];
+
+    for (int i = 0; i < corners.length; i += 2) {
+      output[0][i / 2] = corners[i];
+      output[1][i / 2] = corners[i + 1];
+    }
+
+    return output;
+  }
+
   public static Trajectory PPAutoToTraj(String auto) {
     List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile(auto);
     List<State> states = new ArrayList<>();
@@ -106,6 +117,14 @@ public class GeometryUtils {
       }
     }
     return new Trajectory(states);
+  }
+
+  public static Pose2d PoseSpaceToFieldSpace(Pose2d targetPose, Pose2d robotPose) {
+    return new Pose2d(
+        targetPose.getX() + robotPose.getX(),
+        targetPose.getY() + robotPose.getY(),
+        new Rotation2d(
+            targetPose.getRotation().getRadians() + robotPose.getRotation().getRadians()));
   }
 
   public static double[] getPoseError(Pose2d pose1, Pose2d pose2) {

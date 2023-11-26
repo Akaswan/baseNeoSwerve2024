@@ -14,10 +14,9 @@
 package frc.robot;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
-import com.pathplanner.lib.util.PathPlannerLogging;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.utilities.GeometryUtils;
@@ -65,11 +64,6 @@ public class Robot extends LoggedRobot {
     }
 
     Pathfinding.setPathfinder(new LocalADStarAK());
-    PathPlannerLogging.setLogActivePathCallback(
-        (activePath) -> {
-          Logger.recordOutput(
-              "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
-        });
 
     // Set up data receivers & replay source
     switch (Constants.currentMode) {
@@ -118,12 +112,24 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+
+    if (Constants.TUNING) {
+      m_robotContainer.tuningPeriodic();
+    }
+
+    if (Constants.INFO) {
+      m_robotContainer.infoPeriodic();
+    }
+
+    if (RobotBase.isReal()) {
+      m_robotContainer.realPeriodic();
+    }
   }
 
   /** This function is called once when autonomous is enabled. */
   @Override
   public void autonomousInit() {
-    RobotContainer.m_driveBase.setTrajectory(
+    RobotContainer.m_drivebase.setTrajectory(
         RobotContainer.autoChooser.getString() != "None"
             ? GeometryUtils.PPAutoToTraj(RobotContainer.autoChooser.getString())
             : new Trajectory());
@@ -142,20 +148,12 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    RobotContainer.m_driveBase.setTrajectory(new Trajectory());
+    RobotContainer.m_drivebase.setTrajectory(new Trajectory());
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {
-    if (Constants.TUNING) {
-      m_robotContainer.tuningPeriodic();
-    }
-
-    if (Constants.INFO) {
-      m_robotContainer.infoPeriodic();
-    }
-  }
+  public void teleopPeriodic() {}
 
   /** This function is called once when the robot is disabled. */
   @Override

@@ -20,7 +20,7 @@ public class TeleopSwerve extends Command {
 
   public double m_percentSpeed;
 
-  private SwerveDrive m_driveBase;
+  private SwerveDrive m_drivebase;
 
   private int m_translationAxis;
   private int m_strafeAxis;
@@ -52,7 +52,7 @@ public class TeleopSwerve extends Command {
       int rotationAxis,
       boolean openLoop,
       double percentSpeed) {
-    this.m_driveBase = m_drivebase;
+    this.m_drivebase = m_drivebase;
     addRequirements(m_drivebase);
 
     m_controller = controller;
@@ -91,6 +91,6 @@ public class TeleopSwerve extends Command {
     double m_strafe = xAxis * m_percentSpeed;
     m_rotation = rAxis * m_percentSpeed;
 
-    m_driveBase.drive(m_throttle, m_strafe, m_rotation, m_openLoop);
+    m_drivebase.drive(m_throttle, m_strafe, m_rotation, m_openLoop);
   }
 }
