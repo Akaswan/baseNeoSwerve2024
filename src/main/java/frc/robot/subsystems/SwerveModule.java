@@ -196,7 +196,7 @@ public class SwerveModule extends SubsystemBase {
         RobotContainer.tuningTab.add("Angle Offset " + m_moduleNumber, m_angleOffset).getEntry();
   }
 
-  public void testPeriodic() {
+  public void tuningPeriodic() {
     m_angleOffset = angleOffsetEntry.getDouble(m_angleOffset);
 
     m_driveController.setP(RobotContainer.m_drivebase.bufferDriveController.getP());

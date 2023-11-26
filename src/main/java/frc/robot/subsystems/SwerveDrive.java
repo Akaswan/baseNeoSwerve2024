@@ -326,7 +326,7 @@ public class SwerveDrive extends SubsystemBase {
     driveRampRateTuning = driveRampRateEntry.getDouble(0);
 
     for (SwerveModule module : m_SwerveMods) {
-      module.testPeriodic();
+      module.tuningPeriodic();
     }
   }
 
