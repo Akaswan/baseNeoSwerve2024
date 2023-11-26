@@ -127,13 +127,18 @@ public class GeometryUtils {
             targetPose.getRotation().getRadians() + robotPose.getRotation().getRadians()));
   }
 
-  public static double[] getPoseError(Pose2d pose1, Pose2d pose2) {
-    double[] output = new double[3];
+  public static Pose2d getPoseError(Pose2d pose1, Pose2d pose2) {
+    return new Pose2d(
+        pose1.getX() - pose2.getX(),
+        pose1.getY() - pose2.getY(),
+        new Rotation2d(pose1.getRotation().getRadians() - pose2.getRotation().getRadians()));
+  }
 
-    output[0] = pose1.getX() - pose2.getX();
-    output[1] = pose1.getY() - pose2.getY();
-    output[2] = pose1.getRotation().getRadians() - pose2.getRotation().getRadians();
+  public static double getAdjustedYawDegrees(double initialvalue, double addedValue) {
+    double numTo180 = 180 - addedValue;
 
-    return output;
+    return (initialvalue + numTo180) % 360 < 0
+        ? ((initialvalue + numTo180) % 360) + 360.0
+        : ((initialvalue + numTo180) % 360);
   }
 }

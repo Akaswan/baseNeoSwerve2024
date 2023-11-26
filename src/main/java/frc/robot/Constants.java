@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.util.PIDConstants;
 import edu.wpi.first.math.util.Units;
 import frc.robot.utilities.SwerveModuleConstants;
 
@@ -32,6 +33,8 @@ public final class Constants {
 
   public static final double WHEEL_BASE =
       Units.inchesToMeters(20.75); // Distance between front and back wheels on robot
+
+  public static final double DRIVE_BASE_RADIUS = Math.hypot(Units.inchesToMeters(32) / 2, Units.inchesToMeters(32) / 2);
 
   public static final double MAX_METERS_PER_SECOND =
       Units.feetToMeters(12.0); // Find this on sds website
@@ -98,6 +101,9 @@ public final class Constants {
           BACK_RIGHT_MODULE_STEER_MOTOR,
           BACK_RIGHT_MODULE_STEER_ENCODER,
           BACK_RIGHT_MODULE_STEER_OFFSET);
+
+  public static final PIDConstants TRANSLATION_CONSTANTS = new PIDConstants(5.0, 0, 0);
+  public static final PIDConstants ROTATION_CONSTANTS = new PIDConstants(5.0, 0, 0);
 
   public static enum Mode {
     /** Running on a real robot. */

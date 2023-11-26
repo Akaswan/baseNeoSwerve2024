@@ -52,5 +52,6 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": null
+  "folder": "Auto Paths",
+  "previewStartingState": null
 }

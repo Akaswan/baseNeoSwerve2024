@@ -12,7 +12,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.VecBuilder;
@@ -137,10 +136,11 @@ public class SwerveDrive extends SubsystemBase {
         this::autoDrive, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
         new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in
             // your Constants class
-            new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-            new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
-            4.5, // Max module speed, in m/s
-            0.4, // Drive base radius in meters. Distance from robot center to furthest module.
+            TRANSLATION_CONSTANTS, // Translation PID constants
+            ROTATION_CONSTANTS, // Rotation PID constants
+            MAX_METERS_PER_SECOND, // Max module speed, in m/s
+            DRIVE_BASE_RADIUS, // Drive base radius in meters. Distance from robot center to
+            // furthest module.
             new ReplanningConfig() // Default path replanning config. See the API for the options
             // here
             ),
@@ -254,18 +254,6 @@ public class SwerveDrive extends SubsystemBase {
     return Math.IEEEremainder(m_pigeon.getYaw(), 360);
   }
 
-  public double getAdjustedYawDegrees() {
-    return getYawDegrees() % 360 < 0 ? (getYawDegrees() % 360) + 360.0 : (getYawDegrees() % 360);
-  }
-
-  public double getAdjustedYawDegrees(double addedValue) {
-    double numTo180 = 180 - addedValue;
-
-    return (getYawDegrees() + numTo180) % 360 < 0
-        ? ((getYawDegrees() + numTo180) % 360) + 360.0
-        : ((getYawDegrees() + numTo180) % 360);
-  }
-
   public void setSwerveModuleStates(SwerveModuleState[] states) {
     setSwerveModuleStates(states, false);
   }
@@ -309,7 +297,8 @@ public class SwerveDrive extends SubsystemBase {
     Logger.recordOutput(
         "PathPlanner/Pathplanner Setpoint", GeometryUtils.AKitOdometry(targetPPPose));
     Logger.recordOutput(
-        "PathPlanner/PathPlannerError", GeometryUtils.getPoseError(getPose(), targetPPPose));
+        "PathPlanner/PathPlannerError",
+        GeometryUtils.AKitOdometry(GeometryUtils.getPoseError(getPose(), targetPPPose)));
 
     m_field.setRobotPose(poseEstimator.getEstimatedPosition());
   }
