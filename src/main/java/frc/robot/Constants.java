@@ -34,7 +34,8 @@ public final class Constants {
   public static final double WHEEL_BASE =
       Units.inchesToMeters(20.75); // Distance between front and back wheels on robot
 
-  public static final double DRIVE_BASE_RADIUS = Math.hypot(Units.inchesToMeters(32) / 2, Units.inchesToMeters(32) / 2);
+  public static final double DRIVE_BASE_RADIUS =
+      Math.hypot(Units.inchesToMeters(32) / 2, Units.inchesToMeters(32) / 2);
 
   public static final double MAX_METERS_PER_SECOND =
       Units.feetToMeters(12.0); // Find this on sds website

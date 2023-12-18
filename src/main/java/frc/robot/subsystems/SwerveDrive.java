@@ -9,8 +9,6 @@ import static frc.robot.Constants.*;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -23,7 +21,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Timer;
@@ -34,8 +31,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.utilities.GeometryUtils;
 import frc.robot.utilities.SwerveModuleConstants;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 
@@ -268,21 +263,6 @@ public class SwerveDrive extends SubsystemBase {
     for (SwerveModule mod : m_SwerveMods) {
       mod.resetAngleToAbsolute();
     }
-  }
-
-  public static Trajectory PPPathToTraj(PathPlannerPath path) {
-    List<State> states = new ArrayList<>();
-
-    for (PathPoint point : path.getAllPathPoints()) {
-      states.add(new State(0, 0, 0, new Pose2d(point.position, new Rotation2d(0)), 0));
-    }
-
-    return new Trajectory(states);
-  }
-
-  public void setTrajectory(Trajectory traj) {
-    robotTrajectory = traj;
-    m_field.getObject("traj").setTrajectory(robotTrajectory);
   }
 
   @Override

@@ -2,7 +2,7 @@
 
 >*Untested* Base Neo Swerve Code
 
-#### Includes 
+#### Includes
 * Pathplanner auto command templates/example and pathplanner on the fly path generation with obstacle avoidance
 * Teleop Swerve control with adjustable speeds for more precision
 * Sendable Chooser for changing auto plays on the fly

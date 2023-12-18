@@ -105,15 +105,7 @@ public class GeometryUtils {
 
     for (PathPlannerPath path : paths) {
       for (PathPoint point : path.getAllPathPoints()) {
-        states.add(
-            new State(
-                0,
-                0,
-                0,
-                new Pose2d(
-                    point.position,
-                    point.holonomicRotation != null ? point.holonomicRotation : new Rotation2d(0)),
-                0));
+        states.add(new State(0, 0, 0, new Pose2d(point.position, new Rotation2d(0)), 0));
       }
     }
     return new Trajectory(states);

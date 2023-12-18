@@ -53,10 +53,6 @@ public class RobotContainer {
       new SwerveDrive(FRONT_LEFT_MODULE, FRONT_RIGHT_MODULE, BACK_LEFT_MODULE, BACK_RIGHT_MODULE);
   public static final Limelight m_limelight = new Limelight();
 
-  // ROBOT STATE MACHINE \\
-  // public static final RobotStateMachine m_machine =
-  //     new RobotStateMachine();
-
   // SENDABLE CHOOSER \\
   public static LoggedDashboardChooser<Command> autoChooser =
       new LoggedDashboardChooser<>(

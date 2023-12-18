@@ -7,9 +7,6 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.StateMachine.RobotState;
-import java.util.HashMap;
-import java.util.Map;
 
 public class LED extends SubsystemBase {
   /** Creates a new LED. */
@@ -21,8 +18,6 @@ public class LED extends SubsystemBase {
 
   private boolean rainbow = false;
 
-  private Map<RobotState, Runnable> stateMap;
-
   public LED(AddressableLED led, int length) {
     m_led = led;
 
@@ -31,30 +26,6 @@ public class LED extends SubsystemBase {
 
     m_led.setData(m_ledBuffer);
     m_led.start();
-  }
-
-  public void initializeStateMap() {
-    stateMap = new HashMap<>();
-
-    stateMap.put(
-        RobotState.IN,
-        () -> {
-          this.setRGB(7, 123, 133);
-          rainbow = false;
-        });
-    stateMap.put(
-        RobotState.LOW,
-        () -> {
-          this.setRGB(30, 12, 155);
-          rainbow = false;
-        });
-    stateMap.put(
-        RobotState.MANUAL,
-        () -> {
-          this.setRGB(25, 200, 20);
-          rainbow = false;
-        });
-    stateMap.put(RobotState.HIGH_CONE, () -> rainbow = true);
   }
 
   public void setRGB(int r, int g, int b) {

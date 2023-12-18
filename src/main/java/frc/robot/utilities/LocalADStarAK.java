@@ -8,9 +8,7 @@ import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinder;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.SwerveDrive;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -144,9 +142,7 @@ public class LocalADStarAK implements Pathfinder {
                   .get(currentPathPoints.size() - 1)
                   .position
                   .getDistance(RobotContainer.m_drivebase.getPose().getTranslation())
-              <= .1) {
-        RobotContainer.m_drivebase.setTrajectory(new Trajectory());
-      }
+              <= .1) {}
     }
 
     public void updateCurrentPathPoints(PathConstraints constraints, GoalEndState goalEndState) {
@@ -154,12 +150,8 @@ public class LocalADStarAK implements Pathfinder {
 
       if (currentPath != null) {
         currentPathPoints = currentPath.getAllPathPoints();
-        if (lastPath != currentPath) {
-          RobotContainer.m_drivebase.setTrajectory(SwerveDrive.PPPathToTraj(currentPath));
-        }
       } else {
         currentPathPoints = Collections.emptyList();
-        RobotContainer.m_drivebase.setTrajectory(new Trajectory());
       }
 
       lastPath = currentPath;
