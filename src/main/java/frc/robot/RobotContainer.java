@@ -33,6 +33,8 @@ import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.manager.ServoMotorSubsystem;
 import frc.robot.subsystems.manager.SuperstructureStateManager;
 import frc.robot.subsystems.manager.SuperstructureStateManager.SuperstructureState;
+import frc.robot.utilities.Alert;
+import frc.robot.utilities.Alert.AlertType;
 import frc.robot.utilities.LoggedDashboardChooser;
 
 /*
@@ -76,6 +78,8 @@ public class RobotContainer {
   public static LoggedDashboardChooser<Command> autoChooser =
       new LoggedDashboardChooser<>(
           "Auto Picker", AutoBuilder.buildAutoChooser(), mainTab, 0, 0, 2, 1);
+
+  private final Alert test = new Alert("U smell bruh", AlertType.WARNING);
 
   public RobotContainer() {
 
@@ -184,12 +188,14 @@ public class RobotContainer {
           .setSuperstructureState(
               new ServoMotorSubsystem[] {m_arm, m_elevator, m_wrist}, SuperstructureState.PLACE)
           .schedule();
+      test.set(true);
     }
     if (m_operatorController.getXButtonPressed()) {
       m_manager
           .setSuperstructureState(
               new ServoMotorSubsystem[] {m_arm, m_elevator, m_wrist}, SuperstructureState.HOME)
           .schedule();
+      test.set(false);
     }
     if (m_operatorController.getBButtonPressed()) {
       m_manager

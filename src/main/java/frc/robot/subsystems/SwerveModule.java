@@ -39,6 +39,7 @@ public class SwerveModule extends SubsystemBase {
   private double m_simDriveEncoderVelocity;
 
   private LoggedTunableNumber m_angleOffset;
+  private double m_lastAngleOffset;
 
   private final SparkMaxPIDController m_driveController;
   private SparkMaxPIDController m_turnController;
@@ -70,7 +71,14 @@ public class SwerveModule extends SubsystemBase {
     m_angleEncoder = new CANCoder(swerveModuleConstants.cancoderID, "rio");
     m_angleOffset =
         new LoggedTunableNumber(
-            "Drivebase/Module " + m_moduleNumber + " Offset", swerveModuleConstants.angleOffset);
+            "Module " + m_moduleNumber + " Offset",
+            swerveModuleConstants.angleOffset,
+            RobotContainer.tuningTab,
+            BuiltInWidgets.kTextView,
+            Map.of("min", 0),
+            m_moduleNumber,
+            2);
+    m_lastAngleOffset = m_angleOffset.get();
 
     m_driveMotor.restoreFactoryDefaults();
     RevUtils.setDriveMotorConfig(m_driveMotor);
@@ -195,6 +203,11 @@ public class SwerveModule extends SubsystemBase {
     m_turnController.setI(SwerveDrive.driveki.get());
     m_turnController.setD(SwerveDrive.drivekd.get());
     m_turnController.setFF(SwerveDrive.drivekff.get());
+
+    if (m_lastAngleOffset != m_angleOffset.get()) {
+      resetAngleToAbsolute();
+      m_lastAngleOffset = m_angleOffset.get();
+    }
   }
 
   public void infoInit() {

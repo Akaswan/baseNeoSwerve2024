@@ -30,7 +30,7 @@ import frc.robot.utilities.SwerveModuleConstants;
 public final class Constants {
   public static final Mode currentMode = Mode.SIM;
 
-  public static final boolean kInfoMode = true;
+  public static final boolean kInfoMode = false;
 
   public static final boolean kTuningMode = false;
 

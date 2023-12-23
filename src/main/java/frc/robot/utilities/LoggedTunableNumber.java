@@ -7,22 +7,21 @@
 
 package frc.robot.utilities;
 
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import frc.robot.Constants;
 import java.util.HashMap;
 import java.util.Map;
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
 /**
  * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or
  * value not in dashboard.
  */
 public class LoggedTunableNumber {
-  private static final String tableKey = "TunableNumbers";
-
   private final String key;
   private boolean hasDefault = false;
   private double defaultValue;
-  private LoggedDashboardNumber dashboardNumber;
+  private LoggedShuffleboardNumber shuffleboardNumber;
   private Map<Integer, Double> lastHasChangedValues = new HashMap<>();
 
   /**
@@ -31,7 +30,7 @@ public class LoggedTunableNumber {
    * @param dashboardKey Key on dashboard
    */
   public LoggedTunableNumber(String dashboardKey) {
-    this.key = tableKey + "/" + dashboardKey;
+    this.key = dashboardKey;
   }
 
   /**
@@ -40,9 +39,16 @@ public class LoggedTunableNumber {
    * @param dashboardKey Key on dashboard
    * @param defaultValue Default value
    */
-  public LoggedTunableNumber(String dashboardKey, double defaultValue) {
+  public LoggedTunableNumber(
+      String dashboardKey,
+      double defaultValue,
+      ShuffleboardTab tab,
+      WidgetType widget,
+      Map<String, Object> properties,
+      int columnIndex,
+      int rowIndex) {
     this(dashboardKey);
-    initDefault(defaultValue);
+    initDefault(defaultValue, tab, widget, properties, columnIndex, rowIndex);
   }
 
   /**
@@ -50,12 +56,20 @@ public class LoggedTunableNumber {
    *
    * @param defaultValue The default value
    */
-  public void initDefault(double defaultValue) {
+  public void initDefault(
+      double defaultValue,
+      ShuffleboardTab tab,
+      WidgetType widget,
+      Map<String, Object> properties,
+      int columnIndex,
+      int rowIndex) {
     if (!hasDefault) {
       hasDefault = true;
       this.defaultValue = defaultValue;
       if (Constants.kTuningMode) {
-        dashboardNumber = new LoggedDashboardNumber(key, defaultValue);
+        shuffleboardNumber =
+            new LoggedShuffleboardNumber(
+                key, defaultValue, tab, widget, properties, columnIndex, rowIndex);
       }
     }
   }
@@ -69,7 +83,7 @@ public class LoggedTunableNumber {
     if (!hasDefault) {
       return 0.0;
     } else {
-      return Constants.kTuningMode ? dashboardNumber.get() : defaultValue;
+      return Constants.kTuningMode ? shuffleboardNumber.get() : defaultValue;
     }
   }
 

@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.*;
-
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -13,14 +11,12 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
@@ -48,31 +44,88 @@ public class SwerveDrive extends SubsystemBase {
 
   private SimpleWidget m_gyroWidget;
 
-  private GenericEntry driveRampRateEntry;
-  public double driveRampRateTuning;
-
-  public PIDController bufferDriveController = new PIDController(0, 0, 0);
-  public PIDController bufferTurnController = new PIDController(0, 0, 0);
-
   public static final LoggedTunableNumber drivekp =
-      new LoggedTunableNumber("Drivebase/Drive P", DriveConstants.drivekp);
+      new LoggedTunableNumber(
+          "Drive P",
+          DriveConstants.drivekp,
+          RobotContainer.tuningTab,
+          BuiltInWidgets.kTextView,
+          Map.of("min", 0),
+          0,
+          0);
   public static final LoggedTunableNumber driveki =
-      new LoggedTunableNumber("Drivebase/Drive I", DriveConstants.driveki);
+      new LoggedTunableNumber(
+          "Drive I",
+          DriveConstants.driveki,
+          RobotContainer.tuningTab,
+          BuiltInWidgets.kTextView,
+          Map.of("min", 0),
+          1,
+          0);
   public static final LoggedTunableNumber drivekd =
-      new LoggedTunableNumber("Drivebase/Drive D", DriveConstants.drivekd);
+      new LoggedTunableNumber(
+          "Drive D",
+          DriveConstants.drivekd,
+          RobotContainer.tuningTab,
+          BuiltInWidgets.kTextView,
+          Map.of("min", 0),
+          2,
+          0);
   public static final LoggedTunableNumber drivekff =
-      new LoggedTunableNumber("Drivebase/Drive FF", DriveConstants.drivekff);
+      new LoggedTunableNumber(
+          "Drive FF",
+          DriveConstants.drivekff,
+          RobotContainer.tuningTab,
+          BuiltInWidgets.kTextView,
+          Map.of("min", 0),
+          3,
+          0);
   public static final LoggedTunableNumber driveRampRate =
-      new LoggedTunableNumber("Drivebase/Drive RampRate", DriveConstants.driverampRate);
+      new LoggedTunableNumber(
+          "Drive RampRate",
+          DriveConstants.driverampRate,
+          RobotContainer.tuningTab,
+          BuiltInWidgets.kTextView,
+          Map.of("min", 0),
+          4,
+          0);
 
   public static final LoggedTunableNumber turnkp =
-      new LoggedTunableNumber("Drivebase/Turn P", DriveConstants.turnkp);
+      new LoggedTunableNumber(
+          "Turn P",
+          DriveConstants.turnkp,
+          RobotContainer.tuningTab,
+          BuiltInWidgets.kTextView,
+          Map.of("min", 0),
+          0,
+          1);
   public static final LoggedTunableNumber turnki =
-      new LoggedTunableNumber("Drivebase/Turn I", DriveConstants.turnki);
+      new LoggedTunableNumber(
+          "Turn I",
+          DriveConstants.turnki,
+          RobotContainer.tuningTab,
+          BuiltInWidgets.kTextView,
+          Map.of("min", 0),
+          1,
+          1);
   public static final LoggedTunableNumber turnkd =
-      new LoggedTunableNumber("Drivebase/Turn D", DriveConstants.turnkd);
+      new LoggedTunableNumber(
+          "Turn D",
+          DriveConstants.turnkd,
+          RobotContainer.tuningTab,
+          BuiltInWidgets.kTextView,
+          Map.of("min", 0),
+          2,
+          1);
   public static final LoggedTunableNumber turnkff =
-      new LoggedTunableNumber("Drivebase/Turn FF", DriveConstants.turnkff);
+      new LoggedTunableNumber(
+          "Turn FF",
+          DriveConstants.turnkff,
+          RobotContainer.tuningTab,
+          BuiltInWidgets.kTextView,
+          Map.of("min", 0),
+          3,
+          1);
 
   private static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0; // Last year 11.5?
   private static final boolean invertGyro = false;
@@ -181,7 +234,7 @@ public class SwerveDrive extends SubsystemBase {
     setSwerveModuleStates(moduleStates, isOpenLoop);
     chassisSpeeds = correctForDynamics(chassisSpeeds);
 
-    Logger.recordOutput("Drivebase/SwerveStateSetpoints", GeometryUtils.AKitStates(moduleStates));
+    Logger.recordOutput("Drivebase/SwerveStateSetpoints", moduleStates);
 
     robotRelativeChassisSpeeds = correctForDynamics(new ChassisSpeeds(throttle, strafe, rotation));
   }
@@ -289,17 +342,16 @@ public class SwerveDrive extends SubsystemBase {
     poseEstimator.update(getYaw(), getModulePositions());
 
     Logger.recordOutput("Drivebase/Gyro Connected", m_pigeon.getLastError().equals(ErrorCode.OK));
-    Logger.recordOutput("Drivebase/Gyro", getYaw().getRadians());
-    Logger.recordOutput("Drivebase/SwerveStates", GeometryUtils.AKitStates(getModuleStates()));
-    Logger.recordOutput("Drivebase/Pose", GeometryUtils.AKitOdometry(getPose()));
+    Logger.recordOutput("Drivebase/Gyro", getYaw());
+    Logger.recordOutput("Drivebase/SwerveStates", getModuleStates());
+    Logger.recordOutput("Drivebase/Pose", getPose());
     Logger.recordOutput("PathPlanner/Trajectory", GeometryUtils.listToArray(ppPath));
+    Logger.recordOutput("PathPlanner/Pathplanner Setpoint", targetPPPose);
     Logger.recordOutput(
-        "PathPlanner/Pathplanner Setpoint", GeometryUtils.AKitOdometry(targetPPPose));
-    Logger.recordOutput(
-        "PathPlanner/PathPlannerError",
-        GeometryUtils.AKitOdometry(GeometryUtils.getPoseError(getPose(), targetPPPose)));
+        "PathPlanner/PathPlannerError", GeometryUtils.getPoseError(getPose(), targetPPPose));
 
     m_field.setRobotPose(poseEstimator.getEstimatedPosition());
+    m_field.getObject("path").setPoses(ppPath);
   }
 
   public void realPeriodic() {
@@ -323,7 +375,6 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void tuningPeriodic() {
-    driveRampRateTuning = driveRampRateEntry.getDouble(0);
 
     for (SwerveModule module : m_SwerveMods) {
       module.tuningPeriodic();
@@ -331,15 +382,6 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void tuningInit() {
-    RobotContainer.tuningTab.add("Drive Motor PID", bufferDriveController);
-    RobotContainer.tuningTab.add("Turn Motor PID", bufferTurnController);
-    driveRampRateEntry =
-        RobotContainer.tuningTab
-            .add("Drive Ramp Rate", 0)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", 0))
-            .getEntry();
-    driveRampRateTuning = driveRampRateEntry.getDouble(0);
 
     for (SwerveModule module : m_SwerveMods) {
       module.tuningInit();
