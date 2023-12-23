@@ -114,10 +114,10 @@ public class GeometryUtils {
   public static double[] listToArray(List<Pose2d> list) {
     double[] output = new double[list.size() * 3];
 
-    for (int i = 0; i < list.size(); i++) {
-      output[i] = list.get(i).getX();
-      output[i] = list.get(i).getY();
-      output[i] = list.get(i).getRotation().getRadians();
+    for (int i = 0; i < list.size() * 3; i += 3) {
+      output[i] = list.get(i / 3).getX();
+      output[i + 1] = list.get(i / 3).getY();
+      output[i + 2] = list.get(i / 3).getRotation().getRadians();
     }
 
     return output;
