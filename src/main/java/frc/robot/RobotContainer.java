@@ -18,10 +18,21 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.WristConstants;
 import frc.robot.commands.SwerveDrivebase.TeleopSwerve;
 import frc.robot.commands.SwerveDrivebase.TurnToAngle;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.manager.ServoMotorSubsystem;
+import frc.robot.subsystems.manager.SuperstructureStateManager;
+import frc.robot.subsystems.manager.SuperstructureStateManager.SuperstructureState;
 import frc.robot.utilities.LoggedDashboardChooser;
 
 /*
@@ -36,12 +47,11 @@ public class RobotContainer {
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
   private final int rotationAxis = XboxController.Axis.kRightX.value;
 
-  // CONTROLLER PORTS \\
-  public static final int DriverControllerPort = 0;
-
   // CONTROLLERS \\
-  CommandXboxController driverController = new CommandXboxController(0);
-  XboxController testcontroller = new XboxController(0);
+  public static final CommandXboxController m_driverController =
+      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  public static final XboxController m_operatorController =
+      new XboxController(OperatorConstants.kOperatorControllerPort);
 
   // SHUFFLEBOARD TABS \\
   public static ShuffleboardTab mainTab = Shuffleboard.getTab("Main");
@@ -50,8 +60,17 @@ public class RobotContainer {
 
   // SUBSYSTEMS \\
   public static final SwerveDrive m_drivebase =
-      new SwerveDrive(FRONT_LEFT_MODULE, FRONT_RIGHT_MODULE, BACK_LEFT_MODULE, BACK_RIGHT_MODULE);
+      new SwerveDrive(
+          DriveConstants.FRONT_LEFT_MODULE,
+          DriveConstants.FRONT_RIGHT_MODULE,
+          DriveConstants.BACK_LEFT_MODULE,
+          DriveConstants.BACK_RIGHT_MODULE);
   public static final Limelight m_limelight = new Limelight();
+  public static final Arm m_arm = new Arm(ArmConstants.kArmConstants);
+  public static final Elevator m_elevator = new Elevator(ElevatorConstants.kElevatorConstants);
+  public static final Wrist m_wrist = new Wrist(WristConstants.kWristConstants);
+  public static final SuperstructureStateManager m_manager =
+      new SuperstructureStateManager(SuperstructureState.HOME);
 
   // SENDABLE CHOOSER \\
   public static LoggedDashboardChooser<Command> autoChooser =
@@ -69,46 +88,47 @@ public class RobotContainer {
     m_drivebase.setDefaultCommand(
         new TeleopSwerve(
             m_drivebase,
-            driverController,
+            m_driverController,
             translationAxis,
             strafeAxis,
             rotationAxis,
             true,
-            REGULAR_SPEED));
+            DriveConstants.REGULAR_SPEED));
 
     configureButtonBindings();
   }
 
   private void configureButtonBindings() {
+
     // XBOX 0
-    driverController
+    m_driverController
         .leftBumper()
         .onTrue(
             new TeleopSwerve(
                 m_drivebase,
-                driverController,
+                m_driverController,
                 translationAxis,
                 strafeAxis,
                 rotationAxis,
                 true,
-                SLOW_SPEED));
+                DriveConstants.SLOW_SPEED));
 
-    driverController
+    m_driverController
         .leftBumper()
         .onFalse(
             new TeleopSwerve(
                 m_drivebase,
-                driverController,
+                m_driverController,
                 translationAxis,
                 strafeAxis,
                 rotationAxis,
                 true,
-                REGULAR_SPEED));
+                DriveConstants.REGULAR_SPEED));
 
-    driverController.back().onTrue(new InstantCommand(m_drivebase::zeroGyroscope));
+    m_driverController.back().onTrue(new InstantCommand(m_drivebase::zeroGyroscope));
 
     // Example of an automatic path generated to score in the B2 zone
-    driverController
+    m_driverController
         .a()
         .onTrue(
             AutoBuilder.pathfindToPose(
@@ -118,7 +138,7 @@ public class RobotContainer {
                 0.0));
 
     // Example of an automatic path generated to pick up from the human player
-    driverController
+    m_driverController
         .b()
         .onTrue(
             AutoBuilder.pathfindToPose(
@@ -127,7 +147,7 @@ public class RobotContainer {
                 0.0,
                 0.0));
 
-    driverController.x().onTrue(new TurnToAngle(m_drivebase, 30));
+    m_driverController.x().onTrue(new TurnToAngle(m_drivebase, 30));
   }
 
   public Command getAutonomousCommand() {
@@ -153,5 +173,26 @@ public class RobotContainer {
   public void realPeriodic() {
     m_drivebase.realPeriodic();
     m_limelight.realPeriodic();
+  }
+
+  public void periodic() {
+    if (m_operatorController.getYButtonPressed()) {
+      m_manager
+          .setSuperstructureState(
+              new ServoMotorSubsystem[] {m_arm, m_elevator, m_wrist}, SuperstructureState.PLACE)
+          .schedule();
+    }
+    if (m_operatorController.getXButtonPressed()) {
+      m_manager
+          .setSuperstructureState(
+              new ServoMotorSubsystem[] {m_arm, m_elevator, m_wrist}, SuperstructureState.HOME)
+          .schedule();
+    }
+    if (m_operatorController.getBButtonPressed()) {
+      m_manager
+          .setSuperstructureState(
+              new ServoMotorSubsystem[] {m_arm, m_elevator, m_wrist}, SuperstructureState.PICKUP)
+          .schedule();
+    }
   }
 }

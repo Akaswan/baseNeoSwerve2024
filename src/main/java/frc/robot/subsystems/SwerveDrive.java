@@ -37,10 +37,10 @@ import org.littletonrobotics.junction.Logger;
 public class SwerveDrive extends SubsystemBase {
   private boolean isFieldRelative = true;
   public static final Translation2d[] kModuleTranslations = {
-    new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
-    new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
-    new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
-    new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)
+    new Translation2d(DriveConstants.WHEEL_BASE / 2, DriveConstants.TRACK_WIDTH / 2),
+    new Translation2d(DriveConstants.WHEEL_BASE / 2, -DriveConstants.TRACK_WIDTH / 2),
+    new Translation2d(-DriveConstants.WHEEL_BASE / 2, DriveConstants.TRACK_WIDTH / 2),
+    new Translation2d(-DriveConstants.WHEEL_BASE / 2, -DriveConstants.TRACK_WIDTH / 2)
   };
 
   public static final SwerveDriveKinematics kDriveKinematics =
@@ -131,10 +131,11 @@ public class SwerveDrive extends SubsystemBase {
         this::autoDrive, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
         new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in
             // your Constants class
-            TRANSLATION_CONSTANTS, // Translation PID constants
-            ROTATION_CONSTANTS, // Rotation PID constants
-            MAX_METERS_PER_SECOND, // Max module speed, in m/s
-            DRIVE_BASE_RADIUS, // Drive base radius in meters. Distance from robot center to
+            DriveConstants.TRANSLATION_CONSTANTS, // Translation PID constants
+            DriveConstants.ROTATION_CONSTANTS, // Rotation PID constants
+            DriveConstants.MAX_METERS_PER_SECOND, // Max module speed, in m/s
+            DriveConstants
+                .DRIVE_BASE_RADIUS, // Drive base radius in meters. Distance from robot center to
             // furthest module.
             new ReplanningConfig() // Default path replanning config. See the API for the options
             // here
@@ -149,8 +150,8 @@ public class SwerveDrive extends SubsystemBase {
 
   public void drive(double throttle, double strafe, double rotation, boolean isOpenLoop) {
 
-    throttle = throttle * MAX_METERS_PER_SECOND;
-    strafe = strafe * MAX_METERS_PER_SECOND;
+    throttle = throttle * DriveConstants.MAX_METERS_PER_SECOND;
+    strafe = strafe * DriveConstants.MAX_METERS_PER_SECOND;
     rotation = rotation * kMaxRotationRadiansPerSecond;
 
     ChassisSpeeds chassisSpeeds =
@@ -174,7 +175,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_METERS_PER_SECOND);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.MAX_METERS_PER_SECOND);
 
     for (int i = 0; i < m_SwerveMods.length; i++) {
       SwerveModule module = m_SwerveMods[i];

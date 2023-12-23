@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
 import frc.robot.utilities.RevUtils;
 import frc.robot.utilities.SwerveModuleConstants;
@@ -30,9 +31,10 @@ public class SwerveModule extends SubsystemBase {
   private final int POS_SLOT = 0;
   private final int VEL_SLOT = 0;
 
-  public static final double kDriveRevToMeters = ((WHEEL_DIAMETER * Math.PI) / DRIVE_GEAR_RATIO);
+  public static final double kDriveRevToMeters =
+      ((DriveConstants.WHEEL_DIAMETER * Math.PI) / DriveConstants.DRIVE_GEAR_RATIO);
   public static final double kDriveRpmToMetersPerSecond = kDriveRevToMeters / 60.0;
-  public static final double kTurnRotationsToDegrees = 360.0 / TURN_GEAR_RATIO;
+  public static final double kTurnRotationsToDegrees = 360.0 / DriveConstants.TURN_GEAR_RATIO;
 
   private CANSparkMax m_driveMotor;
   private CANSparkMax m_turningMotor;
@@ -155,7 +157,8 @@ public class SwerveModule extends SubsystemBase {
     desiredState = RevUtils.optimize(desiredState, getHeadingRotation2d());
 
     if (isOpenLoop) {
-      double percentOutput = desiredState.speedMetersPerSecond / MAX_METERS_PER_SECOND;
+      double percentOutput =
+          desiredState.speedMetersPerSecond / DriveConstants.MAX_METERS_PER_SECOND;
       m_driveMotor.set(percentOutput);
     } else {
       int DRIVE_PID_SLOT = VEL_SLOT;
@@ -165,7 +168,7 @@ public class SwerveModule extends SubsystemBase {
 
     double angle =
         (Math.abs(desiredState.speedMetersPerSecond)
-                <= (MAX_METERS_PER_SECOND
+                <= (DriveConstants.MAX_METERS_PER_SECOND
                     * 0.01)) // Prevent rotating module if speed is less than 1%. Prevents
             // Jittering.
             ? m_lastAngle

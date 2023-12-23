@@ -122,6 +122,8 @@ public class Robot extends LoggedRobot {
     if (RobotBase.isReal()) {
       m_robotContainer.realPeriodic();
     }
+
+    m_robotContainer.periodic();
   }
 
   /** This function is called once when autonomous is enabled. */
