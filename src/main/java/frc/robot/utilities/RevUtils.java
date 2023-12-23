@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.Constants.DriveConstants;
 
 public final class RevUtils {
 
@@ -14,12 +15,12 @@ public final class RevUtils {
    */
   public static void setDriveMotorConfig(CANSparkMax motorController) {
 
-    motorController.getPIDController().setFF(0.15751);
-    motorController.getPIDController().setP(0.23983);
-    motorController.getPIDController().setI(0.0);
-    motorController.getPIDController().setD(0.0);
+    motorController.getPIDController().setFF(DriveConstants.drivekff);
+    motorController.getPIDController().setP(DriveConstants.drivekp);
+    motorController.getPIDController().setI(DriveConstants.driveki);
+    motorController.getPIDController().setD(DriveConstants.drivekd);
 
-    motorController.setOpenLoopRampRate(0.1);
+    motorController.setOpenLoopRampRate(DriveConstants.driverampRate);
 
     motorController.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 10);
     motorController.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20);
@@ -35,10 +36,10 @@ public final class RevUtils {
    */
   public static void setTurnMotorConfig(CANSparkMax motorController) {
 
-    motorController.getPIDController().setFF(0);
-    motorController.getPIDController().setP(0.01);
-    motorController.getPIDController().setI(0.0);
-    motorController.getPIDController().setD(0.0);
+    motorController.getPIDController().setFF(DriveConstants.turnkff);
+    motorController.getPIDController().setP(DriveConstants.turnkp);
+    motorController.getPIDController().setI(DriveConstants.turnki);
+    motorController.getPIDController().setD(DriveConstants.turnkd);
 
     motorController.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100);
     motorController.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20);

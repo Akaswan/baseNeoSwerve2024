@@ -93,11 +93,11 @@ public class Robot extends LoggedRobot {
 
     m_robotContainer = new RobotContainer();
 
-    if (Constants.TUNING) {
+    if (Constants.kTuningMode) {
       m_robotContainer.tuningInit();
     }
 
-    if (Constants.INFO) {
+    if (Constants.kInfoMode) {
       m_robotContainer.infoInit();
     }
 
@@ -111,11 +111,11 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
 
-    if (Constants.TUNING) {
+    if (Constants.kTuningMode) {
       m_robotContainer.tuningPeriodic();
     }
 
-    if (Constants.INFO) {
+    if (Constants.kInfoMode) {
       m_robotContainer.infoPeriodic();
     }
 

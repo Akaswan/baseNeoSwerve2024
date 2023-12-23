@@ -55,16 +55,16 @@ public class RobotContainer {
 
   // SHUFFLEBOARD TABS \\
   public static ShuffleboardTab mainTab = Shuffleboard.getTab("Main");
-  public static ShuffleboardTab infoTab = INFO ? Shuffleboard.getTab("Info") : null;
-  public static ShuffleboardTab tuningTab = TUNING ? Shuffleboard.getTab("Tuning") : null;
+  public static ShuffleboardTab infoTab = kInfoMode ? Shuffleboard.getTab("Info") : null;
+  public static ShuffleboardTab tuningTab = kTuningMode ? Shuffleboard.getTab("Tuning") : null;
 
   // SUBSYSTEMS \\
   public static final SwerveDrive m_drivebase =
       new SwerveDrive(
-          DriveConstants.FRONT_LEFT_MODULE,
-          DriveConstants.FRONT_RIGHT_MODULE,
-          DriveConstants.BACK_LEFT_MODULE,
-          DriveConstants.BACK_RIGHT_MODULE);
+          DriveConstants.kFrontLeft,
+          DriveConstants.kFrontRight,
+          DriveConstants.kBackLeft,
+          DriveConstants.kBackRight);
   public static final Limelight m_limelight = new Limelight();
   public static final Arm m_arm = new Arm(ArmConstants.kArmConstants);
   public static final Elevator m_elevator = new Elevator(ElevatorConstants.kElevatorConstants);
@@ -93,7 +93,8 @@ public class RobotContainer {
             strafeAxis,
             rotationAxis,
             true,
-            DriveConstants.REGULAR_SPEED));
+            DriveConstants.kRegularSpeed,
+            true));
 
     configureButtonBindings();
   }
@@ -111,7 +112,8 @@ public class RobotContainer {
                 strafeAxis,
                 rotationAxis,
                 true,
-                DriveConstants.SLOW_SPEED));
+                DriveConstants.kSlowSpeed,
+                true));
 
     m_driverController
         .leftBumper()
@@ -123,7 +125,8 @@ public class RobotContainer {
                 strafeAxis,
                 rotationAxis,
                 true,
-                DriveConstants.REGULAR_SPEED));
+                DriveConstants.kRegularSpeed,
+                true));
 
     m_driverController.back().onTrue(new InstantCommand(m_drivebase::zeroGyroscope));
 

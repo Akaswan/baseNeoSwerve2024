@@ -28,6 +28,8 @@ public class TeleopSwerve extends Command {
 
   private boolean m_openLoop;
 
+  private boolean m_fieldRelative;
+
   /**
    *
    *
@@ -43,6 +45,7 @@ public class TeleopSwerve extends Command {
    * @param fieldRelative Controlls relative to orientation
    * @param openLoop Open Loop does not use PID values to correct inputs
    * @param percentSpeed The speed of the robot from 0.0 to 1.0
+   * @param fieldRelative If the robot should be driven relative to the field or the robot
    */
   public TeleopSwerve(
       SwerveDrive m_drivebase,
@@ -51,7 +54,8 @@ public class TeleopSwerve extends Command {
       int strafeAxis,
       int rotationAxis,
       boolean openLoop,
-      double percentSpeed) {
+      double percentSpeed,
+      boolean fieldRelative) {
     this.m_drivebase = m_drivebase;
     addRequirements(m_drivebase);
 
@@ -61,6 +65,7 @@ public class TeleopSwerve extends Command {
     m_rotationAxis = rotationAxis;
     m_openLoop = openLoop;
     m_percentSpeed = percentSpeed;
+    m_fieldRelative = fieldRelative;
   }
 
   @Override
@@ -91,6 +96,6 @@ public class TeleopSwerve extends Command {
     double m_strafe = xAxis * m_percentSpeed;
     m_rotation = rAxis * m_percentSpeed;
 
-    m_drivebase.drive(m_throttle, m_strafe, m_rotation, m_openLoop);
+    m_drivebase.drive(m_throttle, m_strafe, m_rotation, m_openLoop, m_fieldRelative);
   }
 }

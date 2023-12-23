@@ -7,6 +7,8 @@ package frc.robot;
 import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.subsystems.Arm.ArmState;
@@ -28,9 +30,9 @@ import frc.robot.utilities.SwerveModuleConstants;
 public final class Constants {
   public static final Mode currentMode = Mode.SIM;
 
-  public static final boolean INFO = true;
+  public static final boolean kInfoMode = true;
 
-  public static final boolean TUNING = false;
+  public static final boolean kTuningMode = false;
 
   // // DRIVEBASE \\ \\
 
@@ -43,83 +45,97 @@ public final class Constants {
   }
 
   public static final class DriveConstants {
-    public static final double TRACK_WIDTH =
+
+    public static double drivekp = 0.15751;
+    public static double driveki = 0.0;
+    public static double drivekd = 0.0;
+    public static double drivekff = 0.23983;
+    public static double driverampRate = 0.0;
+
+    public static double turnkp = 0.1;
+    public static double turnki = 0.0;
+    public static double turnkd = 0.0;
+    public static double turnkff = 0.0;
+
+    public static int kPigeon = 0;
+
+    public static final double kTrackWidth =
         Units.inchesToMeters(20.67); // Distance between centers of right and left wheels on robot
 
-    public static final double WHEEL_BASE =
+    public static final double kWheelBase =
         Units.inchesToMeters(20.75); // Distance between front and back wheels on robot
 
-    public static final double DRIVE_BASE_RADIUS =
+    public static final double kDriveBaseRadius =
         Math.hypot(Units.inchesToMeters(32) / 2, Units.inchesToMeters(32) / 2);
 
-    public static final double MAX_METERS_PER_SECOND =
+    public static final double kMaxMetersPerSecond =
         Units.feetToMeters(12.0); // Find this on sds website
 
-    public static final double DRIVE_GEAR_RATIO = 8.14; // MK4i L1 Neo, find on sds website
+    public static final double kDriveGearRatio = 8.14; // MK4i L1 Neo, find on sds website
 
-    public static final double TURN_GEAR_RATIO =
+    public static final double kTurnGearRatio =
         150.0 / 7.0; // MK4i turning ratio MK4i Neo, find on sds website
 
-    public static final double WHEEL_DIAMETER = Units.inchesToMeters(3.79); // Wheel diameter
+    public static final double kWheelDiameter = Units.inchesToMeters(3.79); // Wheel diameter
 
-    public static final double REGULAR_SPEED = 1; // Regular speed multiplier of robot
+    public static final double kRegularSpeed = 1; // Regular speed multiplier of robot
 
-    public static final double SLOW_SPEED = 0.4; // Slow speed multiplier of robot
+    public static final double kSlowSpeed = 0.4; // Slow speed multiplier of robot
 
-    // FRONT LEFT MODULE \\
-
-    public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 12;
-    public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 11;
-    public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 1;
-    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = 52.03; // 52.03: Grimes House
-    public static final SwerveModuleConstants FRONT_LEFT_MODULE =
+    public static final int kFrontLeftDriveMotor = 12;
+    public static final int kFrontLeftSteerMotor = 11;
+    public static final int kFrontLeftSteerEncoder = 1;
+    public static final double kFrontLeftOffset = 52.03; // 52.03: Grimes House
+    public static final SwerveModuleConstants kFrontLeft =
         new SwerveModuleConstants(
-            FRONT_LEFT_MODULE_DRIVE_MOTOR,
-            FRONT_LEFT_MODULE_STEER_MOTOR,
-            FRONT_LEFT_MODULE_STEER_ENCODER,
-            FRONT_LEFT_MODULE_STEER_OFFSET);
+            kFrontLeftDriveMotor, kFrontLeftSteerMotor, kFrontLeftSteerEncoder, kFrontLeftOffset);
 
-    // FRONT RIGHT MODULE \\
-
-    public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 18;
-    public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 17;
-    public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 7;
-    public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 144.22; // 144.22: Grimes House
-    public static final SwerveModuleConstants FRONT_RIGHT_MODULE =
+    public static final int kFrontRightDriveMotor = 18;
+    public static final int kFrontRightSteerMotor = 17;
+    public static final int kFrontRightSteerEncoder = 7;
+    public static final double kFrontRightSteerOffset = 144.22; // 144.22: Grimes House
+    public static final SwerveModuleConstants kFrontRight =
         new SwerveModuleConstants(
-            FRONT_RIGHT_MODULE_DRIVE_MOTOR,
-            FRONT_RIGHT_MODULE_STEER_MOTOR,
-            FRONT_RIGHT_MODULE_STEER_ENCODER,
-            FRONT_RIGHT_MODULE_STEER_OFFSET);
+            kFrontRightDriveMotor,
+            kFrontRightSteerMotor,
+            kFrontRightSteerEncoder,
+            kFrontRightSteerOffset);
 
-    // BACK LEFT MODULE \\
-
-    public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 14;
-    public static final int BACK_LEFT_MODULE_STEER_MOTOR = 13;
-    public static final int BACK_LEFT_MODULE_STEER_ENCODER = 3;
-    public static final double BACK_LEFT_MODULE_STEER_OFFSET = 45.25; // 45.25: Grimes House
-    public static final SwerveModuleConstants BACK_LEFT_MODULE =
+    public static final int kBackLeftDriveMotor = 14;
+    public static final int kBackLeftSteerMotor = 13;
+    public static final int kBackLeftSteerEncoder = 3;
+    public static final double kBackLeftSteerOffset = 45.25; // 45.25: Grimes House
+    public static final SwerveModuleConstants kBackLeft =
         new SwerveModuleConstants(
-            BACK_LEFT_MODULE_DRIVE_MOTOR,
-            BACK_LEFT_MODULE_STEER_MOTOR,
-            BACK_LEFT_MODULE_STEER_ENCODER,
-            BACK_LEFT_MODULE_STEER_OFFSET);
+            kBackLeftDriveMotor, kBackLeftSteerMotor, kBackLeftSteerEncoder, kBackLeftSteerOffset);
 
-    // BACK RIGHT MODULE \\
-
-    public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 16;
-    public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 15;
-    public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 5;
-    public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 231.1; // 231.1: Grimes House
-    public static final SwerveModuleConstants BACK_RIGHT_MODULE =
+    public static final int kBackRightDriveMotor = 16;
+    public static final int kBackRightSteerMotor = 15;
+    public static final int kBackRightSteerEncoder = 5;
+    public static final double kBackRightSteerOffset = 231.1; // 231.1: Grimes House
+    public static final SwerveModuleConstants kBackRight =
         new SwerveModuleConstants(
-            BACK_RIGHT_MODULE_DRIVE_MOTOR,
-            BACK_RIGHT_MODULE_STEER_MOTOR,
-            BACK_RIGHT_MODULE_STEER_ENCODER,
-            BACK_RIGHT_MODULE_STEER_OFFSET);
+            kBackRightDriveMotor,
+            kBackRightSteerMotor,
+            kBackRightSteerEncoder,
+            kBackRightSteerOffset);
 
-    public static final PIDConstants TRANSLATION_CONSTANTS = new PIDConstants(5.0, 0, 0);
-    public static final PIDConstants ROTATION_CONSTANTS = new PIDConstants(5.0, 0, 0);
+    public static final double kDriveRevToMeters = ((kWheelDiameter * Math.PI) / kDriveGearRatio);
+    public static final double kDriveRpmToMetersPerSecond = kDriveRevToMeters / 60.0;
+    public static final double kTurnRotationsToDegrees = 360.0 / kTurnGearRatio;
+
+    public static final Translation2d[] kModuleTranslations = {
+      new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+      new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+      new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+      new Translation2d(-kWheelBase / 2, -kTrackWidth / 2)
+    };
+
+    public static final SwerveDriveKinematics kDriveKinematics =
+        new SwerveDriveKinematics(kModuleTranslations);
+
+    public static final PIDConstants kPathPlannerTranslationPID = new PIDConstants(5.0, 0, 0);
+    public static final PIDConstants kPathPlannerRotationPID = new PIDConstants(5.0, 0, 0);
   }
 
   public static final class ArmConstants {

@@ -10,17 +10,16 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
+import frc.robot.utilities.LoggedTunableNumber;
 import frc.robot.utilities.RevUtils;
 import frc.robot.utilities.SwerveModuleConstants;
 import java.util.Map;
@@ -28,11 +27,6 @@ import java.util.Map;
 public class SwerveModule extends SubsystemBase {
   private final int POS_SLOT = 0;
   private final int VEL_SLOT = 0;
-
-  public static final double kDriveRevToMeters =
-      ((DriveConstants.WHEEL_DIAMETER * Math.PI) / DriveConstants.DRIVE_GEAR_RATIO);
-  public static final double kDriveRpmToMetersPerSecond = kDriveRevToMeters / 60.0;
-  public static final double kTurnRotationsToDegrees = 360.0 / DriveConstants.TURN_GEAR_RATIO;
 
   private CANSparkMax m_driveMotor;
   private CANSparkMax m_turningMotor;
@@ -44,8 +38,7 @@ public class SwerveModule extends SubsystemBase {
   private double m_simDriveEncoderPosition;
   private double m_simDriveEncoderVelocity;
 
-  private GenericEntry angleOffsetEntry;
-  private double m_angleOffset;
+  private LoggedTunableNumber m_angleOffset;
 
   private final SparkMaxPIDController m_driveController;
   private SparkMaxPIDController m_turnController;
@@ -75,7 +68,9 @@ public class SwerveModule extends SubsystemBase {
             swerveModuleConstants.turningMotorChannel, CANSparkMaxLowLevel.MotorType.kBrushless);
 
     m_angleEncoder = new CANCoder(swerveModuleConstants.cancoderID, "rio");
-    m_angleOffset = swerveModuleConstants.angleOffset;
+    m_angleOffset =
+        new LoggedTunableNumber(
+            "Drivebase/Module " + m_moduleNumber + " Offset", swerveModuleConstants.angleOffset);
 
     m_driveMotor.restoreFactoryDefaults();
     RevUtils.setDriveMotorConfig(m_driveMotor);
@@ -93,13 +88,13 @@ public class SwerveModule extends SubsystemBase {
     m_angleEncoder.configFactoryDefault();
 
     m_driveEncoder = m_driveMotor.getEncoder();
-    m_driveEncoder.setPositionConversionFactor(kDriveRevToMeters);
-    m_driveEncoder.setVelocityConversionFactor(kDriveRpmToMetersPerSecond);
+    m_driveEncoder.setPositionConversionFactor(DriveConstants.kDriveRevToMeters);
+    m_driveEncoder.setVelocityConversionFactor(DriveConstants.kDriveRpmToMetersPerSecond);
     m_driveEncoder.setPosition(0);
 
     m_turnEncoder = m_turningMotor.getEncoder();
-    m_turnEncoder.setPositionConversionFactor(kTurnRotationsToDegrees);
-    m_turnEncoder.setVelocityConversionFactor(kTurnRotationsToDegrees / 60);
+    m_turnEncoder.setPositionConversionFactor(DriveConstants.kTurnRotationsToDegrees);
+    m_turnEncoder.setVelocityConversionFactor(DriveConstants.kTurnRotationsToDegrees / 60);
 
     m_driveController = m_driveMotor.getPIDController();
     m_turnController = m_turningMotor.getPIDController();
@@ -124,7 +119,7 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public void resetAngleToAbsolute() {
-    double angle = m_angleEncoder.getAbsolutePosition() - m_angleOffset;
+    double angle = m_angleEncoder.getAbsolutePosition() - m_angleOffset.get();
     m_turnEncoder.setPosition(angle);
   }
 
@@ -147,16 +142,11 @@ public class SwerveModule extends SubsystemBase {
     else return m_simDriveEncoderVelocity;
   }
 
-  public SwerveDriveKinematics getSwerveKinematics() {
-    return SwerveDrive.kDriveKinematics;
-  }
-
   public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
     desiredState = RevUtils.optimize(desiredState, getHeadingRotation2d());
 
     if (isOpenLoop) {
-      double percentOutput =
-          desiredState.speedMetersPerSecond / DriveConstants.MAX_METERS_PER_SECOND;
+      double percentOutput = desiredState.speedMetersPerSecond / DriveConstants.kMaxMetersPerSecond;
       m_driveMotor.set(percentOutput);
     } else {
       int DRIVE_PID_SLOT = VEL_SLOT;
@@ -166,7 +156,7 @@ public class SwerveModule extends SubsystemBase {
 
     double angle =
         (Math.abs(desiredState.speedMetersPerSecond)
-                <= (DriveConstants.MAX_METERS_PER_SECOND
+                <= (DriveConstants.kMaxMetersPerSecond
                     * 0.01)) // Prevent rotating module if speed is less than 1%. Prevents
             // Jittering.
             ? m_lastAngle
@@ -192,24 +182,19 @@ public class SwerveModule extends SubsystemBase {
     m_simDriveEncoderPosition += distancePer20Ms;
   }
 
-  public void tuningInit() {
-    angleOffsetEntry =
-        RobotContainer.tuningTab.add("Angle Offset " + m_moduleNumber, m_angleOffset).getEntry();
-  }
+  public void tuningInit() {}
 
   public void tuningPeriodic() {
-    m_angleOffset = angleOffsetEntry.getDouble(m_angleOffset);
+    m_driveController.setP(SwerveDrive.drivekp.get());
+    m_driveController.setI(SwerveDrive.driveki.get());
+    m_driveController.setD(SwerveDrive.drivekd.get());
+    m_driveController.setFF(SwerveDrive.drivekff.get());
+    m_driveMotor.setOpenLoopRampRate(SwerveDrive.driveRampRate.get());
 
-    m_driveController.setP(RobotContainer.m_drivebase.bufferDriveController.getP());
-    m_driveController.setI(RobotContainer.m_drivebase.bufferDriveController.getI());
-    m_driveController.setD(RobotContainer.m_drivebase.bufferDriveController.getD());
-    m_driveController.setFF(RobotContainer.m_drivebase.bufferDriveController.getSetpoint());
-    m_driveMotor.setOpenLoopRampRate(RobotContainer.m_drivebase.driveRampRateTuning);
-
-    m_turnController.setP(RobotContainer.m_drivebase.bufferTurnController.getP());
-    m_turnController.setI(RobotContainer.m_drivebase.bufferTurnController.getI());
-    m_turnController.setD(RobotContainer.m_drivebase.bufferTurnController.getD());
-    m_turnController.setFF(RobotContainer.m_drivebase.bufferTurnController.getSetpoint());
+    m_turnController.setP(SwerveDrive.drivekp.get());
+    m_turnController.setI(SwerveDrive.driveki.get());
+    m_turnController.setD(SwerveDrive.drivekd.get());
+    m_turnController.setFF(SwerveDrive.drivekff.get());
   }
 
   public void infoInit() {

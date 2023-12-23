@@ -111,6 +111,18 @@ public class GeometryUtils {
     return new Trajectory(states);
   }
 
+  public static double[] listToArray(List<Pose2d> list) {
+    double[] output = new double[list.size() * 3];
+
+    for (int i = 0; i < list.size(); i++) {
+      output[i] = list.get(i).getX();
+      output[i] = list.get(i).getY();
+      output[i] = list.get(i).getRotation().getRadians();
+    }
+
+    return output;
+  }
+
   public static Pose2d PoseSpaceToFieldSpace(Pose2d targetPose, Pose2d robotPose) {
     return new Pose2d(
         targetPose.getX() + robotPose.getX(),

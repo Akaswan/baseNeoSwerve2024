@@ -48,7 +48,7 @@ public class TurnToAngle extends Command {
         angleController.calculate(
             GeometryUtils.getAdjustedYawDegrees(m_drivebase.getYawDegrees(), m_targetAngle), 180);
 
-    m_drivebase.drive(0, 0, speeds, false);
+    m_drivebase.drive(0, 0, speeds, false, true);
   }
 
   // Called once the command ends or is interrupted.

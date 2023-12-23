@@ -17,10 +17,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.*;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Timer;
@@ -28,39 +26,53 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
 import frc.robot.utilities.GeometryUtils;
+import frc.robot.utilities.LoggedTunableNumber;
 import frc.robot.utilities.SwerveModuleConstants;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 
 public class SwerveDrive extends SubsystemBase {
-  private boolean isFieldRelative = true;
-  public static final Translation2d[] kModuleTranslations = {
-    new Translation2d(DriveConstants.WHEEL_BASE / 2, DriveConstants.TRACK_WIDTH / 2),
-    new Translation2d(DriveConstants.WHEEL_BASE / 2, -DriveConstants.TRACK_WIDTH / 2),
-    new Translation2d(-DriveConstants.WHEEL_BASE / 2, DriveConstants.TRACK_WIDTH / 2),
-    new Translation2d(-DriveConstants.WHEEL_BASE / 2, -DriveConstants.TRACK_WIDTH / 2)
-  };
 
-  public static final SwerveDriveKinematics kDriveKinematics =
-      new SwerveDriveKinematics(kModuleTranslations);
-
-  private final Pigeon2 m_pigeon = new Pigeon2(0);
+  private final Pigeon2 m_pigeon = new Pigeon2(Constants.DriveConstants.kPigeon);
 
   private Pose2d targetPPPose = new Pose2d(0, 0, new Rotation2d(0));
+  public static List<Pose2d> ppPath = new ArrayList<>();
 
   public final Field2d m_field = new Field2d();
 
   private SimpleWidget m_gyroWidget;
-
-  public static Trajectory robotTrajectory = new Trajectory();
 
   private GenericEntry driveRampRateEntry;
   public double driveRampRateTuning;
 
   public PIDController bufferDriveController = new PIDController(0, 0, 0);
   public PIDController bufferTurnController = new PIDController(0, 0, 0);
+
+  public static final LoggedTunableNumber drivekp =
+      new LoggedTunableNumber("Drivebase/Drive P", DriveConstants.drivekp);
+  public static final LoggedTunableNumber driveki =
+      new LoggedTunableNumber("Drivebase/Drive I", DriveConstants.driveki);
+  public static final LoggedTunableNumber drivekd =
+      new LoggedTunableNumber("Drivebase/Drive D", DriveConstants.drivekd);
+  public static final LoggedTunableNumber drivekff =
+      new LoggedTunableNumber("Drivebase/Drive FF", DriveConstants.drivekff);
+  public static final LoggedTunableNumber driveRampRate =
+      new LoggedTunableNumber("Drivebase/Drive RampRate", DriveConstants.driverampRate);
+
+  public static final LoggedTunableNumber turnkp =
+      new LoggedTunableNumber("Drivebase/Turn P", DriveConstants.turnkp);
+  public static final LoggedTunableNumber turnki =
+      new LoggedTunableNumber("Drivebase/Turn I", DriveConstants.turnki);
+  public static final LoggedTunableNumber turnkd =
+      new LoggedTunableNumber("Drivebase/Turn D", DriveConstants.turnkd);
+  public static final LoggedTunableNumber turnkff =
+      new LoggedTunableNumber("Drivebase/Turn FF", DriveConstants.turnkff);
 
   private static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0; // Last year 11.5?
   private static final boolean invertGyro = false;
@@ -107,7 +119,7 @@ public class SwerveDrive extends SubsystemBase {
 
     poseEstimator =
         new SwerveDrivePoseEstimator(
-            kDriveKinematics,
+            DriveConstants.kDriveKinematics,
             getYaw(),
             getModulePositions(),
             new Pose2d(),
@@ -123,6 +135,11 @@ public class SwerveDrive extends SubsystemBase {
           targetPPPose = targetPose;
         });
 
+    PathPlannerLogging.setLogActivePathCallback(
+        (activePath) -> {
+          ppPath = activePath;
+        });
+
     AutoBuilder.configureHolonomic(
         this::getPose, // Robot pose supplier
         this::updateEstimatorWithPose, // Method to reset odometry (will be called if your auto has
@@ -131,11 +148,11 @@ public class SwerveDrive extends SubsystemBase {
         this::autoDrive, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
         new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in
             // your Constants class
-            DriveConstants.TRANSLATION_CONSTANTS, // Translation PID constants
-            DriveConstants.ROTATION_CONSTANTS, // Rotation PID constants
-            DriveConstants.MAX_METERS_PER_SECOND, // Max module speed, in m/s
+            DriveConstants.kPathPlannerTranslationPID, // Translation PID constants
+            DriveConstants.kPathPlannerRotationPID, // Rotation PID constants
+            DriveConstants.kMaxMetersPerSecond, // Max module speed, in m/s
             DriveConstants
-                .DRIVE_BASE_RADIUS, // Drive base radius in meters. Distance from robot center to
+                .kDriveBaseRadius, // Drive base radius in meters. Distance from robot center to
             // furthest module.
             new ReplanningConfig() // Default path replanning config. See the API for the options
             // here
@@ -148,34 +165,35 @@ public class SwerveDrive extends SubsystemBase {
     m_pigeon.setYaw(0);
   }
 
-  public void drive(double throttle, double strafe, double rotation, boolean isOpenLoop) {
+  public void drive(
+      double throttle, double strafe, double rotation, boolean isOpenLoop, boolean fieldRelative) {
 
-    throttle = throttle * DriveConstants.MAX_METERS_PER_SECOND;
-    strafe = strafe * DriveConstants.MAX_METERS_PER_SECOND;
+    throttle = throttle * DriveConstants.kMaxMetersPerSecond;
+    strafe = strafe * DriveConstants.kMaxMetersPerSecond;
     rotation = rotation * kMaxRotationRadiansPerSecond;
 
     ChassisSpeeds chassisSpeeds =
-        isFieldRelative
+        fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getYaw())
             : new ChassisSpeeds(throttle, strafe, rotation);
 
-    moduleStates = kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+    moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
     setSwerveModuleStates(moduleStates, isOpenLoop);
     chassisSpeeds = correctForDynamics(chassisSpeeds);
 
-    Logger.recordOutput("Drive/SwerveStateSetpoints", GeometryUtils.AKitStates(moduleStates));
+    Logger.recordOutput("Drivebase/SwerveStateSetpoints", GeometryUtils.AKitStates(moduleStates));
 
     robotRelativeChassisSpeeds = correctForDynamics(new ChassisSpeeds(throttle, strafe, rotation));
   }
 
   public void autoDrive(ChassisSpeeds speeds) {
-    moduleStates = kDriveKinematics.toSwerveModuleStates(speeds);
+    moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     setSwerveModuleStates(moduleStates, false);
     speeds = correctForDynamics(speeds);
   }
 
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.MAX_METERS_PER_SECOND);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.kMaxMetersPerSecond);
 
     for (int i = 0; i < m_SwerveMods.length; i++) {
       SwerveModule module = m_SwerveMods[i];
@@ -215,7 +233,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public static SwerveDriveKinematics getSwerveKinematics() {
-    return kDriveKinematics;
+    return DriveConstants.kDriveKinematics;
   }
 
   /**
@@ -274,7 +292,7 @@ public class SwerveDrive extends SubsystemBase {
     Logger.recordOutput("Drivebase/Gyro", getYaw().getRadians());
     Logger.recordOutput("Drivebase/SwerveStates", GeometryUtils.AKitStates(getModuleStates()));
     Logger.recordOutput("Drivebase/Pose", GeometryUtils.AKitOdometry(getPose()));
-    Logger.recordOutput("PathPlanner/Trajectory", GeometryUtils.AKitTrajectory(robotTrajectory));
+    Logger.recordOutput("PathPlanner/Trajectory", GeometryUtils.listToArray(ppPath));
     Logger.recordOutput(
         "PathPlanner/Pathplanner Setpoint", GeometryUtils.AKitOdometry(targetPPPose));
     Logger.recordOutput(
@@ -300,7 +318,8 @@ public class SwerveDrive extends SubsystemBase {
   public void simulationPeriodic() {
     m_pigeon.addYaw(
         Units.radiansToDegrees(
-            kDriveKinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond * 0.02));
+            DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
+                * 0.02));
   }
 
   public void tuningPeriodic() {
