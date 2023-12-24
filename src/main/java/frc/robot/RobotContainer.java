@@ -34,6 +34,8 @@ import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.manager.ServoMotorSubsystem;
 import frc.robot.subsystems.manager.SuperstructureStateManager;
 import frc.robot.subsystems.manager.SuperstructureStateManager.SuperstructureState;
+import frc.robot.utilities.Alert;
+import frc.robot.utilities.Alert.AlertType;
 import frc.robot.utilities.LoggedDashboardChooser;
 
 /*
@@ -77,6 +79,12 @@ public class RobotContainer {
   public static LoggedDashboardChooser<Command> autoChooser =
       new LoggedDashboardChooser<>(
           "Auto Picker", AutoBuilder.buildAutoChooser(), mainTab, 0, 0, 2, 1);
+
+  // ALERTS \\
+  private Alert infoAlert =
+      new Alert("Info Mode Activated, expect decreased network performance.", AlertType.INFO);
+  private Alert tuningAlert =
+      new Alert("Tuning Mode Activated, expect decreased network performance.", AlertType.INFO);
 
   public RobotContainer() {
 
@@ -161,6 +169,7 @@ public class RobotContainer {
 
   public void tuningInit() {
     m_drivebase.tuningInit();
+    tuningAlert.set(true);
   }
 
   public void tuningPeriodic() {
@@ -169,6 +178,7 @@ public class RobotContainer {
 
   public void infoInit() {
     m_drivebase.infoInit();
+    infoAlert.set(true);
   }
 
   public void infoPeriodic() {

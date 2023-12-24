@@ -14,8 +14,7 @@ public class Wrist extends ServoMotorSubsystem {
   }
 
   @Override
-  public void outputTelemetry() {
-  }
+  public void outputTelemetry() {}
 
   @Override
   public void lowLevelSubsystemPeriodic() {

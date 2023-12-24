@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.subsystems.Arm.ArmState;
 import frc.robot.subsystems.Elevator.ElevatorState;
@@ -28,9 +29,10 @@ import frc.robot.utilities.SwerveModuleConstants;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Mode currentMode = Mode.SIM;
 
-  public static final boolean kInfoMode = false;
+  public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : Mode.SIM;
+
+  public static final boolean kInfoMode = true;
 
   public static final boolean kTuningMode = true;
 
