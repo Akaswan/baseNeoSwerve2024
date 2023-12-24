@@ -127,6 +127,16 @@ public class SwerveDrive extends SubsystemBase {
           3,
           1);
 
+  public static final LoggedTunableNumber apriltagTrustMultiplier =
+      new LoggedTunableNumber(
+          "April Tag Trust Multiplier",
+          DriveConstants.kAprilTagTrustMultiplier,
+          RobotContainer.tuningTab,
+          BuiltInWidgets.kTextView,
+          Map.of("min", 0),
+          0,
+          3);
+
   private static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0; // Last year 11.5?
   private static final boolean invertGyro = false;
 
@@ -362,7 +372,11 @@ public class SwerveDrive extends SubsystemBase {
         <= 1.0) {
       poseEstimator.addVisionMeasurement(
           RobotContainer.m_limelight.getLimelightPose(),
-          Timer.getFPGATimestamp() - (RobotContainer.m_limelight.getBotPose()[6] / 1000.0));
+          Timer.getFPGATimestamp() - (RobotContainer.m_limelight.getBotPose()[6] / 1000.0),
+          VecBuilder.fill(
+              RobotContainer.m_limelight.getA() * apriltagTrustMultiplier.get(),
+              RobotContainer.m_limelight.getA() * apriltagTrustMultiplier.get(),
+              0.9));
     }
   }
 
