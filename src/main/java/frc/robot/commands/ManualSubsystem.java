@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.manager.ServoMotorSubsystem;
 
 public class ManualSubsystem extends Command {
@@ -25,13 +26,13 @@ public class ManualSubsystem extends Command {
   @Override
   public void execute() {
 
-    // double throttle =
-    //     -RobotContainer.m_operatorController
-    //         .getHID()
-    //         .getRawAxis(m_subsystem.getConstants().kManualAxis);
+    double throttle =
+        -RobotContainer.m_driverController
+            .getHID()
+            .getRawAxis(m_subsystem.getConstants().kManualAxis);
 
     m_subsystem.manualControl(
-        0,
+        throttle,
         m_subsystem.getConstants().kManualMultiplier,
         m_subsystem.getConstants().kManualDeadZone);
   }

@@ -23,6 +23,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.WristConstants;
+import frc.robot.commands.ManualSubsystem;
 import frc.robot.commands.SwerveDrivebase.TeleopSwerve;
 import frc.robot.commands.SwerveDrivebase.TurnToAngle;
 import frc.robot.subsystems.Arm;
@@ -33,8 +34,6 @@ import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.manager.ServoMotorSubsystem;
 import frc.robot.subsystems.manager.SuperstructureStateManager;
 import frc.robot.subsystems.manager.SuperstructureStateManager.SuperstructureState;
-import frc.robot.utilities.Alert;
-import frc.robot.utilities.Alert.AlertType;
 import frc.robot.utilities.LoggedDashboardChooser;
 
 /*
@@ -79,8 +78,6 @@ public class RobotContainer {
       new LoggedDashboardChooser<>(
           "Auto Picker", AutoBuilder.buildAutoChooser(), mainTab, 0, 0, 2, 1);
 
-  private final Alert test = new Alert("U smell bruh", AlertType.WARNING);
-
   public RobotContainer() {
 
     // NAMED COMMANDS FOR AUTO \\
@@ -99,6 +96,7 @@ public class RobotContainer {
             true,
             DriveConstants.kRegularSpeed,
             true));
+    m_arm.setDefaultCommand(new ManualSubsystem(m_arm));
 
     configureButtonBindings();
   }
@@ -188,14 +186,12 @@ public class RobotContainer {
           .setSuperstructureState(
               new ServoMotorSubsystem[] {m_arm, m_elevator, m_wrist}, SuperstructureState.PLACE)
           .schedule();
-      test.set(true);
     }
     if (m_operatorController.getXButtonPressed()) {
       m_manager
           .setSuperstructureState(
               new ServoMotorSubsystem[] {m_arm, m_elevator, m_wrist}, SuperstructureState.HOME)
           .schedule();
-      test.set(false);
     }
     if (m_operatorController.getBButtonPressed()) {
       m_manager

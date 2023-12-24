@@ -32,7 +32,7 @@ public final class Constants {
 
   public static final boolean kInfoMode = false;
 
-  public static final boolean kTuningMode = false;
+  public static final boolean kTuningMode = true;
 
   // // DRIVEBASE \\ \\
 
@@ -312,7 +312,7 @@ public final class Constants {
       kWristConstants.kMaxPosition = 160;
       kWristConstants.kMinPosition = -160;
 
-      kWristConstants.kManualAxis = XboxController.Axis.kRightX.value;
+      kWristConstants.kManualAxis = XboxController.Axis.kRightY.value;
       kWristConstants.kManualMultiplier = 1;
       kWristConstants.kManualDeadZone = .1;
 
