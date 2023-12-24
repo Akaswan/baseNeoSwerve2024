@@ -29,7 +29,15 @@ public class TelescopingArmFeedforward {
    * @param kv The velocity gain.
    * @param ka The acceleration gain.
    */
-  public TelescopingArmFeedforward(double ks, double minkg, double maxkg, double kv, double minka, double maxka, double minTelescope, double maxTelescope) {
+  public TelescopingArmFeedforward(
+      double ks,
+      double minkg,
+      double maxkg,
+      double kv,
+      double minka,
+      double maxka,
+      double minTelescope,
+      double maxTelescope) {
     this.ks = ks;
     this.kg = minkg;
     this.minkg = minkg;
@@ -50,7 +58,8 @@ public class TelescopingArmFeedforward {
    * @param kg The gravity gain.
    * @param kv The velocity gain.
    */
-  public TelescopingArmFeedforward(double ks, double minkg, double maxkg, double kv, double minTelescope, double maxTelescope) {
+  public TelescopingArmFeedforward(
+      double ks, double minkg, double maxkg, double kv, double minTelescope, double maxTelescope) {
     this(ks, minkg, maxkg, kv, 0, 0, minTelescope, maxTelescope);
   }
 
@@ -65,8 +74,11 @@ public class TelescopingArmFeedforward {
    * @return The computed feedforward.
    */
   public double calculate(
-      double positionRadians, double velocityRadPerSec, double accelRadPerSecSquared, double currentTelescope) {
-        calculateTelescope(currentTelescope);
+      double positionRadians,
+      double velocityRadPerSec,
+      double accelRadPerSecSquared,
+      double currentTelescope) {
+    calculateTelescope(currentTelescope);
     return ks * Math.signum(velocityRadPerSec)
         + kg * Math.cos(positionRadians)
         + kv * velocityRadPerSec
@@ -103,7 +115,8 @@ public class TelescopingArmFeedforward {
    * @param acceleration The acceleration of the arm.
    * @return The maximum possible velocity at the given acceleration and angle.
    */
-  public double maxAchievableVelocity(double maxVoltage, double angle, double acceleration, double currentTelescope) {
+  public double maxAchievableVelocity(
+      double maxVoltage, double angle, double acceleration, double currentTelescope) {
     // Assume max velocity is positive
     calculateTelescope(currentTelescope);
     return (maxVoltage - ks - Math.cos(angle) * kg - acceleration * ka) / kv;
@@ -122,7 +135,8 @@ public class TelescopingArmFeedforward {
    * @param acceleration The acceleration of the arm.
    * @return The minimum possible velocity at the given acceleration and angle.
    */
-  public double minAchievableVelocity(double maxVoltage, double angle, double acceleration, double currentTelescope) {
+  public double minAchievableVelocity(
+      double maxVoltage, double angle, double acceleration, double currentTelescope) {
     // Assume min velocity is negative, ks flips sign
     calculateTelescope(currentTelescope);
     return (-maxVoltage + ks - Math.cos(angle) * kg - acceleration * ka) / kv;
@@ -141,7 +155,8 @@ public class TelescopingArmFeedforward {
    * @param velocity The velocity of the arm.
    * @return The maximum possible acceleration at the given velocity.
    */
-  public double maxAchievableAcceleration(double maxVoltage, double angle, double velocity, double currentTelescope) {
+  public double maxAchievableAcceleration(
+      double maxVoltage, double angle, double velocity, double currentTelescope) {
     calculateTelescope(currentTelescope);
     return (maxVoltage - ks * Math.signum(velocity) - Math.cos(angle) * kg - velocity * kv) / ka;
   }
@@ -159,7 +174,8 @@ public class TelescopingArmFeedforward {
    * @param velocity The velocity of the arm.
    * @return The minimum possible acceleration at the given velocity.
    */
-  public double minAchievableAcceleration(double maxVoltage, double angle, double velocity, double currentTelescope) {
+  public double minAchievableAcceleration(
+      double maxVoltage, double angle, double velocity, double currentTelescope) {
     return maxAchievableAcceleration(-maxVoltage, angle, velocity, currentTelescope);
   }
 

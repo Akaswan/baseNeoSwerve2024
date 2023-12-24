@@ -4,7 +4,9 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -123,12 +125,15 @@ public class GeometryUtils {
     return output;
   }
 
-  public static Pose2d PoseSpaceToFieldSpace(Pose2d targetPose, Pose2d robotPose) {
-    return new Pose2d(
+  public static Pose3d PoseSpaceToFieldSpace(Pose3d targetPose, Pose2d robotPose) {
+    return new Pose3d(
         targetPose.getX() + robotPose.getX(),
         targetPose.getY() + robotPose.getY(),
-        new Rotation2d(
-            targetPose.getRotation().getRadians() + robotPose.getRotation().getRadians()));
+        targetPose.getZ(),
+        new Rotation3d(
+            targetPose.getRotation().getX(),
+            targetPose.getRotation().getY(),
+            targetPose.getRotation().getZ() + robotPose.getRotation().getRadians()));
   }
 
   public static Pose2d getPoseError(Pose2d pose1, Pose2d pose2) {

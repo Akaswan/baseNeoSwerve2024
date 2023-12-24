@@ -5,7 +5,9 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -65,10 +67,14 @@ public class Limelight extends SubsystemBase {
     return new Pose2d(botpose[0], botpose[1], Rotation2d.fromDegrees(botpose[5]));
   }
 
-  public Pose2d getTargetPose() {
+  public Pose3d getTargetPose() {
     double[] targetpose = m_targetpose_robotspace.getDoubleArray(new double[6]);
 
-    return new Pose2d(targetpose[0], targetpose[1], Rotation2d.fromDegrees(targetpose[5]));
+    return new Pose3d(
+        targetpose[0],
+        targetpose[1],
+        targetpose[2],
+        new Rotation3d(targetpose[3], targetpose[4], targetpose[5]));
   }
 
   @Override
@@ -84,7 +90,7 @@ public class Limelight extends SubsystemBase {
   }
 
   public void realPeriodic() {
-    Logger.recordOutput("Limelight/Limelight Pose", GeometryUtils.AKitOdometry(getLimelightPose()));
+    Logger.recordOutput("Limelight/Limelight Pose", getLimelightPose());
     Logger.recordOutput("Limelight/Valid Targets", m_tv.getInteger(0));
     Logger.recordOutput("Limelight/Target Area", m_ta.getDouble(0));
     Logger.recordOutput("Limelight/Pipeline Latency", m_tl.getDouble(0));
@@ -97,8 +103,6 @@ public class Limelight extends SubsystemBase {
         GeometryUtils.AKitCorner(m_tcornxy.getDoubleArray(new double[2]))[1]);
     Logger.recordOutput(
         "Limelight/AprilTag Pose",
-        GeometryUtils.AKitOdometry(
-            GeometryUtils.PoseSpaceToFieldSpace(
-                getTargetPose(), RobotContainer.m_drivebase.getPose())));
+        GeometryUtils.PoseSpaceToFieldSpace(getTargetPose(), RobotContainer.m_drivebase.getPose()));
   }
 }
