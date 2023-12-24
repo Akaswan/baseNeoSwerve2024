@@ -374,8 +374,8 @@ public class SwerveDrive extends SubsystemBase {
           RobotContainer.m_limelight.getLimelightPose(),
           Timer.getFPGATimestamp() - (RobotContainer.m_limelight.getBotPose()[6] / 1000.0),
           VecBuilder.fill(
-              RobotContainer.m_limelight.getA() * apriltagTrustMultiplier.get(),
-              RobotContainer.m_limelight.getA() * apriltagTrustMultiplier.get(),
+              1 - Math.pow(RobotContainer.m_limelight.getA(), apriltagTrustMultiplier.get()), // Higher the multiplier the closer it has to be to the tag to trust it
+              1 - Math.pow(RobotContainer.m_limelight.getA(), apriltagTrustMultiplier.get()),
               0.9));
     }
   }
