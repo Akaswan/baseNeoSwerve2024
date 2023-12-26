@@ -11,7 +11,7 @@ import frc.robot.utilities.GeometryUtils;
 
 public class TurnToAngle extends Command {
   /** Creates a new TurnToAngle. */
-  private PIDController angleController;
+  private ProfiledPIDController angleController;
 
   private SwerveDrive m_drivebase;
   private double m_targetAngle;
@@ -32,7 +32,7 @@ public class TurnToAngle extends Command {
     m_drivebase = drivebase;
     m_targetAngle = targetAngle;
 
-    angleController = new PIDController(.1, 0, 0);
+    angleController = new ProfiledPIDController(.1, 0, 0, new TrapizoidProfile.constrains(10, 5));
 
     addRequirements(m_drivebase);
   }

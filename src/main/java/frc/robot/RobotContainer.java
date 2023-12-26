@@ -141,26 +141,28 @@ public class RobotContainer {
     m_driverController.back().onTrue(new InstantCommand(m_drivebase::zeroGyroscope));
 
     // Example of an automatic path generated to score in the B2 zone
-    m_driverController
-        .a()
-        .onTrue(
-            AutoBuilder.pathfindToPose(
-                new Pose2d(1.8252, 2.779, Rotation2d.fromDegrees(180)),
-                new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
-                0.0,
-                0.0));
+    // m_driverController
+    //     .a()
+    //     .onTrue(
+    //         AutoBuilder.pathfindToPose(
+    //             new Pose2d(1.8252, 2.779, Rotation2d.fromDegrees(180)),
+    //             new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
+    //             0.0,
+    //             0.0));
 
     // Example of an automatic path generated to pick up from the human player
-    m_driverController
-        .b()
-        .onTrue(
-            AutoBuilder.pathfindToPose(
-                new Pose2d(16.06056, 6.270, Rotation2d.fromDegrees(0)),
-                new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
-                0.0,
-                0.0));
+    // m_driverController
+    //     .b()
+    //     .onTrue(
+    //         AutoBuilder.pathfindToPose(
+    //             new Pose2d(16.06056, 6.270, Rotation2d.fromDegrees(0)),
+    //             new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
+    //             0.0,
+    //             0.0));
 
     m_driverController.x().onTrue(new TurnToAngle(m_drivebase, 30));
+
+    m_driverController.a().onTrue(new InstantCommand(() -> m_drivebase.setAngleToSnap(AngleToSnap.BACK)));
   }
 
   public Command getAutonomousCommand() {

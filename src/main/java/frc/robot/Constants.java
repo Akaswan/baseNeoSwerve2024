@@ -59,7 +59,10 @@ public final class Constants {
     public static double turnkd = 0.0;
     public static double turnkff = 0.0;
 
-    public static double kAprilTagTrustMultiplier = 1.0;
+    /* The lower this is the more you want odometry to trust the april tags
+        Scales based on the percentage of an april tag in view 
+        Dont do anything below 0*/
+    public static double kAprilTagTrustMultiplier = 1.0; 
 
     public static int kPigeon = 0;
 
@@ -81,6 +84,8 @@ public final class Constants {
         150.0 / 7.0; // MK4i turning ratio MK4i Neo, find on sds website
 
     public static final double kWheelDiameter = Units.inchesToMeters(3.79); // Wheel diameter
+
+    private static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0; // Last year 11.5?
 
     public static final double kRegularSpeed = 1; // Regular speed multiplier of robot
 

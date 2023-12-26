@@ -44,6 +44,9 @@ public class SwerveDrive extends SubsystemBase {
 
   private SimpleWidget m_gyroWidget;
 
+  private ProfiledPIDController m_snapToAngleController;
+  private AngleToSnap m_angleToSnap = AngleToSnap.NONE;
+
   public static final LoggedTunableNumber drivekp =
       new LoggedTunableNumber(
           "Drive P",
@@ -136,8 +139,6 @@ public class SwerveDrive extends SubsystemBase {
           Map.of("min", 0),
           0,
           3);
-
-  private static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0; // Last year 11.5?
   private static final boolean invertGyro = false;
 
   private SwerveModuleState[] moduleStates;
@@ -193,6 +194,8 @@ public class SwerveDrive extends SubsystemBase {
 
     robotRelativeChassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
+    m_snapToAngleController = new ProfiledPIDController(.1, 0, 0, new TrapizoidProfile.constrains(10, 5));
+
     PathPlannerLogging.setLogTargetPoseCallback(
         (targetPose) -> {
           targetPPPose = targetPose;
@@ -231,9 +234,17 @@ public class SwerveDrive extends SubsystemBase {
   public void drive(
       double throttle, double strafe, double rotation, boolean isOpenLoop, boolean fieldRelative) {
 
+    if (m_angleToSnap != AngleToSnap.NONE) {
+      if (Math.abs(m_angleToSnap.getAngle() - getYawDegrees()) < 1) {
+        m_angleToSnap == AngleToSnap.NONE;
+      } else {
+        strafe = m_snapToAngleController.calculate(GeometryUtils.getAdjustedYawDegrees(getYawDegrees(), m_angleToSnap.getAngle()), 180);
+      }
+    }
+
     throttle = throttle * DriveConstants.kMaxMetersPerSecond;
     strafe = strafe * DriveConstants.kMaxMetersPerSecond;
-    rotation = rotation * kMaxRotationRadiansPerSecond;
+    rotation = rotation * DriveConstants.kMaxRotationRadiansPerSecond;
 
     ChassisSpeeds chassisSpeeds =
         fieldRelative
@@ -331,6 +342,10 @@ public class SwerveDrive extends SubsystemBase {
     return Math.IEEEremainder(m_pigeon.getYaw(), 360);
   }
 
+  public void setAngleToSnap(AngleToSnap rotation) {
+    m_angleToSnap = rotation;
+  }
+
   public void setSwerveModuleStates(SwerveModuleState[] states) {
     setSwerveModuleStates(states, false);
   }
@@ -423,4 +438,26 @@ public class SwerveDrive extends SubsystemBase {
       module.infoPeriodic();
     }
   }
+
+
+  public enum AngleToSnap {
+    FORWARD(0),
+    BACK(180),
+    LEFT(90),
+    RIGHT(270),
+    NONE(0);
+
+    private double angle;
+
+    public AngleToSnap(double angle) {
+      this.angle = angle;
+    }
+
+    public double getAngle() {
+      return angle;
+    }
+  }
+
+
+
 }
