@@ -160,9 +160,10 @@ public class RobotContainer {
     //             0.0,
     //             0.0));
 
-    m_driverController.x().onTrue(new TurnToAngle(m_drivebase, 30));
+    m_driverController.b().onTrue(new TurnToAngle(m_drivebase, 30));
 
     m_driverController.a().onTrue(new InstantCommand(() -> m_drivebase.setAngleToSnap(AngleToSnap.BACK)));
+    m_driverController.x().onTrue(new InstantCommand(m_drivebase::toggleXWheels));
   }
 
   public Command getAutonomousCommand() {

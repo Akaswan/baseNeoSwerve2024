@@ -145,6 +145,26 @@ public final class Constants {
 
     public static final PIDConstants kPathPlannerTranslationPID = new PIDConstants(5.0, 0, 0);
     public static final PIDConstants kPathPlannerRotationPID = new PIDConstants(5.0, 0, 0);
+
+
+    public static final SwerveModuleState[] kXWheels = {
+    new SwerveModuleState(
+            0, 
+            Rotation2d.fromDegrees(-45)
+    ),
+    new SwerveModuleState(
+            0, 
+            Rotation2d.fromDegrees(45)
+    ),
+    new SwerveModuleState(
+            0, 
+            Rotation2d.fromDegrees(45)
+    ),
+    new SwerveModuleState(
+            0, 
+            Rotation2d.fromDegrees(-45)
+    ),
+  };
   }
 
   public static final class ArmConstants {

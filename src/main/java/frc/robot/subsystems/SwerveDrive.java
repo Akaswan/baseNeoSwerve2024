@@ -45,7 +45,10 @@ public class SwerveDrive extends SubsystemBase {
   private SimpleWidget m_gyroWidget;
 
   private ProfiledPIDController m_snapToAngleController;
+
   private AngleToSnap m_angleToSnap = AngleToSnap.NONE;
+
+  private boolean m_xWheels = false;
 
   public static final LoggedTunableNumber drivekp =
       new LoggedTunableNumber(
@@ -242,22 +245,32 @@ public class SwerveDrive extends SubsystemBase {
       }
     }
 
-    throttle = throttle * DriveConstants.kMaxMetersPerSecond;
-    strafe = strafe * DriveConstants.kMaxMetersPerSecond;
-    rotation = rotation * DriveConstants.kMaxRotationRadiansPerSecond;
+    if (throttle + strafe + rotation > 0 && m_xWheels == true) {
+      m_xWheels == false;
+    } 
 
-    ChassisSpeeds chassisSpeeds =
-        fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getYaw())
-            : new ChassisSpeeds(throttle, strafe, rotation);
+    if (m_xWheels == false) {
+      throttle = throttle * DriveConstants.kMaxMetersPerSecond;
+      strafe = strafe * DriveConstants.kMaxMetersPerSecond;
+      rotation = rotation * DriveConstants.kMaxRotationRadiansPerSecond;
 
-    moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
-    setSwerveModuleStates(moduleStates, isOpenLoop);
-    chassisSpeeds = correctForDynamics(chassisSpeeds);
+      ChassisSpeeds chassisSpeeds =
+          fieldRelative
+              ? ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getYaw())
+              : new ChassisSpeeds(throttle, strafe, rotation);
 
-    Logger.recordOutput("Drivebase/SwerveStateSetpoints", moduleStates);
+      chassisSpeeds = correctForDynamics(chassisSpeeds);
+      moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+      setSwerveModuleStates(moduleStates, isOpenLoop);
 
-    robotRelativeChassisSpeeds = correctForDynamics(new ChassisSpeeds(throttle, strafe, rotation));
+      Logger.recordOutput("Drivebase/SwerveStateSetpoints", moduleStates);
+
+      robotRelativeChassisSpeeds = correctForDynamics(new ChassisSpeeds(throttle, strafe, rotation));
+    } else {
+      setSwerveModuleStates(DriveConstants.kXWheels, isOpenLoop);
+      Logger.recordOutput("Drivebase/SwerveStateSetpoints", DriveConstants.kXWheels);
+    }
+
   }
 
   public void autoDrive(ChassisSpeeds speeds) {
@@ -359,6 +372,14 @@ public class SwerveDrive extends SubsystemBase {
   public void resetAngleToAbsolute() {
     for (SwerveModule mod : m_SwerveMods) {
       mod.resetAngleToAbsolute();
+    }
+  }
+
+  public void toggleXWheels() {
+    if (m_xWheels) {
+      m_xWheels = false;
+    } else {
+      m_xWheels = true;
     }
   }
 
