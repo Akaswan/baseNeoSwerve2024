@@ -70,30 +70,23 @@ public class TeleopSwerve extends Command {
 
   @Override
   public void execute() {
-    double rAxis;
-    double m_rotation;
-
-    double xAxis;
-    double yAxis;
-
-    // if (RobotBase.isReal()) {
-    yAxis = -m_controller.getHID().getRawAxis(m_translationAxis);
-    xAxis = -m_controller.getHID().getRawAxis(m_strafeAxis);
-    // } else {
-    //     xAxis = -m_controller.getHID().getRawAxis(m_translationAxis);
-    //     yAxis = m_controller.getHID().getRawAxis(m_strafeAxis);
-    // }
-
-    rAxis = -m_controller.getHID().getRawAxis(m_rotationAxis);
+    double yAxis = -m_controller.getHID().getRawAxis(m_translationAxis);
+    double xAxis = -m_controller.getHID().getRawAxis(m_strafeAxis);
+    double rAxis = -m_controller.getHID().getRawAxis(m_rotationAxis);
 
     // Applies a deadband to the values
     yAxis = MathUtil.applyDeadband(yAxis, STICK_DEAD_BAND);
     xAxis = MathUtil.applyDeadband(xAxis, STICK_DEAD_BAND);
     rAxis = MathUtil.applyDeadband(rAxis, STICK_DEAD_BAND);
 
+    // Curves the inputs to make it easier to drive
+    double m_throttle = GeometryUtils.modifyInputs(yAxis, DriveConstants.kDriveModifier);
+    double m_strafe = GeometryUtils.modifyInputs(xAxis, DriveConstants.kDriveModifier);
+    double m_rotation = GeometryUtils.modifyInputs(rAxis, DriveConstants.kTurnModifier);
+
     // Reduces the speed of the robot based on m_percentSpeed
-    double m_throttle = yAxis * m_percentSpeed;
-    double m_strafe = xAxis * m_percentSpeed;
+    m_throttle = yAxis * m_percentSpeed;
+    m_strafe = xAxis * m_percentSpeed;
     m_rotation = rAxis * m_percentSpeed;
 
     m_drivebase.drive(m_throttle, m_strafe, m_rotation, m_openLoop, m_fieldRelative);

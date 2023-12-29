@@ -150,4 +150,18 @@ public class GeometryUtils {
         ? ((initialvalue + numTo180) % 360) + 360.0
         : ((initialvalue + numTo180) % 360);
   }
+
+  /**
+   *
+   *
+   * <h3>ModifyInputs</h3>
+   *
+   * Returns the input to the power of the modifier
+   *
+   * @param input Input to modify
+   * @param modifier Puts the input to the power of this
+   */
+  public static double modifyInputs(double input, double modifier) {
+    return input >= 0 ? Math.pow(input, modifier) : -Math.pow(-input, modifier);
+  }
 }

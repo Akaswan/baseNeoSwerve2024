@@ -59,6 +59,9 @@ public final class Constants {
     public static double turnkd = 0.0;
     public static double turnkff = 0.0;
 
+    public static double kDriveModifier = 1.2;
+    public static double kTurnModifier = 2;
+
     /* The lower this is the more you want odometry to trust the april tags
         Scales based on the percentage of an april tag in view 
         Dont do anything below 0*/
@@ -70,22 +73,22 @@ public final class Constants {
         Units.inchesToMeters(20.67); // Distance between centers of right and left wheels on robot
 
     public static final double kWheelBase =
-        Units.inchesToMeters(20.75); // Distance between front and back wheels on robot
+        Units.inchesToMeters(20.67); // Distance between centers of front and back wheels on robot
 
     public static final double kDriveBaseRadius =
-        Math.hypot(Units.inchesToMeters(32) / 2, Units.inchesToMeters(32) / 2);
+        Math.hypot(Units.inchesToMeters(32) / 2, Units.inchesToMeters(32) / 2); // Distance from center of the robot to corner of the bumpers
 
     public static final double kMaxMetersPerSecond =
-        Units.feetToMeters(12.0); // Find this on sds website
+        Units.feetToMeters(17.6); // Run drivebase at max speed on the ground to find top speed
 
-    public static final double kDriveGearRatio = 8.14; // MK4i L1 Neo, find on sds website
+    public static final double kDriveGearRatio = 6.75; // MK4i L1 Neo, find on sds website
 
     public static final double kTurnGearRatio =
         150.0 / 7.0; // MK4i turning ratio MK4i Neo, find on sds website
 
     public static final double kWheelDiameter = Units.inchesToMeters(3.79); // Wheel diameter
 
-    private static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0; // Last year 11.5?
+    private static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0; // Just kind of find what works, this is from 930 2023
 
     public static final double kRegularSpeed = 1; // Regular speed multiplier of robot
 
@@ -94,7 +97,7 @@ public final class Constants {
     public static final int kFrontLeftDriveMotor = 12;
     public static final int kFrontLeftSteerMotor = 11;
     public static final int kFrontLeftSteerEncoder = 1;
-    public static final double kFrontLeftOffset = 52.03; // 52.03: Grimes House
+    public static final double kFrontLeftOffset = 52.03;
     public static final SwerveModuleConstants kFrontLeft =
         new SwerveModuleConstants(
             kFrontLeftDriveMotor, kFrontLeftSteerMotor, kFrontLeftSteerEncoder, kFrontLeftOffset);
@@ -102,7 +105,7 @@ public final class Constants {
     public static final int kFrontRightDriveMotor = 18;
     public static final int kFrontRightSteerMotor = 17;
     public static final int kFrontRightSteerEncoder = 7;
-    public static final double kFrontRightSteerOffset = 144.22; // 144.22: Grimes House
+    public static final double kFrontRightSteerOffset = 144.22;
     public static final SwerveModuleConstants kFrontRight =
         new SwerveModuleConstants(
             kFrontRightDriveMotor,
@@ -113,7 +116,7 @@ public final class Constants {
     public static final int kBackLeftDriveMotor = 14;
     public static final int kBackLeftSteerMotor = 13;
     public static final int kBackLeftSteerEncoder = 3;
-    public static final double kBackLeftSteerOffset = 45.25; // 45.25: Grimes House
+    public static final double kBackLeftSteerOffset = 45.25;
     public static final SwerveModuleConstants kBackLeft =
         new SwerveModuleConstants(
             kBackLeftDriveMotor, kBackLeftSteerMotor, kBackLeftSteerEncoder, kBackLeftSteerOffset);
@@ -121,7 +124,7 @@ public final class Constants {
     public static final int kBackRightDriveMotor = 16;
     public static final int kBackRightSteerMotor = 15;
     public static final int kBackRightSteerEncoder = 5;
-    public static final double kBackRightSteerOffset = 231.1; // 231.1: Grimes House
+    public static final double kBackRightSteerOffset = 231.1;
     public static final SwerveModuleConstants kBackRight =
         new SwerveModuleConstants(
             kBackRightDriveMotor,
@@ -148,23 +151,23 @@ public final class Constants {
 
 
     public static final SwerveModuleState[] kXWheels = {
-    new SwerveModuleState(
-            0, 
-            Rotation2d.fromDegrees(-45)
-    ),
-    new SwerveModuleState(
-            0, 
-            Rotation2d.fromDegrees(45)
-    ),
-    new SwerveModuleState(
-            0, 
-            Rotation2d.fromDegrees(45)
-    ),
-    new SwerveModuleState(
-            0, 
-            Rotation2d.fromDegrees(-45)
-    ),
-  };
+      new SwerveModuleState(
+              0, 
+              Rotation2d.fromDegrees(-45)
+      ),
+      new SwerveModuleState(
+              0, 
+              Rotation2d.fromDegrees(45)
+      ),
+      new SwerveModuleState(
+              0, 
+              Rotation2d.fromDegrees(45)
+      ),
+      new SwerveModuleState(
+              0, 
+              Rotation2d.fromDegrees(-45)
+      ),
+    };
   }
 
   public static final class ArmConstants {
