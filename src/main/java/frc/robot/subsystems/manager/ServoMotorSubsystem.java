@@ -138,7 +138,7 @@ public abstract class ServoMotorSubsystem extends StatedSubsystem {
   }
 
   public double getVelocity() {
-    return RobotBase.isReal() ? m_encoder.getVelocity() : 0;
+    return RobotBase.isReal() ? m_encoder.getVelocity() : m_currentState.getVelocity();
   }
 
   @Override
@@ -148,5 +148,27 @@ public abstract class ServoMotorSubsystem extends StatedSubsystem {
     } else {
       runToSetpoint();
     }
+  }
+
+  @Override
+  public void outputAbstractSubsystemTelemetry() {
+    Logger.recordOutput(m_constants.name + "/Encoder Position", getPosition()); // Current position of encoders
+    Logger.recordOutput(m_constants.name + "/Encoder Velocity", getVelocity()); // Encoder Velocity
+    Logger.recordOutput(m_constants.name + "/Trapezoid Desired Position", m_currentState.getPosition()); // Desired position of trapezoid profile
+    Logger.recordOutput(m_constants.name + "/Trapezoid Desired Velocity", m_currentState.getVelocity()); // Desired position of trapezoid profile
+    Logger.recordOutput(m_constants.name + "/Desired Position", m_desiredState.getPosition()); // Desired position
+    Logger.recordOutput(m_constants.name + "/Current State", m_currentState.getName()); // Current State
+    Logger.recordOutput(m_constants.name + "/Desired State", m_desiredState.getName()); // Current State
+    Logger.recordOutput(m_constants.name + "/At Setpoint", atSetpoint()); // Is at setpoint
+  }
+
+  public interface ServoMotorSubsystemState implements SubsystemState {
+    double getPosition();
+
+    double getVelocity();
+
+    void setPosition(double position);
+
+    void setVelocity(double velocity);
   }
 }

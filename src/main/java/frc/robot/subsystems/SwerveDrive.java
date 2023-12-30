@@ -54,7 +54,7 @@ public class SwerveDrive extends SubsystemBase {
       new LoggedTunableNumber(
           "Drive P",
           DriveConstants.drivekp,
-          RobotContainer.tuningTab,
+          RobotContainer.driveTuningTab,
           BuiltInWidgets.kTextView,
           Map.of("min", 0),
           0,
@@ -63,7 +63,7 @@ public class SwerveDrive extends SubsystemBase {
       new LoggedTunableNumber(
           "Drive I",
           DriveConstants.driveki,
-          RobotContainer.tuningTab,
+          RobotContainer.driveTuningTab,
           BuiltInWidgets.kTextView,
           Map.of("min", 0),
           1,
@@ -72,7 +72,7 @@ public class SwerveDrive extends SubsystemBase {
       new LoggedTunableNumber(
           "Drive D",
           DriveConstants.drivekd,
-          RobotContainer.tuningTab,
+          RobotContainer.driveTuningTab,
           BuiltInWidgets.kTextView,
           Map.of("min", 0),
           2,
@@ -81,7 +81,7 @@ public class SwerveDrive extends SubsystemBase {
       new LoggedTunableNumber(
           "Drive FF",
           DriveConstants.drivekff,
-          RobotContainer.tuningTab,
+          RobotContainer.driveTuningTab,
           BuiltInWidgets.kTextView,
           Map.of("min", 0),
           3,
@@ -90,7 +90,7 @@ public class SwerveDrive extends SubsystemBase {
       new LoggedTunableNumber(
           "Drive RampRate",
           DriveConstants.driverampRate,
-          RobotContainer.tuningTab,
+          RobotContainer.driveTuningTab,
           BuiltInWidgets.kTextView,
           Map.of("min", 0),
           4,
@@ -100,7 +100,7 @@ public class SwerveDrive extends SubsystemBase {
       new LoggedTunableNumber(
           "Turn P",
           DriveConstants.turnkp,
-          RobotContainer.tuningTab,
+          RobotContainer.driveTuningTab,
           BuiltInWidgets.kTextView,
           Map.of("min", 0),
           0,
@@ -109,7 +109,7 @@ public class SwerveDrive extends SubsystemBase {
       new LoggedTunableNumber(
           "Turn I",
           DriveConstants.turnki,
-          RobotContainer.tuningTab,
+          RobotContainer.driveTuningTab,
           BuiltInWidgets.kTextView,
           Map.of("min", 0),
           1,
@@ -118,7 +118,7 @@ public class SwerveDrive extends SubsystemBase {
       new LoggedTunableNumber(
           "Turn D",
           DriveConstants.turnkd,
-          RobotContainer.tuningTab,
+          RobotContainer.driveTuningTab,
           BuiltInWidgets.kTextView,
           Map.of("min", 0),
           2,
@@ -127,7 +127,7 @@ public class SwerveDrive extends SubsystemBase {
       new LoggedTunableNumber(
           "Turn FF",
           DriveConstants.turnkff,
-          RobotContainer.tuningTab,
+          RobotContainer.driveTuningTab,
           BuiltInWidgets.kTextView,
           Map.of("min", 0),
           3,
@@ -137,7 +137,7 @@ public class SwerveDrive extends SubsystemBase {
       new LoggedTunableNumber(
           "April Tag Trust Multiplier",
           DriveConstants.kAprilTagTrustMultiplier,
-          RobotContainer.tuningTab,
+          RobotContainer.driveTuningTab,
           BuiltInWidgets.kTextView,
           Map.of("min", 0),
           0,
@@ -259,13 +259,13 @@ public class SwerveDrive extends SubsystemBase {
               ? ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getYaw())
               : new ChassisSpeeds(throttle, strafe, rotation);
 
-      chassisSpeeds = correctForDynamics(chassisSpeeds);
+      chassisSpeeds = GeometryUtils.discretize(chassisSpeeds);
       moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
       setSwerveModuleStates(moduleStates, isOpenLoop);
 
       Logger.recordOutput("Drivebase/SwerveStateSetpoints", moduleStates);
 
-      robotRelativeChassisSpeeds = correctForDynamics(new ChassisSpeeds(throttle, strafe, rotation));
+      robotRelativeChassisSpeeds = GeometryUtils.discretize(new ChassisSpeeds(throttle, strafe, rotation));
     } else {
       setSwerveModuleStates(DriveConstants.kXWheels, isOpenLoop);
       Logger.recordOutput("Drivebase/SwerveStateSetpoints", DriveConstants.kXWheels);
@@ -274,9 +274,9 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void autoDrive(ChassisSpeeds speeds) {
+    speeds = GeometryUtils.discretize(speeds); // I dont know if you want this here
     moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     setSwerveModuleStates(moduleStates, false);
-    speeds = correctForDynamics(speeds);
   }
 
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
@@ -329,21 +329,21 @@ public class SwerveDrive extends SubsystemBase {
    * Discussion:
    * https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964
    */
-  private static ChassisSpeeds correctForDynamics(ChassisSpeeds originalSpeeds) {
-    final double LOOP_TIME_S = 0.02;
-    Pose2d futureRobotPose =
-        new Pose2d(
-            originalSpeeds.vxMetersPerSecond * LOOP_TIME_S,
-            originalSpeeds.vyMetersPerSecond * LOOP_TIME_S,
-            Rotation2d.fromRadians(originalSpeeds.omegaRadiansPerSecond * LOOP_TIME_S));
-    Twist2d twistForPose = GeometryUtils.log(futureRobotPose);
-    ChassisSpeeds updatedSpeeds =
-        new ChassisSpeeds(
-            twistForPose.dx / LOOP_TIME_S,
-            twistForPose.dy / LOOP_TIME_S,
-            twistForPose.dtheta / LOOP_TIME_S);
-    return updatedSpeeds;
-  }
+  // private static ChassisSpeeds correctForDynamics(ChassisSpeeds originalSpeeds) {
+  //   final double LOOP_TIME_S = 0.02;
+  //   Pose2d futureRobotPose =
+  //       new Pose2d(
+  //           originalSpeeds.vxMetersPerSecond * LOOP_TIME_S,
+  //           originalSpeeds.vyMetersPerSecond * LOOP_TIME_S,
+  //           Rotation2d.fromRadians(originalSpeeds.omegaRadiansPerSecond * LOOP_TIME_S));
+  //   Twist2d twistForPose = GeometryUtils.log(futureRobotPose);
+  //   ChassisSpeeds updatedSpeeds =
+  //       new ChassisSpeeds(
+  //           twistForPose.dx / LOOP_TIME_S,
+  //           twistForPose.dy / LOOP_TIME_S,
+  //           twistForPose.dtheta / LOOP_TIME_S);
+  //   return updatedSpeeds;
+  // }
 
   public Rotation2d getYaw() {
     return (invertGyro)

@@ -59,7 +59,8 @@ public class RobotContainer {
   // SHUFFLEBOARD TABS \\
   public static ShuffleboardTab mainTab = Shuffleboard.getTab("Main");
   public static ShuffleboardTab infoTab = kInfoMode ? Shuffleboard.getTab("Info") : null;
-  public static ShuffleboardTab tuningTab = kTuningMode ? Shuffleboard.getTab("Tuning") : null;
+  public static ShuffleboardTab driveTuningTab = kTuningMode ? Shuffleboard.getTab("Drive Tuning") : null;
+  public static ShuffleboardTab mechTuningTab = kTuningMode ? Shuffleboard.getTab("Mech Tuning") : null;
 
   // SUBSYSTEMS \\
   public static final SwerveDrive m_drivebase =

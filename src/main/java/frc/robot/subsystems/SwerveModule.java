@@ -73,7 +73,7 @@ public class SwerveModule extends SubsystemBase {
         new LoggedTunableNumber(
             "Module " + m_moduleNumber + " Offset",
             swerveModuleConstants.angleOffset,
-            RobotContainer.tuningTab,
+            RobotContainer.driveTuningTab,
             BuiltInWidgets.kTextView,
             Map.of("min", 0),
             m_moduleNumber,

@@ -16,8 +16,8 @@ public abstract class StatedSubsystem extends SubsystemBase {
 
   protected SubsystemState m_lastHeldState = null;
   protected SubsystemState m_currentState = null;
-  protected SubsystemState m_desiredState = null;
   protected SubsystemState m_previousDesiredState = null;
+  protected SubsystemState m_desiredState = null;
 
   public StatedSubsystem(SubsystemConstants constants) {
     m_constants = constants;
@@ -48,11 +48,13 @@ public abstract class StatedSubsystem extends SubsystemBase {
     setName(m_constants.kName);
   }
 
-  public abstract void highLevelSubsystemPeriodic();
+  public abstract void abstractSubsystemPeriodic();
 
-  public abstract void lowLevelSubsystemPeriodic();
+  public abstract void subsystemPeriodic();
 
-  public abstract void outputTelemetry();
+  public abstract void outputAbstractSubsystemTelemetry();
+
+  public abstract void outputSusbsystemTelemetry();
 
   public SubsystemType getSubsystemType() {
     return m_constants.kSubsystemType;
@@ -64,9 +66,10 @@ public abstract class StatedSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    lowLevelSubsystemPeriodic(); // Always put this one first
-    highLevelSubsystemPeriodic();
-    outputTelemetry();
+    abstractSubsystemPeriodic(); // Always put this one first
+    subsystemPeriodic();
+    outputAbstractSubsystemTelemetry();
+    outputSusbsystemTelemetry();
   }
 
   public static class SubsystemConstants {
@@ -127,14 +130,6 @@ public abstract class StatedSubsystem extends SubsystemBase {
   }
 
   public interface SubsystemState {
-    double getPosition();
-
-    double getVelocity();
-
-    void setPosition(double position);
-
-    void setVelocity(double velocity);
-
     String getName();
   }
 

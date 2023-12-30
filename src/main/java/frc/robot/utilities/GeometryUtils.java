@@ -61,6 +61,18 @@ public class GeometryUtils {
     return new Twist2d(translation_part.getX(), translation_part.getY(), dtheta);
   }
 
+  public ChassisSpeeds discretize(ChassisSpeeds speeds) {
+    double dt = 0.02;
+    var desiredDeltaPose = new Pose2d(
+      speeds.vxMetersPerSecond * dt, 
+      speeds.vyMetersPerSecond * dt, 
+      new Rotation2d(speeds.omegaRadiansPerSecond * dt * 4)
+    );
+    var twist = new Pose2d().log(desiredDeltaPose);
+
+    return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (speeds.omegaRadiansPerSecond));
+  }
+
   public static double[] AKitStates(SwerveModuleState[] states) {
     double[] output = new double[8];
     for (int i = 0; i < states.length; i++) {

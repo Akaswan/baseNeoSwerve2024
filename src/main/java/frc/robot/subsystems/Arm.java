@@ -30,11 +30,7 @@ public class Arm extends ServoMotorSubsystem {
   }
 
   @Override
-  public void outputTelemetry() {
-    SmartDashboard.putString("Desired State", m_desiredState.getName());
-    SmartDashboard.putNumber("Desired State Position", m_desiredState.getPosition());
-    SmartDashboard.putNumber("Current Position", m_currentState.getPosition());
-  }
+  public void outputTelemetry() {}
 
   @Override
   public void lowLevelSubsystemPeriodic() {
