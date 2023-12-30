@@ -11,6 +11,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import org.littletonrobotics.junction.Logger;
 
 public abstract class ServoMotorSubsystem extends StatedSubsystem {
 
@@ -142,7 +143,7 @@ public abstract class ServoMotorSubsystem extends StatedSubsystem {
   }
 
   @Override
-  public void highLevelSubsystemPeriodic() {
+  public void abstractSubsystemPeriodic() {
     if (m_profileStartTime == -1) {
       holdPosition();
     } else {
@@ -152,23 +153,21 @@ public abstract class ServoMotorSubsystem extends StatedSubsystem {
 
   @Override
   public void outputAbstractSubsystemTelemetry() {
-    Logger.recordOutput(m_constants.name + "/Encoder Position", getPosition()); // Current position of encoders
-    Logger.recordOutput(m_constants.name + "/Encoder Velocity", getVelocity()); // Encoder Velocity
-    Logger.recordOutput(m_constants.name + "/Trapezoid Desired Position", m_currentState.getPosition()); // Desired position of trapezoid profile
-    Logger.recordOutput(m_constants.name + "/Trapezoid Desired Velocity", m_currentState.getVelocity()); // Desired position of trapezoid profile
-    Logger.recordOutput(m_constants.name + "/Desired Position", m_desiredState.getPosition()); // Desired position
-    Logger.recordOutput(m_constants.name + "/Current State", m_currentState.getName()); // Current State
-    Logger.recordOutput(m_constants.name + "/Desired State", m_desiredState.getName()); // Current State
-    Logger.recordOutput(m_constants.name + "/At Setpoint", atSetpoint()); // Is at setpoint
-  }
-
-  public interface ServoMotorSubsystemState implements SubsystemState {
-    double getPosition();
-
-    double getVelocity();
-
-    void setPosition(double position);
-
-    void setVelocity(double velocity);
+    Logger.recordOutput(
+        m_constants.kName + "/Encoder Position", getPosition()); // Current position of encoders
+    Logger.recordOutput(m_constants.kName + "/Encoder Velocity", getVelocity()); // Encoder Velocity
+    Logger.recordOutput(
+        m_constants.kName + "/Trapezoid Desired Position",
+        m_currentState.getPosition()); // Desired position of trapezoid profile
+    Logger.recordOutput(
+        m_constants.kName + "/Trapezoid Desired Velocity",
+        m_currentState.getVelocity()); // Desired position of trapezoid profile
+    Logger.recordOutput(
+        m_constants.kName + "/Desired Position", m_desiredState.getPosition()); // Desired position
+    Logger.recordOutput(
+        m_constants.kName + "/Current State", m_currentState.getName()); // Current State
+    Logger.recordOutput(
+        m_constants.kName + "/Desired State", m_desiredState.getName()); // Current State
+    Logger.recordOutput(m_constants.kName + "/At Setpoint", atSetpoint()); // Is at setpoint
   }
 }

@@ -7,11 +7,14 @@ public class IntakeSubsystem extends StatedSubsystem {
   }
 
   @Override
-  public void highLevelSubsystemPeriodic() {}
+  public void abstractSubsystemPeriodic() {}
 
   @Override
-  public void lowLevelSubsystemPeriodic() {}
+  public void subsystemPeriodic() {}
 
   @Override
-  public void outputTelemetry() {}
+  public void outputAbstractSubsystemTelemetry() {}
+
+  @Override
+  public void outputSusbsystemTelemetry() {}
 }

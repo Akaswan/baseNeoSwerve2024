@@ -8,10 +8,6 @@ import static frc.robot.Constants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathConstraints;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -30,6 +26,7 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveDrive.AngleToSnap;
 import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.manager.ServoMotorSubsystem;
 import frc.robot.subsystems.manager.SuperstructureStateManager;
@@ -59,8 +56,10 @@ public class RobotContainer {
   // SHUFFLEBOARD TABS \\
   public static ShuffleboardTab mainTab = Shuffleboard.getTab("Main");
   public static ShuffleboardTab infoTab = kInfoMode ? Shuffleboard.getTab("Info") : null;
-  public static ShuffleboardTab driveTuningTab = kTuningMode ? Shuffleboard.getTab("Drive Tuning") : null;
-  public static ShuffleboardTab mechTuningTab = kTuningMode ? Shuffleboard.getTab("Mech Tuning") : null;
+  public static ShuffleboardTab driveTuningTab =
+      kTuningMode ? Shuffleboard.getTab("Drive Tuning") : null;
+  public static ShuffleboardTab mechTuningTab =
+      kTuningMode ? Shuffleboard.getTab("Mech Tuning") : null;
 
   // SUBSYSTEMS \\
   public static final SwerveDrive m_drivebase =
@@ -147,7 +146,8 @@ public class RobotContainer {
     //     .onTrue(
     //         AutoBuilder.pathfindToPose(
     //             new Pose2d(1.8252, 2.779, Rotation2d.fromDegrees(180)),
-    //             new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
+    //             new PathConstraints(3, 4, Units.degreesToRadians(360),
+    // Units.degreesToRadians(540)),
     //             0.0,
     //             0.0));
 
@@ -157,13 +157,19 @@ public class RobotContainer {
     //     .onTrue(
     //         AutoBuilder.pathfindToPose(
     //             new Pose2d(16.06056, 6.270, Rotation2d.fromDegrees(0)),
-    //             new PathConstraints(3, 4, Units.degreesToRadians(360), Units.degreesToRadians(540)),
+    //             new PathConstraints(3, 4, Units.degreesToRadians(360),
+    // Units.degreesToRadians(540)),
     //             0.0,
     //             0.0));
 
     m_driverController.b().onTrue(new TurnToAngle(m_drivebase, 30));
 
-    m_driverController.a().onTrue(new InstantCommand(() -> m_drivebase.setAngleToSnap(AngleToSnap.BACK)));
+    m_driverController
+        .a()
+        .onTrue(new InstantCommand(() -> m_drivebase.setAngleToSnap(AngleToSnap.BACKWARD)));
+    m_driverController
+        .y()
+        .onTrue(new InstantCommand(() -> m_drivebase.setAngleToSnap(AngleToSnap.FORWARD)));
     m_driverController.x().onTrue(new InstantCommand(m_drivebase::toggleXWheels));
   }
 

@@ -7,8 +7,10 @@ package frc.robot;
 import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
@@ -59,13 +61,13 @@ public final class Constants {
     public static double turnkd = 0.0;
     public static double turnkff = 0.0;
 
-    public static double kDriveModifier = 1.2;
+    public static double kDriveModifier = 2;
     public static double kTurnModifier = 2;
 
     /* The lower this is the more you want odometry to trust the april tags
-        Scales based on the percentage of an april tag in view 
-        Dont do anything below 0*/
-    public static double kAprilTagTrustMultiplier = 1.0; 
+    Scales based on the percentage of an april tag in view
+    Dont do anything below 0*/
+    public static double kAprilTagTrustMultiplier = 1.0;
 
     public static int kPigeon = 0;
 
@@ -76,7 +78,10 @@ public final class Constants {
         Units.inchesToMeters(20.67); // Distance between centers of front and back wheels on robot
 
     public static final double kDriveBaseRadius =
-        Math.hypot(Units.inchesToMeters(32) / 2, Units.inchesToMeters(32) / 2); // Distance from center of the robot to corner of the bumpers
+        Math.hypot(
+            Units.inchesToMeters(32) / 2,
+            Units.inchesToMeters(32)
+                / 2); // Distance from center of the robot to corner of the bumpers
 
     public static final double kMaxMetersPerSecond =
         Units.feetToMeters(17.6); // Run drivebase at max speed on the ground to find top speed
@@ -88,7 +93,8 @@ public final class Constants {
 
     public static final double kWheelDiameter = Units.inchesToMeters(3.79); // Wheel diameter
 
-    private static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0; // Just kind of find what works, this is from 930 2023
+    public static final double kMaxRotationRadiansPerSecond =
+        Math.PI * 2.0; // Just kind of find what works, this is from 930 2023
 
     public static final double kRegularSpeed = 1; // Regular speed multiplier of robot
 
@@ -149,24 +155,11 @@ public final class Constants {
     public static final PIDConstants kPathPlannerTranslationPID = new PIDConstants(5.0, 0, 0);
     public static final PIDConstants kPathPlannerRotationPID = new PIDConstants(5.0, 0, 0);
 
-
     public static final SwerveModuleState[] kXWheels = {
-      new SwerveModuleState(
-              0, 
-              Rotation2d.fromDegrees(-45)
-      ),
-      new SwerveModuleState(
-              0, 
-              Rotation2d.fromDegrees(45)
-      ),
-      new SwerveModuleState(
-              0, 
-              Rotation2d.fromDegrees(45)
-      ),
-      new SwerveModuleState(
-              0, 
-              Rotation2d.fromDegrees(-45)
-      ),
+      new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+      new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+      new SwerveModuleState(0, Rotation2d.fromDegrees(135)),
+      new SwerveModuleState(0, Rotation2d.fromDegrees(-135)),
     };
   }
 

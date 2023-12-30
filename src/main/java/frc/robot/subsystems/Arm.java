@@ -30,10 +30,10 @@ public class Arm extends ServoMotorSubsystem {
   }
 
   @Override
-  public void outputTelemetry() {}
+  public void outputSusbsystemTelemetry() {}
 
   @Override
-  public void lowLevelSubsystemPeriodic() {
+  public void subsystemPeriodic() {
     setFeedforward(m_feedforward.calculate(m_encoder.getPosition(), m_encoder.getVelocity()));
 
     armLig.setAngle(m_currentState.getPosition());

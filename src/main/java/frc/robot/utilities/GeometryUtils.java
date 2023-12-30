@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
@@ -61,13 +62,13 @@ public class GeometryUtils {
     return new Twist2d(translation_part.getX(), translation_part.getY(), dtheta);
   }
 
-  public ChassisSpeeds discretize(ChassisSpeeds speeds) {
+  public static ChassisSpeeds discretize(ChassisSpeeds speeds) {
     double dt = 0.02;
-    var desiredDeltaPose = new Pose2d(
-      speeds.vxMetersPerSecond * dt, 
-      speeds.vyMetersPerSecond * dt, 
-      new Rotation2d(speeds.omegaRadiansPerSecond * dt * 4)
-    );
+    var desiredDeltaPose =
+        new Pose2d(
+            speeds.vxMetersPerSecond * dt,
+            speeds.vyMetersPerSecond * dt,
+            new Rotation2d(speeds.omegaRadiansPerSecond * dt * 4));
     var twist = new Pose2d().log(desiredDeltaPose);
 
     return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (speeds.omegaRadiansPerSecond));

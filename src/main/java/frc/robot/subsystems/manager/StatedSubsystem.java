@@ -131,6 +131,14 @@ public abstract class StatedSubsystem extends SubsystemBase {
 
   public interface SubsystemState {
     String getName();
+
+    double getPosition();
+
+    double getVelocity();
+
+    void setPosition(double position);
+
+    void setVelocity(double velocity);
   }
 
   public enum SubsystemType {

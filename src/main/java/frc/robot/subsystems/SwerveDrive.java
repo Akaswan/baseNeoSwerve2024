@@ -10,11 +10,12 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
@@ -44,7 +45,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private SimpleWidget m_gyroWidget;
 
-  private ProfiledPIDController m_snapToAngleController;
+  private PIDController m_snapToAngleController;
 
   private AngleToSnap m_angleToSnap = AngleToSnap.NONE;
 
@@ -197,7 +198,7 @@ public class SwerveDrive extends SubsystemBase {
 
     robotRelativeChassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
-    m_snapToAngleController = new ProfiledPIDController(.1, 0, 0, new TrapizoidProfile.constrains(10, 5));
+    m_snapToAngleController = new PIDController(.06, 0, 0);
 
     PathPlannerLogging.setLogTargetPoseCallback(
         (targetPose) -> {
@@ -239,15 +240,21 @@ public class SwerveDrive extends SubsystemBase {
 
     if (m_angleToSnap != AngleToSnap.NONE) {
       if (Math.abs(m_angleToSnap.getAngle() - getYawDegrees()) < 1) {
-        m_angleToSnap == AngleToSnap.NONE;
+        m_angleToSnap = AngleToSnap.NONE;
       } else {
-        strafe = m_snapToAngleController.calculate(GeometryUtils.getAdjustedYawDegrees(getYawDegrees(), m_angleToSnap.getAngle()), 180);
+        rotation =
+            MathUtil.clamp(
+                m_snapToAngleController.calculate(
+                    GeometryUtils.getAdjustedYawDegrees(getYawDegrees(), m_angleToSnap.getAngle()),
+                    180),
+                -1,
+                1);
       }
     }
 
-    if (throttle + strafe + rotation > 0 && m_xWheels == true) {
-      m_xWheels == false;
-    } 
+    if (throttle + strafe + rotation != 0 && m_xWheels == true) {
+      m_xWheels = false;
+    }
 
     if (m_xWheels == false) {
       throttle = throttle * DriveConstants.kMaxMetersPerSecond;
@@ -259,22 +266,22 @@ public class SwerveDrive extends SubsystemBase {
               ? ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getYaw())
               : new ChassisSpeeds(throttle, strafe, rotation);
 
-      chassisSpeeds = GeometryUtils.discretize(chassisSpeeds);
+      // chassisSpeeds = GeometryUtils.discretize(chassisSpeeds);
       moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
       setSwerveModuleStates(moduleStates, isOpenLoop);
 
       Logger.recordOutput("Drivebase/SwerveStateSetpoints", moduleStates);
 
-      robotRelativeChassisSpeeds = GeometryUtils.discretize(new ChassisSpeeds(throttle, strafe, rotation));
+      robotRelativeChassisSpeeds =
+          GeometryUtils.discretize(new ChassisSpeeds(throttle, strafe, rotation));
     } else {
       setSwerveModuleStates(DriveConstants.kXWheels, isOpenLoop);
       Logger.recordOutput("Drivebase/SwerveStateSetpoints", DriveConstants.kXWheels);
     }
-
   }
 
   public void autoDrive(ChassisSpeeds speeds) {
-    speeds = GeometryUtils.discretize(speeds); // I dont know if you want this here
+    // speeds = GeometryUtils.discretize(speeds); // I dont know if you want this here
     moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     setSwerveModuleStates(moduleStates, false);
   }
@@ -410,7 +417,12 @@ public class SwerveDrive extends SubsystemBase {
           RobotContainer.m_limelight.getLimelightPose(),
           Timer.getFPGATimestamp() - (RobotContainer.m_limelight.getBotPose()[6] / 1000.0),
           VecBuilder.fill(
-              1 - Math.pow(RobotContainer.m_limelight.getA(), apriltagTrustMultiplier.get()), // Higher the multiplier the closer it has to be to the tag to trust it
+              1
+                  - Math.pow(
+                      RobotContainer.m_limelight.getA(),
+                      apriltagTrustMultiplier
+                          .get()), // Higher the multiplier the closer it has to be to the tag to
+              // trust it
               1 - Math.pow(RobotContainer.m_limelight.getA(), apriltagTrustMultiplier.get()),
               0.9));
     }
@@ -460,17 +472,16 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
-
   public enum AngleToSnap {
     FORWARD(0),
-    BACK(180),
+    BACKWARD(180),
     LEFT(90),
     RIGHT(270),
     NONE(0);
 
     private double angle;
 
-    public AngleToSnap(double angle) {
+    private AngleToSnap(double angle) {
       this.angle = angle;
     }
 
@@ -478,7 +489,4 @@ public class SwerveDrive extends SubsystemBase {
       return angle;
     }
   }
-
-
-
 }
