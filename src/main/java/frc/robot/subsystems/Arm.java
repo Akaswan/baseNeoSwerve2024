@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -8,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.subsystems.manager.ServoMotorSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 public class Arm extends ServoMotorSubsystem {
 
@@ -30,7 +33,16 @@ public class Arm extends ServoMotorSubsystem {
   }
 
   @Override
-  public void outputSusbsystemTelemetry() {}
+  public void outputSusbsystemTelemetry() {
+    Logger.recordOutput(
+        "Arm/Mech3d",
+        new Pose3d(
+            -.2347,
+            0,
+            .254,
+            new Rotation3d(
+                Math.toRadians(-m_currentState.getPosition() + 90), 0, Math.toRadians(90))));
+  }
 
   @Override
   public void subsystemPeriodic() {
@@ -42,10 +54,11 @@ public class Arm extends ServoMotorSubsystem {
   public enum ArmState implements SubsystemState {
     MANUAL(0, 0, "Manual"),
     TRANSITION(0, 0, "Transition"),
-    SETPOINT_SWITCH(0, 0, "Setpoint Switch"),
     HOME(0, 0, "Home"),
-    OUT(100, 0, "Out"),
-    IN(20, 0, "In");
+    SUBSTATION_PICKUP(43, 0, "Substation Pickup"),
+    SCORE_HIGH(38, 0, "Score High"),
+    SCORE_MID(38.5, 0, "Score Mid"),
+    SCORE_LOW(15.325, 0, "Score Low");
 
     private double position;
     private double velocity;

@@ -75,7 +75,7 @@ public final class Constants {
         Units.inchesToMeters(20.67); // Distance between centers of right and left wheels on robot
 
     public static final double kWheelBase =
-        Units.inchesToMeters(20.67); // Distance between centers of front and back wheels on robot
+        Units.inchesToMeters(20.76); // Distance between centers of front and back wheels on robot
 
     public static final double kDriveBaseRadius =
         Math.hypot(
@@ -84,9 +84,9 @@ public final class Constants {
                 / 2); // Distance from center of the robot to corner of the bumpers
 
     public static final double kMaxMetersPerSecond =
-        Units.feetToMeters(17.6); // Run drivebase at max speed on the ground to find top speed
+        Units.feetToMeters(12); // Run drivebase at max speed on the ground to find top speed
 
-    public static final double kDriveGearRatio = 6.75; // MK4i L1 Neo, find on sds website
+    public static final double kDriveGearRatio = 8.14; // MK4i L1 Neo, find on sds website
 
     public static final double kTurnGearRatio =
         150.0 / 7.0; // MK4i turning ratio MK4i Neo, find on sds website
@@ -205,25 +205,24 @@ public final class Constants {
 
       kArmConstants.kDefaultSlot = 0;
 
-      kArmConstants.kMaxVelocity = 200;
-      kArmConstants.kMaxAcceleration = 200;
+      kArmConstants.kMaxVelocity = 720;
+      kArmConstants.kMaxAcceleration = 700;
 
       kArmConstants.kKs = 0.0;
       kArmConstants.kKg = 0.0;
       kArmConstants.kKv = 0.0;
       kArmConstants.kKa = 0.0;
 
-      kArmConstants.kMaxPosition = 150.0;
-      kArmConstants.kMinPosition = 0.0;
+      kArmConstants.kMaxPosition = 108;
+      kArmConstants.kMinPosition = -8.5;
 
       kArmConstants.kManualAxis = XboxController.Axis.kRightY.value;
       kArmConstants.kManualMultiplier = 1;
-      kArmConstants.kManualDeadZone = .1;
+      kArmConstants.kManualDeadBand = .1;
 
       kArmConstants.kInitialState = ArmState.HOME;
       kArmConstants.kManualState = ArmState.MANUAL;
       kArmConstants.kTransitionState = ArmState.TRANSITION;
-      kArmConstants.kSetpointSwitchState = ArmState.SETPOINT_SWITCH;
     }
   }
 
@@ -270,25 +269,24 @@ public final class Constants {
 
       kElevatorConstants.kDefaultSlot = 0;
 
-      kElevatorConstants.kMaxVelocity = 1;
-      kElevatorConstants.kMaxAcceleration = .5;
+      kElevatorConstants.kMaxVelocity = 10;
+      kElevatorConstants.kMaxAcceleration = 7.5;
 
       kElevatorConstants.kKs = 0.0;
       kElevatorConstants.kKg = 0.0;
       kElevatorConstants.kKv = 0.0;
       kElevatorConstants.kKa = 0.0;
 
-      kElevatorConstants.kMaxPosition = 3.0;
+      kElevatorConstants.kMaxPosition = 1;
       kElevatorConstants.kMinPosition = 0.0;
 
       kElevatorConstants.kManualAxis = XboxController.Axis.kLeftY.value;
       kElevatorConstants.kManualMultiplier = .05;
-      kElevatorConstants.kManualDeadZone = .1;
+      kElevatorConstants.kManualDeadBand = .1;
 
       kElevatorConstants.kInitialState = ElevatorState.HOME;
       kElevatorConstants.kManualState = ElevatorState.MANUAL;
       kElevatorConstants.kTransitionState = ElevatorState.TRANSITION;
-      kElevatorConstants.kSetpointSwitchState = ElevatorState.SETPOINT_SWITCH;
     }
   }
 
@@ -315,7 +313,7 @@ public final class Constants {
       kWristConstants.kMasterConstants = kWristMasterConstants;
       kWristConstants.kSlaveConstants = kWristSlaveConstants;
 
-      kWristConstants.kHomePosition = 0.0;
+      kWristConstants.kHomePosition = 155;
       kWristConstants.kRotationsPerUnitDistance = 360 / 100;
 
       kWristConstants.kKp = 0.2;
@@ -326,25 +324,24 @@ public final class Constants {
 
       kWristConstants.kDefaultSlot = 0;
 
-      kWristConstants.kMaxVelocity = 150;
-      kWristConstants.kMaxAcceleration = 140;
+      kWristConstants.kMaxVelocity = 2000;
+      kWristConstants.kMaxAcceleration = 2000;
 
       kWristConstants.kKs = 0.0;
       kWristConstants.kKg = 0.0;
       kWristConstants.kKv = 0.0;
       kWristConstants.kKa = 0.0;
 
-      kWristConstants.kMaxPosition = 160;
-      kWristConstants.kMinPosition = -160;
+      kWristConstants.kMaxPosition = 155;
+      kWristConstants.kMinPosition = -85;
 
-      kWristConstants.kManualAxis = XboxController.Axis.kRightY.value;
+      kWristConstants.kManualAxis = XboxController.Axis.kRightX.value;
       kWristConstants.kManualMultiplier = 1;
-      kWristConstants.kManualDeadZone = .1;
+      kWristConstants.kManualDeadBand = .1;
 
       kWristConstants.kInitialState = WristState.HOME;
       kWristConstants.kManualState = WristState.MANUAL;
       kWristConstants.kTransitionState = WristState.TRANSITION;
-      kWristConstants.kSetpointSwitchState = WristState.SETPOINT_SWITCH;
     }
   }
 

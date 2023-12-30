@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.manager.ServoMotorSubsystem;
+import frc.robot.subsystems.manager.StatedSubsystem.SubsystemType;
 
 public class ManualSubsystem extends Command {
 
@@ -25,16 +26,21 @@ public class ManualSubsystem extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    double throttle = 0;
+    if (m_subsystem.getSubsystemType() == SubsystemType.ARM) {
+      throttle =
+          RobotContainer.m_driverController.getRightTriggerAxis()
+              - RobotContainer.m_driverController.getLeftTriggerAxis();
+    } else if (m_subsystem.getSubsystemType() == SubsystemType.ELEVATOR) {
+      throttle = -RobotContainer.m_driverController.getRightY();
+    } else if (m_subsystem.getSubsystemType() == SubsystemType.WRIST) {
+      throttle =
+          RobotContainer.m_operatorController.getLeftBumper()
+              ? 1
+              : 0 + (RobotContainer.m_operatorController.getRightBumper() ? -1 : 0);
+    }
 
-    double throttle =
-        -RobotContainer.m_driverController
-            .getHID()
-            .getRawAxis(m_subsystem.getConstants().kManualAxis);
-
-    m_subsystem.manualControl(
-        throttle,
-        m_subsystem.getConstants().kManualMultiplier,
-        m_subsystem.getConstants().kManualDeadZone);
+    m_subsystem.manualControl(throttle);
   }
 
   // Called once the command ends or is interrupted.

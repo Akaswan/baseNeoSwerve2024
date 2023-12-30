@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class StatedSubsystem extends SubsystemBase {
 
-  protected SubsystemConstants m_constants;
+  public SubsystemConstants m_constants;
 
   protected final CANSparkMax m_master;
   protected final CANSparkMax[] m_slaves;
@@ -28,6 +28,7 @@ public abstract class StatedSubsystem extends SubsystemBase {
     m_master.setSmartCurrentLimit(m_constants.kMasterConstants.kCurrentLimit);
 
     m_encoder = m_master.getEncoder();
+    m_encoder.setPosition(m_constants.kHomePosition);
 
     m_slaves = new CANSparkMax[m_constants.kSlaveConstants.length];
 
@@ -85,7 +86,6 @@ public abstract class StatedSubsystem extends SubsystemBase {
     public SubsystemState kInitialState = null;
     public SubsystemState kManualState = null;
     public SubsystemState kTransitionState = null;
-    public SubsystemState kSetpointSwitchState = null;
 
     // Servo Motor Subsystem Constants \\
     public double kHomePosition = 0.0;
@@ -119,7 +119,7 @@ public abstract class StatedSubsystem extends SubsystemBase {
     // Manual constants
     public int kManualAxis = 0;
     public double kManualMultiplier = 0;
-    public double kManualDeadZone = 0;
+    public double kManualDeadBand = 0;
   }
 
   public static class CANSparkMaxConstants {

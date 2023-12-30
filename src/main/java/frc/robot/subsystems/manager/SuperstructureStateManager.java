@@ -5,8 +5,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.SetSubsystemState;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Arm.ArmState;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorState;
+import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.Wrist.WristState;
 import frc.robot.subsystems.manager.StatedSubsystem.SubsystemState;
 import java.util.ArrayList;
@@ -98,8 +101,15 @@ public class SuperstructureStateManager {
   public enum SuperstructureState {
     TRANSITION(ArmState.TRANSITION, WristState.TRANSITION, ElevatorState.TRANSITION, "Transition"),
     HOME(ArmState.HOME, WristState.HOME, ElevatorState.HOME, "Home"),
-    PICKUP(ArmState.IN, WristState.IN, ElevatorState.IN, "Pickup"),
-    PLACE(ArmState.OUT, WristState.OUT, ElevatorState.OUT, "Place");
+    GROUND_PICKUP(ArmState.HOME, WristState.GROUND_PICKUP, ElevatorState.HOME, "Ground Pickup"),
+    SUBSTATION_PICKUP(
+        ArmState.SUBSTATION_PICKUP,
+        WristState.SUBSTATION_PICKUP,
+        ElevatorState.SUBSTATION_PICKUP,
+        "Substation Pickup"),
+    SCORE_HIGH(ArmState.SCORE_HIGH, WristState.SCORE_HIGH, ElevatorState.SCORE_HIGH, "Score High"),
+    SCORE_MID(ArmState.SCORE_MID, WristState.SCORE_MID, ElevatorState.SCORE_MID, "Score Mid"),
+    SCORE_LOW(ArmState.SCORE_LOW, WristState.SCORE_LOW, ElevatorState.SCORE_LOW, "Score Low");
 
     SubsystemState armState;
     SubsystemState elevatorState;
@@ -148,28 +158,62 @@ public class SuperstructureStateManager {
 
   // Logic for if going from a specific state from a specific state would break the robot
   // Do an if statement for those specific cases, else return a default setSuperstructureState
-  // public SequentialCommandGroup goToState(SuperstructureState desiredState) {
-  //     switch (m_currentState) {
-  //         case HOME:
-  //             switch (desiredState) {
-  //                 case HOME:
-  //                     break;
-  //                 case PICKUP:
-  //                     break;
-  //                 case PLACE:
-  //                     break;
-  //                 default:
-  //                     break;
-  //             }
-  //             break;
-  //         case PICKUP:
-  //             break;
-  //         case PLACE:
-  //             break;
-  //         default:
-  //             break;
+  public SequentialCommandGroup goToState(
+      SuperstructureState desiredState, Arm arm, Elevator elevator, Wrist wrist) {
+    ServoMotorSubsystem[] order;
+    // switch (desiredState) {
+    //   case GROUND_PICKUP:
+    //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
+    // SuperstructureState.SCORE_MID || m_currentState == SuperstructureState.SUBSTATION_PICKUP) {
+    //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
+    //     } else if (m_currentState == SuperstructureState.HOME || m_currentState ==
+    // SuperstructureState.SCORE_LOW) {
+    //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
+    //     }
+    //     break;
+    //   case HOME:
+    //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
+    // SuperstructureState.SCORE_MID || m_currentState == SuperstructureState.SUBSTATION_PICKUP) {
+    //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
+    //     } else if (m_currentState == SuperstructureState.GROUND_PICKUP || m_currentState ==
+    // SuperstructureState.SCORE_LOW) {
+    //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
+    //     }
+    //     break;
+    //   case SCORE_HIGH:
+    //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
+    // SuperstructureState.SCORE_MID || m_currentState == SuperstructureState.SUBSTATION_PICKUP) {
+    //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
+    //     } else if (m_currentState == SuperstructureState.GROUND_PICKUP || m_currentState ==
+    // SuperstructureState.SCORE_LOW) {
+    //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
+    //     }
+    //     break;
+    //   case SCORE_LOW:
+    //     break;
+    //   case SCORE_MID:
+    //     break;
+    //   case SUBSTATION_PICKUP:
+    //     break;
+    //   case TRANSITION:
+    //     break;
+    //   default:
+    //     order = new ServoMotorSubsystem[] {arm, elevator, wrist};
+    //     break;
+    // }
 
-  //     }
-  // }
+    if (m_currentState == SuperstructureState.SCORE_HIGH
+        || m_currentState == SuperstructureState.SCORE_MID
+        || m_currentState == SuperstructureState.SUBSTATION_PICKUP) {
+      order = new ServoMotorSubsystem[] {wrist, elevator, arm};
+    } else if (m_currentState == SuperstructureState.HOME
+        || m_currentState == SuperstructureState.GROUND_PICKUP
+        || m_currentState == SuperstructureState.SCORE_LOW) {
+      order = new ServoMotorSubsystem[] {arm, elevator, wrist};
+    } else {
+      order = new ServoMotorSubsystem[] {arm, elevator, wrist};
+    }
 
+    return setSuperstructureState(order, desiredState);
+  }
 }

@@ -21,14 +21,11 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.commands.ManualSubsystem;
 import frc.robot.commands.SwerveDrivebase.TeleopSwerve;
-import frc.robot.commands.SwerveDrivebase.TurnToAngle;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.SwerveDrive.AngleToSnap;
 import frc.robot.subsystems.Wrist;
-import frc.robot.subsystems.manager.ServoMotorSubsystem;
 import frc.robot.subsystems.manager.SuperstructureStateManager;
 import frc.robot.subsystems.manager.SuperstructureStateManager.SuperstructureState;
 import frc.robot.utilities.Alert;
@@ -104,7 +101,9 @@ public class RobotContainer {
             true,
             DriveConstants.kRegularSpeed,
             true));
+    m_elevator.setDefaultCommand(new ManualSubsystem(m_elevator));
     m_arm.setDefaultCommand(new ManualSubsystem(m_arm));
+    m_wrist.setDefaultCommand(new ManualSubsystem(m_wrist));
 
     configureButtonBindings();
   }
@@ -112,33 +111,33 @@ public class RobotContainer {
   private void configureButtonBindings() {
 
     // XBOX 0
-    m_driverController
-        .leftBumper()
-        .onTrue(
-            new TeleopSwerve(
-                m_drivebase,
-                m_driverController,
-                translationAxis,
-                strafeAxis,
-                rotationAxis,
-                true,
-                DriveConstants.kSlowSpeed,
-                true));
+    // m_driverController
+    //     .leftBumper()
+    //     .onTrue(
+    //         new TeleopSwerve(
+    //             m_drivebase,
+    //             m_driverController,
+    //             translationAxis,
+    //             strafeAxis,
+    //             rotationAxis,
+    //             true,
+    //             DriveConstants.kSlowSpeed,
+    //             true));
 
-    m_driverController
-        .leftBumper()
-        .onFalse(
-            new TeleopSwerve(
-                m_drivebase,
-                m_driverController,
-                translationAxis,
-                strafeAxis,
-                rotationAxis,
-                true,
-                DriveConstants.kRegularSpeed,
-                true));
+    // m_driverController
+    //     .leftBumper()
+    //     .onFalse(
+    //         new TeleopSwerve(
+    //             m_drivebase,
+    //             m_driverController,
+    //             translationAxis,
+    //             strafeAxis,
+    //             rotationAxis,
+    //             true,
+    //             DriveConstants.kRegularSpeed,
+    //             true));
 
-    m_driverController.back().onTrue(new InstantCommand(m_drivebase::zeroGyroscope));
+    // m_driverController.back().onTrue(new InstantCommand(m_drivebase::zeroGyroscope));
 
     // Example of an automatic path generated to score in the B2 zone
     // m_driverController
@@ -162,15 +161,15 @@ public class RobotContainer {
     //             0.0,
     //             0.0));
 
-    m_driverController.b().onTrue(new TurnToAngle(m_drivebase, 30));
+    // m_driverController.b().onTrue(new TurnToAngle(m_drivebase, 30));
 
-    m_driverController
-        .a()
-        .onTrue(new InstantCommand(() -> m_drivebase.setAngleToSnap(AngleToSnap.BACKWARD)));
-    m_driverController
-        .y()
-        .onTrue(new InstantCommand(() -> m_drivebase.setAngleToSnap(AngleToSnap.FORWARD)));
-    m_driverController.x().onTrue(new InstantCommand(m_drivebase::toggleXWheels));
+    // m_driverController
+    //     .a()
+    //     .onTrue(new InstantCommand(() -> m_drivebase.setAngleToSnap(AngleToSnap.BACKWARD)));
+    // m_driverController
+    //     .y()
+    //     .onTrue(new InstantCommand(() -> m_drivebase.setAngleToSnap(AngleToSnap.FORWARD)));
+    // m_driverController.x().onTrue(new InstantCommand(m_drivebase::toggleXWheels));
   }
 
   public Command getAutonomousCommand() {
@@ -201,23 +200,25 @@ public class RobotContainer {
   }
 
   public void periodic() {
-    if (m_operatorController.getYButtonPressed()) {
-      m_manager
-          .setSuperstructureState(
-              new ServoMotorSubsystem[] {m_arm, m_elevator, m_wrist}, SuperstructureState.PLACE)
-          .schedule();
+    if (m_operatorController.getAButtonPressed()) {
+      m_manager.goToState(SuperstructureState.HOME, m_arm, m_elevator, m_wrist).schedule();
     }
     if (m_operatorController.getXButtonPressed()) {
       m_manager
-          .setSuperstructureState(
-              new ServoMotorSubsystem[] {m_arm, m_elevator, m_wrist}, SuperstructureState.HOME)
+          .goToState(SuperstructureState.SUBSTATION_PICKUP, m_arm, m_elevator, m_wrist)
           .schedule();
     }
     if (m_operatorController.getBButtonPressed()) {
-      m_manager
-          .setSuperstructureState(
-              new ServoMotorSubsystem[] {m_arm, m_elevator, m_wrist}, SuperstructureState.PICKUP)
-          .schedule();
+      m_manager.goToState(SuperstructureState.GROUND_PICKUP, m_arm, m_elevator, m_wrist).schedule();
+    }
+    if (m_operatorController.getPOV() == 0) {
+      m_manager.goToState(SuperstructureState.SCORE_HIGH, m_arm, m_elevator, m_wrist).schedule();
+    }
+    if (m_operatorController.getPOV() == 90) {
+      m_manager.goToState(SuperstructureState.SCORE_MID, m_arm, m_elevator, m_wrist).schedule();
+    }
+    if (m_operatorController.getPOV() == 180) {
+      m_manager.goToState(SuperstructureState.SCORE_LOW, m_arm, m_elevator, m_wrist).schedule();
     }
   }
 }

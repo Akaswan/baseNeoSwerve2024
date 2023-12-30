@@ -1,7 +1,11 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.manager.ServoMotorSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 public class Wrist extends ServoMotorSubsystem {
 
@@ -14,7 +18,22 @@ public class Wrist extends ServoMotorSubsystem {
   }
 
   @Override
-  public void outputSusbsystemTelemetry() {}
+  public void outputSusbsystemTelemetry() {
+    Logger.recordOutput(
+        "Wrist/Mech3d",
+        new Pose3d(
+            -0.2574
+                + (RobotContainer.m_elevator.getPosition() + .54)
+                    * Math.cos(Math.toRadians(RobotContainer.m_arm.getPosition())),
+            0,
+            0.2715
+                + (RobotContainer.m_elevator.getPosition() + .54)
+                    * Math.sin(Math.toRadians(RobotContainer.m_arm.getPosition())),
+            new Rotation3d(
+                Math.toRadians(-RobotContainer.m_arm.getPosition() - getPosition() + 90 + 155),
+                0,
+                Math.toRadians(90))));
+  }
 
   @Override
   public void subsystemPeriodic() {
@@ -26,10 +45,12 @@ public class Wrist extends ServoMotorSubsystem {
   public enum WristState implements SubsystemState {
     MANUAL(0, 0, "Manual"),
     TRANSITION(0, 0, "Transition"),
-    SETPOINT_SWITCH(0, 0, "Setpoint Switch"),
-    HOME(0, 0, "Home"),
-    OUT(100, 0, "Out"),
-    IN(20, 0, "In");
+    HOME(155, 0, "Home"),
+    GROUND_PICKUP(14, 0, "Ground Pickup"),
+    SUBSTATION_PICKUP(-42, 0, "Substation Pickup"),
+    SCORE_HIGH(-24, 0, "Score High"),
+    SCORE_MID(-24, 0, "Score Mid"),
+    SCORE_LOW(-24, 0, "Score Low");
 
     private double position;
     private double velocity;
