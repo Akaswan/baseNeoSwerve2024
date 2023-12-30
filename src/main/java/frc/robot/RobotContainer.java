@@ -19,12 +19,13 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.WristConstants;
-import frc.robot.commands.ManualSubsystem;
 import frc.robot.commands.SwerveDrivebase.TeleopSwerve;
+import frc.robot.commands.SwerveDrivebase.TurnToAngle;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveDrive.AngleToSnap;
 import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.manager.SuperstructureStateManager;
 import frc.robot.subsystems.manager.SuperstructureStateManager.SuperstructureState;
@@ -101,9 +102,9 @@ public class RobotContainer {
             true,
             DriveConstants.kRegularSpeed,
             true));
-    m_elevator.setDefaultCommand(new ManualSubsystem(m_elevator));
-    m_arm.setDefaultCommand(new ManualSubsystem(m_arm));
-    m_wrist.setDefaultCommand(new ManualSubsystem(m_wrist));
+    // m_elevator.setDefaultCommand(new ManualSubsystem(m_elevator));
+    // m_arm.setDefaultCommand(new ManualSubsystem(m_arm));
+    // m_wrist.setDefaultCommand(new ManualSubsystem(m_wrist));
 
     configureButtonBindings();
   }
@@ -137,7 +138,7 @@ public class RobotContainer {
     //             DriveConstants.kRegularSpeed,
     //             true));
 
-    // m_driverController.back().onTrue(new InstantCommand(m_drivebase::zeroGyroscope));
+    m_driverController.back().onTrue(new InstantCommand(m_drivebase::zeroGyroscope));
 
     // Example of an automatic path generated to score in the B2 zone
     // m_driverController

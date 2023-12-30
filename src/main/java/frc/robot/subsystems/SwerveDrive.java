@@ -10,6 +10,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -237,50 +238,49 @@ public class SwerveDrive extends SubsystemBase {
   public void drive(
       double throttle, double strafe, double rotation, boolean isOpenLoop, boolean fieldRelative) {
 
-    // if (m_angleToSnap != AngleToSnap.NONE) {
-    //   if (Math.abs(m_angleToSnap.getAngle() - getYawDegrees()) < 1) {
-    //     m_angleToSnap = AngleToSnap.NONE;
-    //   } else {
-    //     rotation =
-    //         MathUtil.clamp(
-    //             m_snapToAngleController.calculate(
-    //                 GeometryUtils.getAdjustedYawDegrees(getYawDegrees(),
-    // m_angleToSnap.getAngle()),
-    //                 180),
-    //             -1,
-    //             1);
-    //   }
-    // }
+    if (m_angleToSnap != AngleToSnap.NONE) {
+      if (Math.abs(m_angleToSnap.getAngle() - getYawDegrees()) < 1) {
+        m_angleToSnap = AngleToSnap.NONE;
+      } else {
+        rotation =
+            MathUtil.clamp(
+                m_snapToAngleController.calculate(
+                    GeometryUtils.getAdjustedYawDegrees(getYawDegrees(), m_angleToSnap.getAngle()),
+                    180),
+                -1,
+                1);
+      }
+    }
 
-    // if (throttle + strafe + rotation != 0 && m_xWheels == true) {
-    //   m_xWheels = false;
-    // }
+    if (throttle + strafe + rotation != 0 && m_xWheels == true) {
+      m_xWheels = false;
+    }
 
-    // if (m_xWheels == false) {
-    throttle = throttle * DriveConstants.kMaxMetersPerSecond;
-    strafe = strafe * DriveConstants.kMaxMetersPerSecond;
-    rotation = rotation * DriveConstants.kMaxRotationRadiansPerSecond;
+    if (m_xWheels == false) {
+      throttle = throttle * DriveConstants.kMaxMetersPerSecond;
+      strafe = strafe * DriveConstants.kMaxMetersPerSecond;
+      rotation = rotation * DriveConstants.kMaxRotationRadiansPerSecond;
 
-    ChassisSpeeds chassisSpeeds =
-        fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getYaw())
-            : new ChassisSpeeds(throttle, strafe, rotation);
+      ChassisSpeeds chassisSpeeds =
+          fieldRelative
+              ? ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getYaw())
+              : new ChassisSpeeds(throttle, strafe, rotation);
 
-    // chassisSpeeds = GeometryUtils.discretize(chassisSpeeds);
-    moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
-    setSwerveModuleStates(moduleStates, isOpenLoop);
+      // chassisSpeeds = GeometryUtils.discretize(chassisSpeeds);
+      moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+      setSwerveModuleStates(moduleStates, isOpenLoop);
 
-    Logger.recordOutput("Drivebase/SwerveStateSetpoints", moduleStates);
+      Logger.recordOutput("Drivebase/SwerveStateSetpoints", moduleStates);
 
-    // robotRelativeChassisSpeeds =
-    // GeometryUtils.discretize(new ChassisSpeeds(throttle, strafe, rotation));
+      // robotRelativeChassisSpeeds =
+      // GeometryUtils.discretize(new ChassisSpeeds(throttle, strafe, rotation));
 
-    robotRelativeChassisSpeeds = new ChassisSpeeds(throttle, strafe, rotation);
+      robotRelativeChassisSpeeds = new ChassisSpeeds(throttle, strafe, rotation);
 
-    // } else {
-    //   setSwerveModuleStates(DriveConstants.kXWheels, isOpenLoop);
-    //   Logger.recordOutput("Drivebase/SwerveStateSetpoints", DriveConstants.kXWheels);
-    // }
+    } else {
+      setSwerveModuleStates(DriveConstants.kXWheels, isOpenLoop);
+      Logger.recordOutput("Drivebase/SwerveStateSetpoints", DriveConstants.kXWheels);
+    }
   }
 
   public void autoDrive(ChassisSpeeds speeds) {
@@ -411,24 +411,24 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void realPeriodic() {
-    // if (poseEstimator
-    //         .getEstimatedPosition()
-    //         .getTranslation()
-    //         .getDistance(RobotContainer.m_limelight.getLimelightPose().getTranslation())
-    //     <= 1.0) {
-    //   poseEstimator.addVisionMeasurement(
-    //       RobotContainer.m_limelight.getLimelightPose(),
-    //       Timer.getFPGATimestamp() - (RobotContainer.m_limelight.getBotPose()[6] / 1000.0),
-    //       VecBuilder.fill(
-    //           1
-    //               - Math.pow(
-    //                   RobotContainer.m_limelight.getA(),
-    //                   apriltagTrustMultiplier
-    //                       .get()), // Higher the multiplier the closer it has to be to the tag to
-    //           // trust it
-    //           1 - Math.pow(RobotContainer.m_limelight.getA(), apriltagTrustMultiplier.get()),
-    //           0.9));
-    // }
+    if (poseEstimator
+            .getEstimatedPosition()
+            .getTranslation()
+            .getDistance(RobotContainer.m_limelight.getLimelightPose().getTranslation())
+        <= 1.0) {
+      poseEstimator.addVisionMeasurement(
+          RobotContainer.m_limelight.getLimelightPose(),
+          Timer.getFPGATimestamp() - (RobotContainer.m_limelight.getBotPose()[6] / 1000.0),
+          VecBuilder.fill(
+              1
+                  - Math.pow(
+                      RobotContainer.m_limelight.getA(),
+                      apriltagTrustMultiplier
+                          .get()), // Higher the multiplier the closer it has to be to the tag to
+              // trust it
+              1 - Math.pow(RobotContainer.m_limelight.getA(), apriltagTrustMultiplier.get()),
+              0.9));
+    }
   }
 
   @Override
