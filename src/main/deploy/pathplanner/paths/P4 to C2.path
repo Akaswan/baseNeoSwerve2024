@@ -11,7 +11,8 @@
         "x": 5.474354459936989,
         "y": 0.8727952087483121
       },
-      "isLocked": false
+      "isLocked": false,
+      "linkedName": null
     },
     {
       "anchor": {
@@ -23,12 +24,31 @@
         "y": 0.6982117473006884
       },
       "nextControl": null,
-      "isLocked": false
+      "isLocked": false,
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.25,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "home"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3,
     "maxAcceleration": 3,
@@ -37,9 +57,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 180.0,
+    "rotateFast": false
   },
   "reversed": false,
   "folder": "Auto Paths",
-  "previewStartingState": null
+  "previewStartingState": null,
+  "useDefaultConstraints": false
 }

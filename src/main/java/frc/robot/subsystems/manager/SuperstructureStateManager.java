@@ -2,8 +2,8 @@ package frc.robot.subsystems.manager;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.SetSubsystemState;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Arm.ArmState;
@@ -14,8 +14,9 @@ import frc.robot.subsystems.Wrist.WristState;
 import frc.robot.subsystems.manager.StatedSubsystem.SubsystemState;
 import java.util.ArrayList;
 import java.util.Arrays;
+import org.littletonrobotics.junction.Logger;
 
-public class SuperstructureStateManager {
+public class SuperstructureStateManager extends SubsystemBase {
 
   private SuperstructureState m_lastHeldState;
   private SuperstructureState m_currentState;
@@ -23,6 +24,16 @@ public class SuperstructureStateManager {
 
   private Command m_scheduledCommand;
   private SequentialCommandGroup m_scheduledSequentialCommandGroup = new SequentialCommandGroup();
+
+  private static SuperstructureStateManager m_instance = null;
+
+  public static synchronized SuperstructureStateManager getInstance() {
+    if (m_instance == null) {
+      m_instance = new SuperstructureStateManager(SuperstructureState.HOME);
+    }
+
+    return m_instance;
+  }
 
   public SuperstructureStateManager(SuperstructureState initialState) {
     m_currentState = initialState;
@@ -76,23 +87,16 @@ public class SuperstructureStateManager {
   public SequentialCommandGroup setSuperstructureState(
       ServoMotorSubsystem[] order, SuperstructureState desiredState) {
     SequentialCommandGroup outputCommand = new SequentialCommandGroup();
-    setDesiredState(desiredState);
-    setCurrentState(SuperstructureState.TRANSITION);
+    // setDesiredState(desiredState);
+    // setCurrentState(SuperstructureState.TRANSITION);
 
     if (CommandScheduler.getInstance().isScheduled(m_scheduledSequentialCommandGroup)) {
       order = swapOrder(order);
     }
 
     for (int i = 0; i < order.length; i++) {
-      outputCommand.addCommands(new SetSubsystemState(order[i], desiredState));
+      outputCommand.addCommands(new SetSubsystemState(order[i], desiredState, order));
     }
-
-    outputCommand.addCommands(
-        new InstantCommand(
-            () -> {
-              m_currentState = desiredState;
-              m_lastHeldState = desiredState;
-            }));
 
     m_scheduledSequentialCommandGroup = outputCommand;
     return outputCommand;
@@ -158,9 +162,11 @@ public class SuperstructureStateManager {
 
   // Logic for if going from a specific state from a specific state would break the robot
   // Do an if statement for those specific cases, else return a default setSuperstructureState
-  public SequentialCommandGroup goToState(
-      SuperstructureState desiredState, Arm arm, Elevator elevator, Wrist wrist) {
+  public SequentialCommandGroup goToState(SuperstructureState desiredState) {
     ServoMotorSubsystem[] order;
+    Arm arm = Arm.getInstance();
+    Elevator elevator = Elevator.getInstance();
+    Wrist wrist = Wrist.getInstance();
     // switch (desiredState) {
     //   case GROUND_PICKUP:
     //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
@@ -214,6 +220,15 @@ public class SuperstructureStateManager {
       order = new ServoMotorSubsystem[] {arm, elevator, wrist};
     }
 
+    System.out.println(m_currentState.name);
+    System.out.println(m_desiredState.name);
+
     return setSuperstructureState(order, desiredState);
+  }
+
+  @Override
+  public void periodic() {
+    Logger.recordOutput("Current State", m_currentState);
+    Logger.recordOutput("Desired State", m_desiredState);
   }
 }

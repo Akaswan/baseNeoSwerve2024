@@ -11,7 +11,8 @@
         "x": 2.4484312126480163,
         "y": 0.4805734172875338
       },
-      "isLocked": false
+      "isLocked": false,
+      "linkedName": null
     },
     {
       "anchor": {
@@ -23,21 +24,25 @@
         "y": 0.426163834779974
       },
       "nextControl": null,
-      "isLocked": false
+      "isLocked": false,
+      "linkedName": null
     }
   ],
   "rotationTargets": [
     {
       "waypointRelativePos": 0.1,
-      "rotationDegrees": 180.0
+      "rotationDegrees": 180.0,
+      "rotateFast": false
     },
     {
       "waypointRelativePos": 0.2,
-      "rotationDegrees": 90.0
+      "rotationDegrees": 90.0,
+      "rotateFast": false
     },
     {
       "waypointRelativePos": 0.65,
-      "rotationDegrees": 90.0
+      "rotationDegrees": 90.0,
+      "rotateFast": false
     }
   ],
   "constraintZones": [
@@ -53,7 +58,25 @@
       }
     }
   ],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.75,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "groundPickup"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3,
     "maxAcceleration": 3,
@@ -62,9 +85,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 60.0
+    "rotation": 60.0,
+    "rotateFast": false
   },
   "reversed": false,
   "folder": "Auto Paths",
-  "previewStartingState": null
+  "previewStartingState": null,
+  "useDefaultConstraints": false
 }

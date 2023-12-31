@@ -5,7 +5,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.manager.ServoMotorSubsystem;
 import frc.robot.subsystems.manager.StatedSubsystem.SubsystemState;
 import frc.robot.subsystems.manager.SuperstructureStateManager;
@@ -15,10 +14,12 @@ public class SetSubsystemState extends Command {
   /** Creates a new SetMechState. */
   private ServoMotorSubsystem m_subsystem;
 
-  private SuperstructureStateManager m_manager = RobotContainer.m_manager;
+  private SuperstructureStateManager m_manager = SuperstructureStateManager.getInstance();
 
   private SubsystemState m_state;
   private SuperstructureState m_superStructureState;
+
+  private ServoMotorSubsystem[] m_order;
 
   public SetSubsystemState(ServoMotorSubsystem subsystem, SubsystemState state) {
     m_subsystem = subsystem;
@@ -28,10 +29,14 @@ public class SetSubsystemState extends Command {
     addRequirements(m_subsystem);
   }
 
-  public SetSubsystemState(ServoMotorSubsystem subsystem, SuperstructureState superStructureState) {
+  public SetSubsystemState(
+      ServoMotorSubsystem subsystem,
+      SuperstructureState superStructureState,
+      ServoMotorSubsystem[] order) {
     m_subsystem = subsystem;
     m_superStructureState = superStructureState;
     m_state = null;
+    m_order = order;
 
     addRequirements(m_subsystem);
     setName(m_subsystem.getSubsystemType().name());
@@ -62,22 +67,32 @@ public class SetSubsystemState extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (SuperstructureState.TRANSITION.getArmState() != RobotContainer.m_arm.getCurrentState()) {
-      SuperstructureState.TRANSITION.setArmState(RobotContainer.m_arm.getCurrentState());
-    }
-    if (SuperstructureState.TRANSITION.getWristState()
-        != RobotContainer.m_wrist.getCurrentState()) {
-      SuperstructureState.TRANSITION.setWristState(RobotContainer.m_wrist.getCurrentState());
-    }
-    if (SuperstructureState.TRANSITION.getElevatorState()
-        != RobotContainer.m_elevator.getCurrentState()) {
-      SuperstructureState.TRANSITION.setElevatorState(RobotContainer.m_elevator.getCurrentState());
-    }
+    if (m_manager.getDesiredState() != m_superStructureState)
+      m_manager.setDesiredState(m_superStructureState);
+    if (m_manager.getCurrentState() != SuperstructureState.TRANSITION)
+      m_manager.setCurrentState(SuperstructureState.TRANSITION);
+
+    // if (SuperstructureState.TRANSITION.getArmState() != RobotContainer.m_arm.getCurrentState()) {
+    //   SuperstructureState.TRANSITION.setArmState(RobotContainer.m_arm.getCurrentState());
+    // }
+    // if (SuperstructureState.TRANSITION.getWristState()
+    //     != RobotContainer.m_wrist.getCurrentState()) {
+    //   SuperstructureState.TRANSITION.setWristState(RobotContainer.m_wrist.getCurrentState());
+    // }
+    // if (SuperstructureState.TRANSITION.getElevatorState()
+    //     != RobotContainer.m_elevator.getCurrentState()) {
+    //
+    // SuperstructureState.TRANSITION.setElevatorState(RobotContainer.m_elevator.getCurrentState());
+    // }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    if (m_order[2] == m_subsystem) {
+      m_manager.setCurrentState(m_superStructureState);
+    }
+  }
 
   // Returns true when the command should end.
   @Override

@@ -14,20 +14,16 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.WristConstants;
+import frc.robot.commands.ManualSubsystem;
+import frc.robot.commands.SetSuperstructureState;
 import frc.robot.commands.SwerveDrivebase.TeleopSwerve;
-import frc.robot.commands.SwerveDrivebase.TurnToAngle;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.SwerveDrive.AngleToSnap;
 import frc.robot.subsystems.Wrist;
-import frc.robot.subsystems.manager.SuperstructureStateManager;
 import frc.robot.subsystems.manager.SuperstructureStateManager.SuperstructureState;
 import frc.robot.utilities.Alert;
 import frc.robot.utilities.Alert.AlertType;
@@ -48,8 +44,8 @@ public class RobotContainer {
   // CONTROLLERS \\
   public static final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
-  public static final XboxController m_operatorController =
-      new XboxController(OperatorConstants.kOperatorControllerPort);
+  public static final CommandXboxController m_operatorController =
+      new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
   // SHUFFLEBOARD TABS \\
   public static ShuffleboardTab mainTab = Shuffleboard.getTab("Main");
@@ -66,17 +62,10 @@ public class RobotContainer {
           DriveConstants.kFrontRight,
           DriveConstants.kBackLeft,
           DriveConstants.kBackRight);
-  public static final Limelight m_limelight = new Limelight();
-  public static final Arm m_arm = new Arm(ArmConstants.kArmConstants);
-  public static final Elevator m_elevator = new Elevator(ElevatorConstants.kElevatorConstants);
-  public static final Wrist m_wrist = new Wrist(WristConstants.kWristConstants);
-  public static final SuperstructureStateManager m_manager =
-      new SuperstructureStateManager(SuperstructureState.HOME);
 
   // SENDABLE CHOOSER \\
-  public static LoggedDashboardChooser<Command> autoChooser =
-      new LoggedDashboardChooser<>(
-          "Auto Picker", AutoBuilder.buildAutoChooser(), mainTab, 0, 0, 2, 1);
+  public static LoggedDashboardChooser<Command> autoChooser;
+  ;
 
   // ALERTS \\
   private Alert infoAlert =
@@ -89,7 +78,14 @@ public class RobotContainer {
     // NAMED COMMANDS FOR AUTO \\
     // you would never do this while following a path, its just to show how to implement
     NamedCommands.registerCommand(
-        "Zero Yaw", new InstantCommand(() -> m_drivebase.zeroGyroscope()));
+        "scoreHigh", new SetSuperstructureState(SuperstructureState.SCORE_HIGH));
+    NamedCommands.registerCommand(
+        "groundPickup", new SetSuperstructureState(SuperstructureState.GROUND_PICKUP));
+    NamedCommands.registerCommand("home", new SetSuperstructureState(SuperstructureState.HOME));
+
+    autoChooser =
+        new LoggedDashboardChooser<>(
+            "Auto Picker", AutoBuilder.buildAutoChooser(), mainTab, 0, 0, 2, 1);
 
     // CONFIGURE DEFAULT COMMANDS \\
     m_drivebase.setDefaultCommand(
@@ -102,9 +98,9 @@ public class RobotContainer {
             true,
             DriveConstants.kRegularSpeed,
             true));
-    // m_elevator.setDefaultCommand(new ManualSubsystem(m_elevator));
-    // m_arm.setDefaultCommand(new ManualSubsystem(m_arm));
-    // m_wrist.setDefaultCommand(new ManualSubsystem(m_wrist));
+    Elevator.getInstance().setDefaultCommand(new ManualSubsystem(Elevator.getInstance()));
+    Arm.getInstance().setDefaultCommand(new ManualSubsystem(Arm.getInstance()));
+    Wrist.getInstance().setDefaultCommand(new ManualSubsystem(Wrist.getInstance()));
 
     configureButtonBindings();
   }
@@ -171,6 +167,19 @@ public class RobotContainer {
     //     .y()
     //     .onTrue(new InstantCommand(() -> m_drivebase.setAngleToSnap(AngleToSnap.FORWARD)));
     // m_driverController.x().onTrue(new InstantCommand(m_drivebase::toggleXWheels));
+
+    m_operatorController.a().onTrue(new SetSuperstructureState(SuperstructureState.HOME));
+    m_operatorController
+        .x()
+        .onTrue(new SetSuperstructureState(SuperstructureState.SUBSTATION_PICKUP));
+    m_operatorController.b().onTrue(new SetSuperstructureState(SuperstructureState.GROUND_PICKUP));
+    m_operatorController.povUp().onTrue(new SetSuperstructureState(SuperstructureState.SCORE_HIGH));
+    m_operatorController
+        .povRight()
+        .onTrue(new SetSuperstructureState(SuperstructureState.SCORE_MID));
+    m_operatorController
+        .povDown()
+        .onTrue(new SetSuperstructureState(SuperstructureState.SCORE_LOW));
   }
 
   public Command getAutonomousCommand() {
@@ -197,29 +206,8 @@ public class RobotContainer {
 
   public void realPeriodic() {
     m_drivebase.realPeriodic();
-    m_limelight.realPeriodic();
+    Limelight.getInstance().realPeriodic();
   }
 
-  public void periodic() {
-    if (m_operatorController.getAButtonPressed()) {
-      m_manager.goToState(SuperstructureState.HOME, m_arm, m_elevator, m_wrist).schedule();
-    }
-    if (m_operatorController.getXButtonPressed()) {
-      m_manager
-          .goToState(SuperstructureState.SUBSTATION_PICKUP, m_arm, m_elevator, m_wrist)
-          .schedule();
-    }
-    if (m_operatorController.getBButtonPressed()) {
-      m_manager.goToState(SuperstructureState.GROUND_PICKUP, m_arm, m_elevator, m_wrist).schedule();
-    }
-    if (m_operatorController.getPOV() == 0) {
-      m_manager.goToState(SuperstructureState.SCORE_HIGH, m_arm, m_elevator, m_wrist).schedule();
-    }
-    if (m_operatorController.getPOV() == 90) {
-      m_manager.goToState(SuperstructureState.SCORE_MID, m_arm, m_elevator, m_wrist).schedule();
-    }
-    if (m_operatorController.getPOV() == 180) {
-      m_manager.goToState(SuperstructureState.SCORE_LOW, m_arm, m_elevator, m_wrist).schedule();
-    }
-  }
+  public void periodic() {}
 }

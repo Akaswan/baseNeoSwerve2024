@@ -12,6 +12,24 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "scoreHigh"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.25
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "home"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "C1 to P4"
@@ -21,6 +39,24 @@
           "type": "path",
           "data": {
             "pathName": "P4 to C2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreHigh"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.25
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "home"
           }
         },
         {
@@ -34,9 +70,28 @@
           "data": {
             "pathName": "P3 to C3"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreHigh"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.25
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "home"
+          }
         }
       ]
     }
   },
-  "folder": "Autos"
+  "folder": "Autos",
+  "choreoAuto": false
 }

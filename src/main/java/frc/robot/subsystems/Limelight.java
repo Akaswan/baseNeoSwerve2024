@@ -18,7 +18,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Limelight extends SubsystemBase {
 
-  public static Limelight camera;
+  private static Limelight m_instance = null;
 
   private NetworkTableInstance m_visionTable;
   private NetworkTableEntry m_tv;
@@ -35,8 +35,15 @@ public class Limelight extends SubsystemBase {
   public int fidId;
   public String camName;
 
+  public static synchronized Limelight getInstance() {
+    if (m_instance == null) {
+      m_instance = new Limelight();
+    }
+
+    return m_instance;
+  }
+
   public Limelight() {
-    Limelight.camera = this;
     m_visionTable = NetworkTableInstance.getDefault();
     m_tv = m_visionTable.getEntry("tv");
     m_ta = m_visionTable.getEntry("ta");

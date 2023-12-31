@@ -35,9 +35,9 @@ public class ManualSubsystem extends Command {
       throttle = -RobotContainer.m_driverController.getRightY();
     } else if (m_subsystem.getSubsystemType() == SubsystemType.WRIST) {
       throttle =
-          RobotContainer.m_operatorController.getLeftBumper()
+          RobotContainer.m_operatorController.getHID().getLeftBumper()
               ? 1
-              : 0 + (RobotContainer.m_operatorController.getRightBumper() ? -1 : 0);
+              : 0 + (RobotContainer.m_operatorController.getHID().getRightBumper() ? -1 : 0);
     }
 
     m_subsystem.manualControl(throttle);

@@ -9,16 +9,27 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.manager.ServoMotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Arm extends ServoMotorSubsystem {
+
+  private static Arm m_instance = null;
 
   private ArmFeedforward m_feedforward;
   public static Mechanism2d mech = new Mechanism2d(3, 3);
   public static MechanismRoot2d root = mech.getRoot("SuperStructure", 1.5, 1.5);
   public static MechanismLigament2d armLig;
   public static MechanismLigament2d wristLig;
+
+  public static synchronized Arm getInstance() {
+    if (m_instance == null) {
+      m_instance = new Arm(ArmConstants.kArmConstants);
+    }
+
+    return m_instance;
+  }
 
   public Arm(SubsystemConstants constants) {
     super(constants);

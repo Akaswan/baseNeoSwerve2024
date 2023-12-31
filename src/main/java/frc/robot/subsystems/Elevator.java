@@ -4,7 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import frc.robot.RobotContainer;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.subsystems.manager.ServoMotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -12,11 +12,21 @@ public class Elevator extends ServoMotorSubsystem {
 
   private ElevatorFeedforward m_feedforward;
 
+  private static Elevator m_instance = null;
+
   public Elevator(SubsystemConstants constants) {
     super(constants);
 
     m_feedforward =
         new ElevatorFeedforward(constants.kKs, constants.kKg, constants.kKv, constants.kKa);
+  }
+
+  public static synchronized Elevator getInstance() {
+    if (m_instance == null) {
+      m_instance = new Elevator(ElevatorConstants.kElevatorConstants);
+    }
+
+    return m_instance;
   }
 
   @Override
@@ -26,27 +36,27 @@ public class Elevator extends ServoMotorSubsystem {
         new Pose3d(
             -.2347
                 + MathUtil.clamp(m_currentState.getPosition(), 0, m_constants.kMaxPosition / 2)
-                    * Math.cos(Math.toRadians(RobotContainer.m_arm.getPosition())),
+                    * Math.cos(Math.toRadians(Arm.getInstance().getPosition())),
             0,
             .254
                 + .005
                 + MathUtil.clamp(m_currentState.getPosition(), 0, m_constants.kMaxPosition / 2)
-                    * Math.sin(Math.toRadians(RobotContainer.m_arm.getPosition())),
+                    * Math.sin(Math.toRadians(Arm.getInstance().getPosition())),
             new Rotation3d(
-                Math.toRadians(-RobotContainer.m_arm.getPosition() + 90), 0, Math.toRadians(90))));
+                Math.toRadians(-Arm.getInstance().getPosition() + 90), 0, Math.toRadians(90))));
     Logger.recordOutput(
         "Elevator/3rd Stage Mech3d",
         new Pose3d(
             -.2347
                 + m_currentState.getPosition()
-                    * Math.cos(Math.toRadians(RobotContainer.m_arm.getPosition())),
+                    * Math.cos(Math.toRadians(Arm.getInstance().getPosition())),
             0,
             .254
                 + .005
                 + m_currentState.getPosition()
-                    * Math.sin(Math.toRadians(RobotContainer.m_arm.getPosition())),
+                    * Math.sin(Math.toRadians(Arm.getInstance().getPosition())),
             new Rotation3d(
-                Math.toRadians(-RobotContainer.m_arm.getPosition() + 90), 0, Math.toRadians(90))));
+                Math.toRadians(-Arm.getInstance().getPosition() + 90), 0, Math.toRadians(90))));
   }
 
   @Override
