@@ -17,9 +17,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.subsystems.Arm.ArmState;
 import frc.robot.subsystems.Elevator.ElevatorState;
 import frc.robot.subsystems.Wrist.WristState;
-import frc.robot.subsystems.manager.StatedSubsystem.CANSparkMaxConstants;
-import frc.robot.subsystems.manager.StatedSubsystem.SubsystemConstants;
-import frc.robot.subsystems.manager.StatedSubsystem.SubsystemType;
+import frc.robot.subsystems.templates.StatedSubsystem.CANSparkMaxConstants;
+import frc.robot.subsystems.templates.StatedSubsystem.SubsystemConstants;
+import frc.robot.subsystems.templates.StatedSubsystem.SubsystemType;
 import frc.robot.utilities.SwerveModuleConstants;
 
 /**

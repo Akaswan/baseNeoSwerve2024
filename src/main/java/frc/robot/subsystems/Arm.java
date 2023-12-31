@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.subsystems.manager.ServoMotorSubsystem;
+import frc.robot.subsystems.templates.ServoMotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Arm extends ServoMotorSubsystem {

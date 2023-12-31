@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.superstructure;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.manager.ServoMotorSubsystem;
-import frc.robot.subsystems.manager.StatedSubsystem.SubsystemState;
-import frc.robot.subsystems.manager.SuperstructureStateManager;
-import frc.robot.subsystems.manager.SuperstructureStateManager.SuperstructureState;
+import frc.robot.subsystems.Superstructure;
+import frc.robot.subsystems.Superstructure.SuperstructureState;
+import frc.robot.subsystems.templates.ServoMotorSubsystem;
+import frc.robot.subsystems.templates.StatedSubsystem.SubsystemState;
 
 public class SetSubsystemState extends Command {
   /** Creates a new SetMechState. */
   private ServoMotorSubsystem m_subsystem;
 
-  private SuperstructureStateManager m_manager = SuperstructureStateManager.getInstance();
+  private Superstructure m_manager = Superstructure.getInstance();
 
   private SubsystemState m_state;
   private SuperstructureState m_superStructureState;

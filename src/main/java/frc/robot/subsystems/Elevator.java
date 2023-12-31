@@ -5,7 +5,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.subsystems.manager.ServoMotorSubsystem;
+import frc.robot.subsystems.templates.ServoMotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends ServoMotorSubsystem {

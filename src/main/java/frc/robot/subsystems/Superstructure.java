@@ -1,22 +1,20 @@
-package frc.robot.subsystems.manager;
+package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.SetSubsystemState;
-import frc.robot.subsystems.Arm;
+import frc.robot.commands.superstructure.SetSubsystemState;
 import frc.robot.subsystems.Arm.ArmState;
-import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorState;
-import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.Wrist.WristState;
-import frc.robot.subsystems.manager.StatedSubsystem.SubsystemState;
+import frc.robot.subsystems.templates.ServoMotorSubsystem;
+import frc.robot.subsystems.templates.StatedSubsystem.SubsystemState;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
 
-public class SuperstructureStateManager extends SubsystemBase {
+public class Superstructure extends SubsystemBase {
 
   private SuperstructureState m_lastHeldState;
   private SuperstructureState m_currentState;
@@ -25,17 +23,17 @@ public class SuperstructureStateManager extends SubsystemBase {
   private Command m_scheduledCommand;
   private SequentialCommandGroup m_scheduledSequentialCommandGroup = new SequentialCommandGroup();
 
-  private static SuperstructureStateManager m_instance = null;
+  private static Superstructure m_instance = null;
 
-  public static synchronized SuperstructureStateManager getInstance() {
+  public static synchronized Superstructure getInstance() {
     if (m_instance == null) {
-      m_instance = new SuperstructureStateManager(SuperstructureState.HOME);
+      m_instance = new Superstructure(SuperstructureState.HOME);
     }
 
     return m_instance;
   }
 
-  public SuperstructureStateManager(SuperstructureState initialState) {
+  public Superstructure(SuperstructureState initialState) {
     m_currentState = initialState;
     m_desiredState = initialState;
     m_lastHeldState = initialState;
@@ -162,69 +160,69 @@ public class SuperstructureStateManager extends SubsystemBase {
 
   // Logic for if going from a specific state from a specific state would break the robot
   // Do an if statement for those specific cases, else return a default setSuperstructureState
-  public SequentialCommandGroup goToState(SuperstructureState desiredState) {
-    ServoMotorSubsystem[] order;
-    Arm arm = Arm.getInstance();
-    Elevator elevator = Elevator.getInstance();
-    Wrist wrist = Wrist.getInstance();
-    // switch (desiredState) {
-    //   case GROUND_PICKUP:
-    //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
-    // SuperstructureState.SCORE_MID || m_currentState == SuperstructureState.SUBSTATION_PICKUP) {
-    //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
-    //     } else if (m_currentState == SuperstructureState.HOME || m_currentState ==
-    // SuperstructureState.SCORE_LOW) {
-    //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
-    //     }
-    //     break;
-    //   case HOME:
-    //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
-    // SuperstructureState.SCORE_MID || m_currentState == SuperstructureState.SUBSTATION_PICKUP) {
-    //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
-    //     } else if (m_currentState == SuperstructureState.GROUND_PICKUP || m_currentState ==
-    // SuperstructureState.SCORE_LOW) {
-    //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
-    //     }
-    //     break;
-    //   case SCORE_HIGH:
-    //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
-    // SuperstructureState.SCORE_MID || m_currentState == SuperstructureState.SUBSTATION_PICKUP) {
-    //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
-    //     } else if (m_currentState == SuperstructureState.GROUND_PICKUP || m_currentState ==
-    // SuperstructureState.SCORE_LOW) {
-    //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
-    //     }
-    //     break;
-    //   case SCORE_LOW:
-    //     break;
-    //   case SCORE_MID:
-    //     break;
-    //   case SUBSTATION_PICKUP:
-    //     break;
-    //   case TRANSITION:
-    //     break;
-    //   default:
-    //     order = new ServoMotorSubsystem[] {arm, elevator, wrist};
-    //     break;
-    // }
+  // public SequentialCommandGroup goToState(SuperstructureState desiredState) {
+  //   ServoMotorSubsystem[] order;
+  //   Arm arm = Arm.getInstance();
+  //   Elevator elevator = Elevator.getInstance();
+  //   Wrist wrist = Wrist.getInstance();
+  //   // switch (desiredState) {
+  //   //   case GROUND_PICKUP:
+  //   //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
+  //   // SuperstructureState.SCORE_MID || m_currentState == SuperstructureState.SUBSTATION_PICKUP)
+  // {
+  //   //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
+  //   //     } else if (m_currentState == SuperstructureState.HOME || m_currentState ==
+  //   // SuperstructureState.SCORE_LOW) {
+  //   //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
+  //   //     }
+  //   //     break;
+  //   //   case HOME:
+  //   //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
+  //   // SuperstructureState.SCORE_MID || m_currentState == SuperstructureState.SUBSTATION_PICKUP)
+  // {
+  //   //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
+  //   //     } else if (m_currentState == SuperstructureState.GROUND_PICKUP || m_currentState ==
+  //   // SuperstructureState.SCORE_LOW) {
+  //   //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
+  //   //     }
+  //   //     break;
+  //   //   case SCORE_HIGH:
+  //   //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
+  //   // SuperstructureState.SCORE_MID || m_currentState == SuperstructureState.SUBSTATION_PICKUP)
+  // {
+  //   //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
+  //   //     } else if (m_currentState == SuperstructureState.GROUND_PICKUP || m_currentState ==
+  //   // SuperstructureState.SCORE_LOW) {
+  //   //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
+  //   //     }
+  //   //     break;
+  //   //   case SCORE_LOW:
+  //   //     break;
+  //   //   case SCORE_MID:
+  //   //     break;
+  //   //   case SUBSTATION_PICKUP:
+  //   //     break;
+  //   //   case TRANSITION:
+  //   //     break;
+  //   //   default:
+  //   //     order = new ServoMotorSubsystem[] {arm, elevator, wrist};
+  //   //     break;
+  //   // }
 
-    if (m_currentState == SuperstructureState.SCORE_HIGH
-        || m_currentState == SuperstructureState.SCORE_MID
-        || m_currentState == SuperstructureState.SUBSTATION_PICKUP) {
-      order = new ServoMotorSubsystem[] {wrist, elevator, arm};
-    } else if (m_currentState == SuperstructureState.HOME
-        || m_currentState == SuperstructureState.GROUND_PICKUP
-        || m_currentState == SuperstructureState.SCORE_LOW) {
-      order = new ServoMotorSubsystem[] {arm, elevator, wrist};
-    } else {
-      order = new ServoMotorSubsystem[] {arm, elevator, wrist};
-    }
+  //   if (m_currentState == SuperstructureState.SCORE_HIGH
+  //       || m_currentState == SuperstructureState.SCORE_MID
+  //       || m_currentState == SuperstructureState.SUBSTATION_PICKUP) {
+  //     order = new ServoMotorSubsystem[] {wrist, elevator, arm};
+  //   } else if (m_currentState == SuperstructureState.HOME
+  //       || m_currentState == SuperstructureState.GROUND_PICKUP
+  //       || m_currentState == SuperstructureState.SCORE_LOW) {
+  //     order = new ServoMotorSubsystem[] {arm, elevator, wrist};
+  //   } else {
+  //     order = new ServoMotorSubsystem[] {arm, elevator, wrist};
+  //   }
 
-    System.out.println(m_currentState.name);
-    System.out.println(m_desiredState.name);
-
-    return setSuperstructureState(order, desiredState);
-  }
+  //   return setSuperstructureState(order, desiredState);
+  // }
 
   @Override
   public void periodic() {

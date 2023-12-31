@@ -6,7 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import frc.robot.subsystems.manager.StatedSubsystem;
+import frc.robot.subsystems.templates.StatedSubsystem;
 
 public class LED extends StatedSubsystem {
   /** Creates a new LED. */

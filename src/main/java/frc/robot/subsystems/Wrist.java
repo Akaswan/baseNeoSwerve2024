@@ -4,7 +4,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.Constants.WristConstants;
-import frc.robot.subsystems.manager.ServoMotorSubsystem;
+import frc.robot.subsystems.templates.ServoMotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Wrist extends ServoMotorSubsystem {

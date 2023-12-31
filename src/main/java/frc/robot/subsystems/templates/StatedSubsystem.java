@@ -1,4 +1,4 @@
-package frc.robot.subsystems.manager;
+package frc.robot.subsystems.templates;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.manager;
+package frc.robot.subsystems.templates;
 
 public class IntakeSubsystem extends StatedSubsystem {
 
