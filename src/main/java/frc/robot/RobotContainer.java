@@ -17,14 +17,15 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.drivebase.TeleopSwerve;
-import frc.robot.commands.superstructure.ManualSubsystem;
+import frc.robot.commands.superstructure.ManualServoSubsystem;
 import frc.robot.commands.superstructure.SetSuperstructureState;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Limelight;
-import frc.robot.subsystems.Superstructure.SuperstructureState;
-import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.superstructure.Arm;
+import frc.robot.subsystems.superstructure.Elevator;
+import frc.robot.subsystems.superstructure.Superstructure.SuperstructureState;
+import frc.robot.subsystems.superstructure.wrist.Wrist;
+import frc.robot.subsystems.superstructure.wrist.WristIntake;
+import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.utilities.Alert;
 import frc.robot.utilities.Alert.AlertType;
 import frc.robot.utilities.LoggedDashboardChooser;
@@ -56,16 +57,14 @@ public class RobotContainer {
       kTuningMode ? Shuffleboard.getTab("Mech Tuning") : null;
 
   // SUBSYSTEMS \\
-  public static final SwerveDrive m_drivebase =
-      new SwerveDrive(
-          DriveConstants.kFrontLeft,
-          DriveConstants.kFrontRight,
-          DriveConstants.kBackLeft,
-          DriveConstants.kBackRight);
+  private SwerveDrive m_drivebase = SwerveDrive.getInstance();
+  private Arm m_arm = Arm.getInstance();
+  private Elevator m_elevator = Elevator.getInstance();
+  private Wrist m_wrist = Wrist.getInstance();
+  private WristIntake m_wristIntake = WristIntake.getInstance();
 
   // SENDABLE CHOOSER \\
   public static LoggedDashboardChooser<Command> autoChooser;
-  ;
 
   // ALERTS \\
   private Alert infoAlert =
@@ -98,9 +97,9 @@ public class RobotContainer {
             true,
             DriveConstants.kRegularSpeed,
             true));
-    Elevator.getInstance().setDefaultCommand(new ManualSubsystem(Elevator.getInstance()));
-    Arm.getInstance().setDefaultCommand(new ManualSubsystem(Arm.getInstance()));
-    Wrist.getInstance().setDefaultCommand(new ManualSubsystem(Wrist.getInstance()));
+    Elevator.getInstance().setDefaultCommand(new ManualServoSubsystem(m_elevator));
+    Arm.getInstance().setDefaultCommand(new ManualServoSubsystem(m_arm));
+    Wrist.getInstance().setDefaultCommand(new ManualServoSubsystem(m_wrist));
 
     configureButtonBindings();
   }

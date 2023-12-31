@@ -1,20 +1,21 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.subsystems.templates.ServoMotorSubsystem;
+import frc.robot.subsystems.templates.ServoSubsystem;
+import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
 import org.littletonrobotics.junction.Logger;
 
-public class Elevator extends ServoMotorSubsystem {
+public class Elevator extends ServoSubsystem {
 
   private ElevatorFeedforward m_feedforward;
 
   private static Elevator m_instance = null;
 
-  public Elevator(SubsystemConstants constants) {
+  public Elevator(ServoSubsystemConstants constants) {
     super(constants);
 
     m_feedforward =
@@ -30,7 +31,7 @@ public class Elevator extends ServoMotorSubsystem {
   }
 
   @Override
-  public void outputSusbsystemTelemetry() {
+  public void outputTelemetry() {
     Logger.recordOutput(
         "Elevator/2nd Stage Mech3d",
         new Pose3d(
@@ -63,10 +64,10 @@ public class Elevator extends ServoMotorSubsystem {
   public void subsystemPeriodic() {
     setFeedforward(m_feedforward.calculate(m_encoder.getPosition(), m_encoder.getVelocity()));
 
-    Arm.root.setPosition(1.5, m_currentState.getPosition());
+    Arm.armLig.setLength(m_currentState.getPosition() + .5);
   }
 
-  public enum ElevatorState implements SubsystemState {
+  public enum ElevatorState implements ServoSubsystemState {
     MANUAL(0, 0, "Manual"),
     TRANSITION(0, 0, "Transition"),
     HOME(0, 0, "Home"),

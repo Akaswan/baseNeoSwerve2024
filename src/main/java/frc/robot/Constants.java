@@ -14,12 +14,15 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.subsystems.Arm.ArmState;
-import frc.robot.subsystems.Elevator.ElevatorState;
-import frc.robot.subsystems.Wrist.WristState;
-import frc.robot.subsystems.templates.StatedSubsystem.CANSparkMaxConstants;
-import frc.robot.subsystems.templates.StatedSubsystem.SubsystemConstants;
-import frc.robot.subsystems.templates.StatedSubsystem.SubsystemType;
+import frc.robot.subsystems.superstructure.Arm.ArmState;
+import frc.robot.subsystems.superstructure.Elevator.ElevatorState;
+import frc.robot.subsystems.superstructure.wrist.Wrist.WristState;
+import frc.robot.subsystems.superstructure.wrist.WristIntake.WristIntakeState;
+import frc.robot.subsystems.templates.IntakeSubsystem.IntakeSubsystemType;
+import frc.robot.subsystems.templates.ServoSubsystem.ServoSubsystemType;
+import frc.robot.subsystems.templates.SubsystemConstants.CANSparkMaxConstants;
+import frc.robot.subsystems.templates.SubsystemConstants.IntakeSubsystemConstants;
+import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
 import frc.robot.utilities.SwerveModuleConstants;
 
 /**
@@ -172,6 +175,7 @@ public final class Constants {
       kArmMasterConstants.kIdleMode = IdleMode.kBrake;
       kArmMasterConstants.kMotorType = MotorType.kBrushless;
       kArmMasterConstants.kCurrentLimit = 80;
+      kArmMasterConstants.kInverted = false;
     }
 
     public static final CANSparkMaxConstants[] kArmSlaveConstants = new CANSparkMaxConstants[1];
@@ -182,20 +186,21 @@ public final class Constants {
       kArmSlaveConstants[0].kIdleMode = IdleMode.kBrake;
       kArmSlaveConstants[0].kMotorType = MotorType.kBrushless;
       kArmSlaveConstants[0].kCurrentLimit = 80;
+      kArmSlaveConstants[0].kInverted = false;
     }
 
-    public static final SubsystemConstants kArmConstants = new SubsystemConstants();
+    public static final ServoSubsystemConstants kArmConstants = new ServoSubsystemConstants();
 
     static {
       kArmConstants.kName = "Arm";
 
-      kArmConstants.kSubsystemType = SubsystemType.ARM;
+      kArmConstants.kSubsystemType = ServoSubsystemType.ARM;
 
       kArmConstants.kMasterConstants = kArmMasterConstants;
       kArmConstants.kSlaveConstants = kArmSlaveConstants;
 
       kArmConstants.kHomePosition = 0.0;
-      kArmConstants.kRotationsPerUnitDistance = 360 / 100;
+      kArmConstants.kPositionConversionFactor = 360 / 100;
 
       kArmConstants.kKp = 0.2;
       kArmConstants.kKi = 0.0;
@@ -235,6 +240,7 @@ public final class Constants {
       kElevatorMasterConstants.kIdleMode = IdleMode.kBrake;
       kElevatorMasterConstants.kMotorType = MotorType.kBrushless;
       kElevatorMasterConstants.kCurrentLimit = 80;
+      kElevatorMasterConstants.kInverted = false;
     }
 
     public static final CANSparkMaxConstants[] kElevatorSlaveConstants =
@@ -246,20 +252,21 @@ public final class Constants {
       kElevatorSlaveConstants[0].kIdleMode = IdleMode.kBrake;
       kElevatorSlaveConstants[0].kMotorType = MotorType.kBrushless;
       kElevatorSlaveConstants[0].kCurrentLimit = 80;
+      kElevatorSlaveConstants[0].kInverted = false;
     }
 
-    public static final SubsystemConstants kElevatorConstants = new SubsystemConstants();
+    public static final ServoSubsystemConstants kElevatorConstants = new ServoSubsystemConstants();
 
     static {
       kElevatorConstants.kName = "Elevator";
 
-      kElevatorConstants.kSubsystemType = SubsystemType.ELEVATOR;
+      kElevatorConstants.kSubsystemType = ServoSubsystemType.ELEVATOR;
 
       kElevatorConstants.kMasterConstants = kElevatorMasterConstants;
       kElevatorConstants.kSlaveConstants = kElevatorSlaveConstants;
 
       kElevatorConstants.kHomePosition = 0.0;
-      kElevatorConstants.kRotationsPerUnitDistance = 10;
+      kElevatorConstants.kPositionConversionFactor = 10;
 
       kElevatorConstants.kKp = 0.2;
       kElevatorConstants.kKi = 0.0;
@@ -299,22 +306,23 @@ public final class Constants {
       kWristMasterConstants.kIdleMode = IdleMode.kBrake;
       kWristMasterConstants.kMotorType = MotorType.kBrushless;
       kWristMasterConstants.kCurrentLimit = 80;
+      kWristMasterConstants.kInverted = false;
     }
 
     public static final CANSparkMaxConstants[] kWristSlaveConstants = new CANSparkMaxConstants[0];
 
-    public static final SubsystemConstants kWristConstants = new SubsystemConstants();
+    public static final ServoSubsystemConstants kWristConstants = new ServoSubsystemConstants();
 
     static {
       kWristConstants.kName = "Wrist";
 
-      kWristConstants.kSubsystemType = SubsystemType.WRIST;
+      kWristConstants.kSubsystemType = ServoSubsystemType.WRIST;
 
       kWristConstants.kMasterConstants = kWristMasterConstants;
       kWristConstants.kSlaveConstants = kWristSlaveConstants;
 
       kWristConstants.kHomePosition = 155;
-      kWristConstants.kRotationsPerUnitDistance = 360 / 100;
+      kWristConstants.kPositionConversionFactor = 360 / 100;
 
       kWristConstants.kKp = 0.2;
       kWristConstants.kKi = 0.0;
@@ -342,6 +350,34 @@ public final class Constants {
       kWristConstants.kInitialState = WristState.HOME;
       kWristConstants.kManualState = WristState.MANUAL;
       kWristConstants.kTransitionState = WristState.TRANSITION;
+    }
+
+    public static final CANSparkMaxConstants kWristIntakeMasterConstants =
+        new CANSparkMaxConstants();
+
+    static {
+      kWristMasterConstants.kID = 45;
+      kWristMasterConstants.kIdleMode = IdleMode.kBrake;
+      kWristMasterConstants.kMotorType = MotorType.kBrushless;
+      kWristMasterConstants.kCurrentLimit = 80;
+      kWristMasterConstants.kInverted = false;
+    }
+
+    public static final CANSparkMaxConstants[] kWristIntakeSlaveConstants =
+        new CANSparkMaxConstants[0];
+
+    public static final IntakeSubsystemConstants kWristIntakeConstants =
+        new IntakeSubsystemConstants();
+
+    static {
+      kWristIntakeConstants.kName = "WristIntake";
+
+      kWristIntakeConstants.kSubsystemType = IntakeSubsystemType.WRIST_INTAKE;
+
+      kWristIntakeConstants.kMasterConstants = kWristIntakeMasterConstants;
+      kWristIntakeConstants.kSlaveConstants = kWristIntakeSlaveConstants;
+
+      kWristIntakeConstants.kInitialState = WristIntakeState.IDLE;
     }
   }
 

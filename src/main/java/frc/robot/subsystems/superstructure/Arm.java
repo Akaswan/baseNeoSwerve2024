@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -10,16 +10,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.subsystems.templates.ServoMotorSubsystem;
+import frc.robot.subsystems.templates.ServoSubsystem;
+import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
 import org.littletonrobotics.junction.Logger;
 
-public class Arm extends ServoMotorSubsystem {
+public class Arm extends ServoSubsystem {
 
   private static Arm m_instance = null;
 
   private ArmFeedforward m_feedforward;
   public static Mechanism2d mech = new Mechanism2d(3, 3);
-  public static MechanismRoot2d root = mech.getRoot("SuperStructure", 1.5, 1.5);
+  public static MechanismRoot2d root = mech.getRoot("SuperStructure", 1, 0);
   public static MechanismLigament2d armLig;
   public static MechanismLigament2d wristLig;
 
@@ -31,7 +32,7 @@ public class Arm extends ServoMotorSubsystem {
     return m_instance;
   }
 
-  public Arm(SubsystemConstants constants) {
+  public Arm(ServoSubsystemConstants constants) {
     super(constants);
 
     m_feedforward = new ArmFeedforward(constants.kKs, constants.kKg, constants.kKv, constants.kKa);
@@ -44,7 +45,7 @@ public class Arm extends ServoMotorSubsystem {
   }
 
   @Override
-  public void outputSusbsystemTelemetry() {
+  public void outputTelemetry() {
     Logger.recordOutput(
         "Arm/Mech3d",
         new Pose3d(
@@ -62,7 +63,7 @@ public class Arm extends ServoMotorSubsystem {
     armLig.setAngle(m_currentState.getPosition());
   }
 
-  public enum ArmState implements SubsystemState {
+  public enum ArmState implements ServoSubsystemState {
     MANUAL(0, 0, "Manual"),
     TRANSITION(0, 0, "Transition"),
     HOME(0, 0, "Home"),

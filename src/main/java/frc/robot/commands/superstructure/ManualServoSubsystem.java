@@ -6,14 +6,14 @@ package frc.robot.commands.superstructure;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.templates.ServoMotorSubsystem;
-import frc.robot.subsystems.templates.StatedSubsystem.SubsystemType;
+import frc.robot.subsystems.templates.ServoSubsystem;
+import frc.robot.subsystems.templates.ServoSubsystem.ServoSubsystemType;
 
-public class ManualSubsystem extends Command {
+public class ManualServoSubsystem extends Command {
 
-  private ServoMotorSubsystem m_subsystem;
+  private ServoSubsystem m_subsystem;
 
-  public ManualSubsystem(ServoMotorSubsystem subsystem) {
+  public ManualServoSubsystem(ServoSubsystem subsystem) {
     m_subsystem = subsystem;
 
     addRequirements(m_subsystem);
@@ -27,13 +27,13 @@ public class ManualSubsystem extends Command {
   @Override
   public void execute() {
     double throttle = 0;
-    if (m_subsystem.getSubsystemType() == SubsystemType.ARM) {
+    if (m_subsystem.getSubsystemType() == ServoSubsystemType.ARM) {
       throttle =
           RobotContainer.m_driverController.getRightTriggerAxis()
               - RobotContainer.m_driverController.getLeftTriggerAxis();
-    } else if (m_subsystem.getSubsystemType() == SubsystemType.ELEVATOR) {
+    } else if (m_subsystem.getSubsystemType() == ServoSubsystemType.ELEVATOR) {
       throttle = -RobotContainer.m_driverController.getRightY();
-    } else if (m_subsystem.getSubsystemType() == SubsystemType.WRIST) {
+    } else if (m_subsystem.getSubsystemType() == ServoSubsystemType.WRIST) {
       throttle =
           RobotContainer.m_operatorController.getHID().getLeftBumper()
               ? 1

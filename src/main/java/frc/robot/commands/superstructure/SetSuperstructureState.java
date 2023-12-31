@@ -5,18 +5,18 @@
 package frc.robot.commands.superstructure;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Superstructure;
-import frc.robot.subsystems.Superstructure.SuperstructureState;
-import frc.robot.subsystems.Wrist;
-import frc.robot.subsystems.templates.ServoMotorSubsystem;
+import frc.robot.subsystems.superstructure.Arm;
+import frc.robot.subsystems.superstructure.Elevator;
+import frc.robot.subsystems.superstructure.Superstructure;
+import frc.robot.subsystems.superstructure.Superstructure.SuperstructureState;
+import frc.robot.subsystems.superstructure.wrist.Wrist;
+import frc.robot.subsystems.templates.ServoSubsystem;
 
 public class SetSuperstructureState extends Command {
   /** Creates a new SetSuperstructureState. */
   private SuperstructureState m_desiredState;
 
-  private ServoMotorSubsystem[] order;
+  private ServoSubsystem[] order;
   private Arm m_arm = Arm.getInstance();
   private Elevator m_elevator = Elevator.getInstance();
   private Wrist m_wrist = Wrist.getInstance();
@@ -32,16 +32,63 @@ public class SetSuperstructureState extends Command {
   public void initialize() {
     SuperstructureState m_currentState = m_manager.getCurrentState();
 
+    //   // switch (desiredState) {
+    //   //   case GROUND_PICKUP:
+    //   //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
+    //   // SuperstructureState.SCORE_MID || m_currentState ==
+    // SuperstructureState.SUBSTATION_PICKUP)
+    // {
+    //   //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
+    //   //     } else if (m_currentState == SuperstructureState.HOME || m_currentState ==
+    //   // SuperstructureState.SCORE_LOW) {
+    //   //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
+    //   //     }
+    //   //     break;
+    //   //   case HOME:
+    //   //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
+    //   // SuperstructureState.SCORE_MID || m_currentState ==
+    // SuperstructureState.SUBSTATION_PICKUP)
+    // {
+    //   //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
+    //   //     } else if (m_currentState == SuperstructureState.GROUND_PICKUP || m_currentState ==
+    //   // SuperstructureState.SCORE_LOW) {
+    //   //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
+    //   //     }
+    //   //     break;
+    //   //   case SCORE_HIGH:
+    //   //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
+    //   // SuperstructureState.SCORE_MID || m_currentState ==
+    // SuperstructureState.SUBSTATION_PICKUP)
+    // {
+    //   //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
+    //   //     } else if (m_currentState == SuperstructureState.GROUND_PICKUP || m_currentState ==
+    //   // SuperstructureState.SCORE_LOW) {
+    //   //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
+    //   //     }
+    //   //     break;
+    //   //   case SCORE_LOW:
+    //   //     break;
+    //   //   case SCORE_MID:
+    //   //     break;
+    //   //   case SUBSTATION_PICKUP:
+    //   //     break;
+    //   //   case TRANSITION:
+    //   //     break;
+    //   //   default:
+    //   //     order = new ServoMotorSubsystem[] {arm, elevator, wrist};
+    //   //     break;
+    //   // }
+
     if (m_currentState == SuperstructureState.SCORE_HIGH
         || m_currentState == SuperstructureState.SCORE_MID
         || m_currentState == SuperstructureState.SUBSTATION_PICKUP) {
-      order = new ServoMotorSubsystem[] {m_wrist, m_elevator, m_arm};
+      order = new ServoSubsystem[] {m_wrist, m_elevator, m_arm};
     } else if (m_currentState == SuperstructureState.HOME
         || m_currentState == SuperstructureState.GROUND_PICKUP
         || m_currentState == SuperstructureState.SCORE_LOW) {
-      order = new ServoMotorSubsystem[] {m_arm, m_elevator, m_wrist};
+      order = new ServoSubsystem[] {m_arm, m_elevator, m_wrist};
     } else {
-      order = new ServoMotorSubsystem[] {m_arm, m_elevator, m_wrist};
+      order = new ServoSubsystem[] {m_arm, m_elevator, m_wrist};
     }
 
     m_manager.setSuperstructureState(order, m_desiredState).schedule();

@@ -5,34 +5,24 @@
 package frc.robot.commands.superstructure;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Superstructure;
-import frc.robot.subsystems.Superstructure.SuperstructureState;
-import frc.robot.subsystems.templates.ServoMotorSubsystem;
-import frc.robot.subsystems.templates.StatedSubsystem.SubsystemState;
+import frc.robot.subsystems.superstructure.Superstructure;
+import frc.robot.subsystems.superstructure.Superstructure.SuperstructureState;
+import frc.robot.subsystems.templates.ServoSubsystem;
+import frc.robot.subsystems.templates.ServoSubsystem.ServoSubsystemState;
 
-public class SetSubsystemState extends Command {
+public class SetServoSubsystemState extends Command {
   /** Creates a new SetMechState. */
-  private ServoMotorSubsystem m_subsystem;
+  private ServoSubsystem m_subsystem;
 
   private Superstructure m_manager = Superstructure.getInstance();
 
-  private SubsystemState m_state;
+  private ServoSubsystemState m_state;
   private SuperstructureState m_superStructureState;
 
-  private ServoMotorSubsystem[] m_order;
+  private ServoSubsystem[] m_order;
 
-  public SetSubsystemState(ServoMotorSubsystem subsystem, SubsystemState state) {
-    m_subsystem = subsystem;
-    m_state = state;
-    m_superStructureState = null;
-
-    addRequirements(m_subsystem);
-  }
-
-  public SetSubsystemState(
-      ServoMotorSubsystem subsystem,
-      SuperstructureState superStructureState,
-      ServoMotorSubsystem[] order) {
+  public SetServoSubsystemState(
+      ServoSubsystem subsystem, SuperstructureState superStructureState, ServoSubsystem[] order) {
     m_subsystem = subsystem;
     m_superStructureState = superStructureState;
     m_state = null;

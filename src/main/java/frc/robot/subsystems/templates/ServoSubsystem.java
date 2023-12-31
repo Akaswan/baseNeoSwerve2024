@@ -13,9 +13,13 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
 import org.littletonrobotics.junction.Logger;
 
-public abstract class ServoMotorSubsystem extends StatedSubsystem {
+public abstract class ServoSubsystem extends SubsystemBase {
+
+  public ServoSubsystemConstants m_constants;
 
   protected final SparkMaxPIDController m_pidController;
 
@@ -27,12 +31,22 @@ public abstract class ServoMotorSubsystem extends StatedSubsystem {
   protected TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   protected TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
+  protected double m_profileStartPosition = 0;
+  protected double m_profileStartVelocity = 0;
+
+  protected ServoSubsystemState m_currentState = null;
+  protected ServoSubsystemState m_desiredState = null;
+
   protected double m_profileStartTime = -1;
 
   protected double m_arbFeedforward = 0;
 
-  protected ServoMotorSubsystem(final SubsystemConstants constants) {
-    super(constants);
+  protected ServoSubsystem(final ServoSubsystemConstants constants) {
+
+    m_constants = constants;
+
+    m_currentState = m_constants.kInitialState;
+    m_desiredState = m_constants.kInitialState;
 
     m_master =
         new CANSparkMax(m_constants.kMasterConstants.kID, m_constants.kMasterConstants.kMotorType);
@@ -41,6 +55,7 @@ public abstract class ServoMotorSubsystem extends StatedSubsystem {
 
     m_encoder = m_master.getEncoder();
     m_encoder.setPosition(m_constants.kHomePosition);
+    m_encoder.setPositionConversionFactor(m_constants.kPositionConversionFactor);
 
     m_slaves = new CANSparkMax[m_constants.kSlaveConstants.length];
 
@@ -62,22 +77,16 @@ public abstract class ServoMotorSubsystem extends StatedSubsystem {
         new TrapezoidProfile(
             new TrapezoidProfile.Constraints(
                 m_constants.kMaxVelocity, m_constants.kMaxAcceleration));
+
+    setName(m_constants.kName);
   }
 
   public void runToSetpoint() {
-    if (m_previousDesiredState != m_desiredState || m_lastHeldState == m_constants.kManualState) {
-      if (m_lastHeldState == m_constants.kManualState) {
-        m_lastHeldState = m_constants.kManualState;
-      } else {
-        m_lastHeldState = m_currentState;
-      }
-    }
 
     m_setpoint =
         m_profile.calculate(
             Timer.getFPGATimestamp() - m_profileStartTime,
-            new TrapezoidProfile.State(
-                m_lastHeldState.getPosition(), m_lastHeldState.getVelocity()),
+            new TrapezoidProfile.State(m_profileStartPosition, m_profileStartVelocity),
             new TrapezoidProfile.State(m_desiredState.getPosition(), 0));
 
     m_pidController.setReference(
@@ -95,12 +104,9 @@ public abstract class ServoMotorSubsystem extends StatedSubsystem {
 
     if (m_setpoint.position == m_desiredState.getPosition()) {
       m_profileStartTime = -1;
-      m_lastHeldState = m_desiredState;
       m_currentState = m_desiredState;
       m_constants.kManualState.setPosition(0);
     }
-
-    m_previousDesiredState = m_desiredState;
   }
 
   public void manualControl(double throttle) {
@@ -110,7 +116,6 @@ public abstract class ServoMotorSubsystem extends StatedSubsystem {
       m_constants.kManualState.setPosition(getPosition());
 
     if (Math.abs(m_throttle) > 0 && m_profileStartTime == -1) {
-      m_lastHeldState = m_constants.kManualState;
       m_desiredState = m_constants.kManualState;
       m_currentState = m_constants.kManualState;
 
@@ -134,7 +139,7 @@ public abstract class ServoMotorSubsystem extends StatedSubsystem {
         ArbFFUnits.kVoltage);
   }
 
-  public SubsystemState getCurrentState() {
+  public ServoSubsystemState getCurrentState() {
     return m_currentState;
   }
 
@@ -142,9 +147,11 @@ public abstract class ServoMotorSubsystem extends StatedSubsystem {
     m_arbFeedforward = feedforward;
   }
 
-  public void setState(SubsystemState desiredState) {
+  public void setState(ServoSubsystemState desiredState) {
     m_desiredState = desiredState;
     m_profileStartTime = Timer.getFPGATimestamp();
+    m_profileStartPosition = getPosition();
+    m_profileStartVelocity = getVelocity();
   }
 
   public boolean atSetpoint() {
@@ -159,17 +166,21 @@ public abstract class ServoMotorSubsystem extends StatedSubsystem {
     return RobotBase.isReal() ? m_encoder.getVelocity() : m_currentState.getVelocity();
   }
 
+  public ServoSubsystemType getSubsystemType() {
+    return m_constants.kSubsystemType;
+  }
+
   @Override
-  public void abstractSubsystemPeriodic() {
+  public void periodic() {
     if (m_profileStartTime == -1) {
       holdPosition();
     } else {
       runToSetpoint();
     }
-  }
 
-  @Override
-  public void outputAbstractSubsystemTelemetry() {
+    subsystemPeriodic();
+    outputTelemetry();
+
     Logger.recordOutput(
         m_constants.kName + "/Encoder Position", getPosition()); // Current position of encoders
     Logger.recordOutput(m_constants.kName + "/Encoder Velocity", getVelocity()); // Encoder Velocity
@@ -182,12 +193,31 @@ public abstract class ServoMotorSubsystem extends StatedSubsystem {
     Logger.recordOutput(
         m_constants.kName + "/Desired Position", m_desiredState.getPosition()); // Desired position
     Logger.recordOutput(
-        m_constants.kName + "/Last Held Position",
-        m_lastHeldState.getPosition()); // Desired position
-    Logger.recordOutput(
         m_constants.kName + "/Current State", m_currentState.getName()); // Current State
     Logger.recordOutput(
         m_constants.kName + "/Desired State", m_desiredState.getName()); // Current State
     Logger.recordOutput(m_constants.kName + "/At Setpoint", atSetpoint()); // Is at setpoint
+  }
+
+  public abstract void subsystemPeriodic();
+
+  public abstract void outputTelemetry();
+
+  public enum ServoSubsystemType {
+    ARM,
+    ELEVATOR,
+    WRIST
+  }
+
+  public interface ServoSubsystemState {
+    String getName();
+
+    double getPosition();
+
+    double getVelocity();
+
+    void setPosition(double position);
+
+    void setVelocity(double velocity);
   }
 }

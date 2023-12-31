@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.Pigeon2;
@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.Limelight;
 import frc.robot.utilities.GeometryUtils;
 import frc.robot.utilities.LoggedTunableNumber;
 import frc.robot.utilities.SwerveModuleConstants;
@@ -35,6 +36,8 @@ import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 
 public class SwerveDrive extends SubsystemBase {
+
+  private static SwerveDrive m_instance = null;
 
   private final Pigeon2 m_pigeon = new Pigeon2(Constants.DriveConstants.kPigeon);
 
@@ -229,6 +232,19 @@ public class SwerveDrive extends SubsystemBase {
             ),
         this // Reference to this subsystem to set requirements
         );
+  }
+
+  public static synchronized SwerveDrive getInstance() {
+    if (m_instance == null) {
+      m_instance =
+          new SwerveDrive(
+              DriveConstants.kFrontLeft,
+              DriveConstants.kFrontRight,
+              DriveConstants.kBackLeft,
+              DriveConstants.kBackRight);
+    }
+
+    return m_instance;
   }
 
   public void zeroGyroscope() {

@@ -1,19 +1,22 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.superstructure.wrist;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.Constants.WristConstants;
-import frc.robot.subsystems.templates.ServoMotorSubsystem;
+import frc.robot.subsystems.superstructure.Arm;
+import frc.robot.subsystems.superstructure.Elevator;
+import frc.robot.subsystems.templates.ServoSubsystem;
+import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
 import org.littletonrobotics.junction.Logger;
 
-public class Wrist extends ServoMotorSubsystem {
+public class Wrist extends ServoSubsystem {
 
   private ArmFeedforward m_feedforward;
 
   private static Wrist m_instance = null;
 
-  public Wrist(SubsystemConstants constants) {
+  public Wrist(ServoSubsystemConstants constants) {
     super(constants);
 
     m_feedforward = new ArmFeedforward(constants.kKs, constants.kKg, constants.kKv, constants.kKa);
@@ -28,7 +31,7 @@ public class Wrist extends ServoMotorSubsystem {
   }
 
   @Override
-  public void outputSusbsystemTelemetry() {
+  public void outputTelemetry() {
     Logger.recordOutput(
         "Wrist/Mech3d",
         new Pose3d(
@@ -52,7 +55,7 @@ public class Wrist extends ServoMotorSubsystem {
     Arm.wristLig.setAngle(m_currentState.getPosition());
   }
 
-  public enum WristState implements SubsystemState {
+  public enum WristState implements ServoSubsystemState {
     MANUAL(0, 0, "Manual"),
     TRANSITION(0, 0, "Transition"),
     HOME(155, 0, "Home"),
