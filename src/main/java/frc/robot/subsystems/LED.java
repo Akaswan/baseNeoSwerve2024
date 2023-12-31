@@ -6,9 +6,9 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.manager.StatedSubsystem;
 
-public class LED extends SubsystemBase {
+public class LED extends StatedSubsystem {
   /** Creates a new LED. */
   private AddressableLED m_led;
 
@@ -18,7 +18,8 @@ public class LED extends SubsystemBase {
 
   private boolean rainbow = false;
 
-  public LED(AddressableLED led, int length) {
+  public LED(AddressableLED led, int length, SubsystemConstants constants) {
+    super(constants);
     m_led = led;
 
     m_ledBuffer = new AddressableLEDBuffer(length);
@@ -53,10 +54,53 @@ public class LED extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
+  public void subsystemPeriodic() {
     if (rainbow) {
       rainbow();
     }
-    // This method will be called once per scheduler run
+  }
+
+  @Override
+  public void outputSusbsystemTelemetry() {
+    if (rainbow) {
+      rainbow();
+    }
+  }
+
+  public enum LEDState implements SubsystemState {
+    BLUE(0, 0, 255, "Blue");
+
+    private double red;
+    private double green;
+    private double blue;
+    private String name;
+
+    private LEDState(double red, double green, double blue, String name) {
+      this.red = red;
+      this.green = green;
+      this.blue = blue;
+      this.name = name;
+    }
+
+    @Override
+    public double getPosition() {
+      return 0;
+    }
+
+    @Override
+    public double getVelocity() {
+      return 0;
+    }
+
+    @Override
+    public void setPosition(double position) {}
+
+    @Override
+    public void setVelocity(double velocity) {}
+
+    @Override
+    public String getName() {
+      return name;
+    }
   }
 }

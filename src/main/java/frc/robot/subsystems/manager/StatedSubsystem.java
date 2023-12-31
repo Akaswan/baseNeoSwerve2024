@@ -1,18 +1,12 @@
 package frc.robot.subsystems.manager;
 
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class StatedSubsystem extends SubsystemBase {
 
   public SubsystemConstants m_constants;
-
-  protected final CANSparkMax m_master;
-  protected final CANSparkMax[] m_slaves;
-  protected final RelativeEncoder m_encoder;
 
   protected SubsystemState m_lastHeldState = null;
   protected SubsystemState m_currentState = null;
@@ -22,25 +16,6 @@ public abstract class StatedSubsystem extends SubsystemBase {
   public StatedSubsystem(SubsystemConstants constants) {
     m_constants = constants;
 
-    m_master =
-        new CANSparkMax(m_constants.kMasterConstants.kID, m_constants.kMasterConstants.kMotorType);
-    m_master.setIdleMode(m_constants.kMasterConstants.kIdleMode);
-    m_master.setSmartCurrentLimit(m_constants.kMasterConstants.kCurrentLimit);
-
-    m_encoder = m_master.getEncoder();
-    m_encoder.setPosition(m_constants.kHomePosition);
-
-    m_slaves = new CANSparkMax[m_constants.kSlaveConstants.length];
-
-    for (int i = 0; i < m_constants.kSlaveConstants.length; i++) {
-      m_slaves[i] =
-          new CANSparkMax(
-              m_constants.kSlaveConstants[i].kID, m_constants.kSlaveConstants[i].kMotorType);
-      m_slaves[i].setIdleMode(m_constants.kSlaveConstants[i].kIdleMode);
-      m_slaves[i].setSmartCurrentLimit(m_constants.kSlaveConstants[i].kCurrentLimit);
-      m_slaves[i].follow(m_master);
-    }
-
     m_lastHeldState = m_constants.kInitialState;
     m_currentState = m_constants.kInitialState;
     m_desiredState = m_constants.kInitialState;
@@ -49,11 +24,13 @@ public abstract class StatedSubsystem extends SubsystemBase {
     setName(m_constants.kName);
   }
 
-  public abstract void abstractSubsystemPeriodic();
+  public void abstractSubsystemPeriodic() {}
+  ;
 
   public abstract void subsystemPeriodic();
 
-  public abstract void outputAbstractSubsystemTelemetry();
+  public void outputAbstractSubsystemTelemetry() {}
+  ;
 
   public abstract void outputSusbsystemTelemetry();
 
