@@ -282,16 +282,14 @@ public class SwerveDrive extends SubsystemBase {
               ? ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getYaw())
               : new ChassisSpeeds(throttle, strafe, rotation);
 
-      // chassisSpeeds = GeometryUtils.discretize(chassisSpeeds);
+      chassisSpeeds = GeometryUtils.discretize(chassisSpeeds);
       moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
       setSwerveModuleStates(moduleStates, isOpenLoop);
 
       Logger.recordOutput("Drivebase/SwerveStateSetpoints", moduleStates);
 
-      // robotRelativeChassisSpeeds =
-      // GeometryUtils.discretize(new ChassisSpeeds(throttle, strafe, rotation));
-
-      robotRelativeChassisSpeeds = new ChassisSpeeds(throttle, strafe, rotation);
+      robotRelativeChassisSpeeds =
+          GeometryUtils.discretize(new ChassisSpeeds(throttle, strafe, rotation));
 
     } else {
       setSwerveModuleStates(DriveConstants.kXWheels, isOpenLoop);
@@ -300,7 +298,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void autoDrive(ChassisSpeeds speeds) {
-    // speeds = GeometryUtils.discretize(speeds); // I dont know if you want this here
+    speeds = GeometryUtils.discretize(speeds); // I dont know if you want this here
     moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     setSwerveModuleStates(moduleStates, false);
   }

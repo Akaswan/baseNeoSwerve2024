@@ -6,6 +6,7 @@ package frc.robot.subsystems.templates;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
@@ -13,8 +14,13 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
+import frc.robot.utilities.LoggedTunableNumber;
+import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 
 public abstract class ServoSubsystem extends SubsystemBase {
@@ -34,6 +40,12 @@ public abstract class ServoSubsystem extends SubsystemBase {
   protected double m_profileStartPosition = 0;
   protected double m_profileStartVelocity = 0;
 
+  protected LoggedTunableNumber m_kp;
+  protected LoggedTunableNumber m_ki;
+  protected LoggedTunableNumber m_kd;
+  protected LoggedTunableNumber m_kMaxAcceleration;
+  protected LoggedTunableNumber m_kMaxVelocity;
+
   protected ServoSubsystemState m_currentState = null;
   protected ServoSubsystemState m_desiredState = null;
 
@@ -52,10 +64,7 @@ public abstract class ServoSubsystem extends SubsystemBase {
         new CANSparkMax(m_constants.kMasterConstants.kID, m_constants.kMasterConstants.kMotorType);
     m_master.setIdleMode(m_constants.kMasterConstants.kIdleMode);
     m_master.setSmartCurrentLimit(m_constants.kMasterConstants.kCurrentLimit);
-
-    m_encoder = m_master.getEncoder();
-    m_encoder.setPosition(m_constants.kHomePosition);
-    m_encoder.setPositionConversionFactor(m_constants.kPositionConversionFactor);
+    m_master.burnFlash();
 
     m_slaves = new CANSparkMax[m_constants.kSlaveConstants.length];
 
@@ -66,7 +75,64 @@ public abstract class ServoSubsystem extends SubsystemBase {
       m_slaves[i].setIdleMode(m_constants.kSlaveConstants[i].kIdleMode);
       m_slaves[i].setSmartCurrentLimit(m_constants.kSlaveConstants[i].kCurrentLimit);
       m_slaves[i].follow(m_master);
+      m_slaves[i].burnFlash();
     }
+
+    if (m_slaves.length > 0) m_master.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
+
+    m_encoder = m_master.getEncoder();
+    m_encoder.setPosition(m_constants.kHomePosition);
+    m_encoder.setPositionConversionFactor(m_constants.kPositionConversionFactor);
+
+    m_kp =
+        new LoggedTunableNumber(
+            m_constants.kName + " p",
+            m_constants.kKp,
+            RobotContainer.mechTuningTab,
+            BuiltInWidgets.kTextView,
+            Map.of("min", 0),
+            0,
+            m_constants.kSubsystemType.ordinal());
+
+    m_ki =
+        new LoggedTunableNumber(
+            m_constants.kName + " i",
+            m_constants.kKi,
+            RobotContainer.mechTuningTab,
+            BuiltInWidgets.kTextView,
+            Map.of("min", 0),
+            1,
+            m_constants.kSubsystemType.ordinal());
+
+    m_kd =
+        new LoggedTunableNumber(
+            m_constants.kName + " d",
+            m_constants.kKd,
+            RobotContainer.mechTuningTab,
+            BuiltInWidgets.kTextView,
+            Map.of("min", 0),
+            2,
+            m_constants.kSubsystemType.ordinal());
+
+    m_kMaxAcceleration =
+        new LoggedTunableNumber(
+            m_constants.kName + " Max Acceleration",
+            m_constants.kMaxAcceleration,
+            RobotContainer.mechTuningTab,
+            BuiltInWidgets.kTextView,
+            Map.of("min", 0),
+            3,
+            m_constants.kSubsystemType.ordinal());
+
+    m_kMaxVelocity =
+        new LoggedTunableNumber(
+            m_constants.kName + " Max Velocity",
+            m_constants.kMaxVelocity,
+            RobotContainer.mechTuningTab,
+            BuiltInWidgets.kTextView,
+            Map.of("min", 0),
+            4,
+            m_constants.kSubsystemType.ordinal());
 
     m_pidController = m_master.getPIDController();
     m_pidController.setP(m_constants.kKp, m_constants.kDefaultSlot);
@@ -178,7 +244,17 @@ public abstract class ServoSubsystem extends SubsystemBase {
     }
 
     subsystemPeriodic();
+
     outputTelemetry();
+
+    if (Constants.kTuningMode) {
+        m_pidController.setP(m_kp.get(), m_constants.kDefaultSlot);
+        m_pidController.setI(m_ki.get(), m_constants.kDefaultSlot);
+        m_pidController.setD(m_kd.get(), m_constants.kDefaultSlot);
+        m_profile =
+            new TrapezoidProfile(
+                new TrapezoidProfile.Constraints(m_kMaxVelocity.get(), m_kMaxAcceleration.get()));
+    }
 
     Logger.recordOutput(
         m_constants.kName + "/Encoder Position", getPosition()); // Current position of encoders

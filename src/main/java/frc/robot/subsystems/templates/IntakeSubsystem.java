@@ -31,8 +31,7 @@ public abstract class IntakeSubsystem extends SubsystemBase {
     m_master.setIdleMode(m_constants.kMasterConstants.kIdleMode);
     m_master.setSmartCurrentLimit(m_constants.kMasterConstants.kCurrentLimit);
     m_master.setInverted(m_constants.kMasterConstants.kInverted);
-
-    m_encoder = m_master.getEncoder();
+    m_master.burnFlash();
 
     m_slaves = new CANSparkMax[m_constants.kSlaveConstants.length];
 
@@ -43,7 +42,10 @@ public abstract class IntakeSubsystem extends SubsystemBase {
       m_slaves[i].setIdleMode(m_constants.kSlaveConstants[i].kIdleMode);
       m_slaves[i].setSmartCurrentLimit(m_constants.kSlaveConstants[i].kCurrentLimit);
       m_slaves[i].follow(m_master, m_constants.kSlaveConstants[i].kInverted);
+      m_slaves[i].burnFlash();
     }
+
+    m_encoder = m_master.getEncoder();
 
     setName(m_constants.kName);
   }

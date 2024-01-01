@@ -13,11 +13,24 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import frc.robot.RobotContainer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GeometryUtils {
   private static final double kEps = 1E-9;
+
+  private static LoggedTunableNumber m_discretizeFudgeFactor =
+      new LoggedTunableNumber(
+          "Discretize Fudge Factor",
+          1,
+          RobotContainer.driveTuningTab,
+          BuiltInWidgets.kTextView,
+          Map.of("min", 0),
+          1,
+          3);
 
   /**
    * Obtain a new Pose2d from a (constant curvature) velocity. See:
@@ -68,7 +81,7 @@ public class GeometryUtils {
         new Pose2d(
             speeds.vxMetersPerSecond * dt,
             speeds.vyMetersPerSecond * dt,
-            new Rotation2d(speeds.omegaRadiansPerSecond * dt * 4));
+            new Rotation2d(speeds.omegaRadiansPerSecond * dt * m_discretizeFudgeFactor.get()));
     var twist = new Pose2d().log(desiredDeltaPose);
 
     return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (speeds.omegaRadiansPerSecond));

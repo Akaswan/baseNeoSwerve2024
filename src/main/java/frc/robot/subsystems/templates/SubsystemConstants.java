@@ -42,13 +42,13 @@ public class SubsystemConstants {
     public double kKd = 0.0;
 
     public double kSetpointTolerance = 0.0; // Tolerance for atSetpoint()
-    public double kSmartMotionTolerance = 0.0; // Tolerance for pid smart motion (Stops ocilation)
+    public double kSmartMotionTolerance = 0.0;
 
     public int kDefaultSlot =
         0; // PID Slot, make more if more than one set of pid constants are used
 
-    public double kMaxVelocity = 0.0; // Max velocity for smart motion
-    public double kMaxAcceleration = 0.0; // Max acceleration for smart motion
+    public double kMaxVelocity = 0.0; // Max velocity for motion profile
+    public double kMaxAcceleration = 0.0; // Max acceleration for motion profile
 
     // Feedforward constants
     public double kKs = 0.0;

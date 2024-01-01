@@ -16,6 +16,7 @@ public class Arm extends ServoSubsystem {
   private static Arm m_instance = null;
 
   private ArmFeedforward m_feedforward;
+
   public static Mechanism2d mech = new Mechanism2d(3, 3);
   public static MechanismRoot2d root = mech.getRoot("SuperStructure", 1.3, .3);
   public static MechanismLigament2d armLig;

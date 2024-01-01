@@ -81,14 +81,20 @@ public class SetSuperstructureState extends Command {
     //   //     break;
     //   // }
 
-    if (m_currentState == SuperstructureState.SCORE_HIGH
-        || m_currentState == SuperstructureState.SCORE_MID
-        || m_currentState == SuperstructureState.SUBSTATION_PICKUP
-        || m_currentState == SuperstructureState.SCORE_LOW) {
+    // if (m_currentState == SuperstructureState.SCORE_HIGH
+    //     || m_currentState == SuperstructureState.SCORE_MID
+    //     || m_currentState == SuperstructureState.SUBSTATION_PICKUP
+    //     || m_currentState == SuperstructureState.SCORE_LOW) {
+    //   order = new ServoSubsystem[] {m_wrist, m_elevator, m_arm};
+    // } else if (m_currentState == SuperstructureState.HOME
+    //     || m_currentState == SuperstructureState.GROUND_PICKUP) {
+    //   order = new ServoSubsystem[] {m_arm, m_elevator, m_wrist};
+    // } else {
+    //   order = new ServoSubsystem[] {m_arm, m_elevator, m_wrist};
+    // }
+
+    if (m_currentState.elevatorState.getPosition() > 0) {
       order = new ServoSubsystem[] {m_wrist, m_elevator, m_arm};
-    } else if (m_currentState == SuperstructureState.HOME
-        || m_currentState == SuperstructureState.GROUND_PICKUP) {
-      order = new ServoSubsystem[] {m_arm, m_elevator, m_wrist};
     } else {
       order = new ServoSubsystem[] {m_arm, m_elevator, m_wrist};
     }
