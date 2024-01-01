@@ -23,7 +23,8 @@ public class Superstructure extends SubsystemBase {
   private SuperstructureState m_currentState;
   private SuperstructureState m_desiredState;
 
-  private SequentialCommandGroup m_scheduledSequentialCommandGroup = new SequentialCommandGroup();
+  // private SequentialCommandGroup m_scheduledSequentialCommandGroup = new
+  // SequentialCommandGroup();
 
   private Command m_scheduledCommand;
   /*
@@ -114,7 +115,7 @@ public class Superstructure extends SubsystemBase {
       outputCommand.addCommands(new SetServoSubsystemState(order[i], desiredState, order));
     }
 
-    m_scheduledSequentialCommandGroup = outputCommand;
+    // m_scheduledSequentialCommandGroup = outputCommand;
     return outputCommand;
   }
 
@@ -203,8 +204,6 @@ public class Superstructure extends SubsystemBase {
       if (!CommandScheduler.getInstance().isScheduled(m_commandQueue.get(0)))
         m_commandQueue.get(0).schedule();
     }
-
-    System.out.println(m_commandQueue.toString());
 
     Logger.recordOutput("Current State", m_currentState);
     Logger.recordOutput("Desired State", m_desiredState);
