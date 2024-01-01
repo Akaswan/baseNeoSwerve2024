@@ -20,19 +20,19 @@ public class SetSuperstructureState extends Command {
   private Arm m_arm = Arm.getInstance();
   private Elevator m_elevator = Elevator.getInstance();
   private Wrist m_wrist = Wrist.getInstance();
-  private Superstructure m_manager = Superstructure.getInstance();
+  private Superstructure m_superstructure = Superstructure.getInstance();
   private boolean m_eject;
 
   public SetSuperstructureState(SuperstructureState desiredState, boolean eject) {
     m_desiredState = desiredState;
     m_eject = eject;
-    addRequirements(m_manager);
+    addRequirements(m_superstructure);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    SuperstructureState m_currentState = m_manager.getCurrentState();
+    SuperstructureState m_currentState = m_superstructure.getCurrentState();
 
     //   // switch (desiredState) {
     //   //   case GROUND_PICKUP:
@@ -99,7 +99,7 @@ public class SetSuperstructureState extends Command {
       order = new ServoSubsystem[] {m_arm, m_elevator, m_wrist};
     }
 
-    m_manager.setSuperstructureState(order, m_desiredState, m_eject).schedule();
+    m_superstructure.setSuperstructureState(order, m_desiredState, m_eject).schedule();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -109,12 +109,12 @@ public class SetSuperstructureState extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_manager.commandFinished();
+    m_superstructure.commandFinished();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_manager.getCurrentState() == m_desiredState;
+    return m_superstructure.getCurrentState() == m_desiredState;
   }
 }

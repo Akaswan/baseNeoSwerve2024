@@ -26,7 +26,6 @@ import frc.robot.subsystems.superstructure.Elevator;
 import frc.robot.subsystems.superstructure.LED;
 import frc.robot.subsystems.superstructure.Superstructure.SuperstructureState;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
-import frc.robot.subsystems.superstructure.wrist.WristIntake;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.utilities.Alert;
 import frc.robot.utilities.Alert.AlertType;
@@ -63,7 +62,6 @@ public class RobotContainer {
   private Arm m_arm = Arm.getInstance();
   private Elevator m_elevator = Elevator.getInstance();
   private Wrist m_wrist = Wrist.getInstance();
-  private WristIntake m_wristIntake = WristIntake.getInstance();
   public static LED m_superStructureLED = new LED(new AddressableLED(0), 20);
 
   // SENDABLE CHOOSER \\

@@ -14,7 +14,7 @@ public class SetServoSubsystemState extends Command {
   /** Creates a new SetMechState. */
   private ServoSubsystem m_subsystem;
 
-  private Superstructure m_manager = Superstructure.getInstance();
+  private Superstructure m_superstructure = Superstructure.getInstance();
 
   private ServoSubsystemState m_state;
   private SuperstructureState m_superStructureState;
@@ -47,16 +47,16 @@ public class SetServoSubsystemState extends Command {
 
     m_subsystem.setState(m_state);
 
-    // m_manager.setScheduledCommand(this);
+    // m_superstructure.setScheduledCommand(this);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (m_manager.getDesiredState() != m_superStructureState)
-      m_manager.setDesiredState(m_superStructureState);
-    if (m_manager.getCurrentState() != SuperstructureState.TRANSITION)
-      m_manager.setCurrentState(SuperstructureState.TRANSITION);
+    if (m_superstructure.getDesiredState() != m_superStructureState)
+      m_superstructure.setDesiredState(m_superStructureState);
+    if (m_superstructure.getCurrentState() != SuperstructureState.TRANSITION)
+      m_superstructure.setCurrentState(SuperstructureState.TRANSITION);
   }
 
   // Called once the command ends or is interrupted.

@@ -31,10 +31,15 @@ public class Superstructure extends SubsystemBase {
   private SuperstructureState m_currentState;
   private SuperstructureState m_desiredState;
 
+  private Arm m_arm = Arm.getInstance();
+  private Elevator m_elevator = Elevator.getInstance();
+  private Wrist m_wrist = Wrist.getInstance();
+  private WristIntake m_wristIntake = WristIntake.getInstance();
+
   // private SequentialCommandGroup m_scheduledSequentialCommandGroup = new
   // SequentialCommandGroup();
 
-  private Command m_scheduledCommand;
+  // private Command m_scheduledCommand;
   /*
    * First item = command scheduled right now
    * Subsequent items = commands in queue
@@ -73,9 +78,9 @@ public class Superstructure extends SubsystemBase {
     return m_currentState;
   }
 
-  public void setScheduledCommand(Command command) {
-    m_scheduledCommand = command;
-  }
+  // public void setScheduledCommand(Command command) {
+  //   m_scheduledCommand = command;
+  // }
 
   public void queueCommand(Command command) {
     m_commandQueue.add(command);
@@ -87,9 +92,9 @@ public class Superstructure extends SubsystemBase {
     }
   }
 
-  public Command getScheduledCommand() {
-    return m_scheduledCommand != null ? m_scheduledCommand : new Command() {};
-  }
+  // public Command getScheduledCommand() {
+  //   return m_scheduledCommand != null ? m_scheduledCommand : new Command() {};
+  // }
 
   // public ServoSubsystem[] swapOrder(ServoSubsystem[] originalOrder) {
   //   ArrayList<ServoSubsystem> newOrder = new ArrayList<>(Arrays.asList(originalOrder));
@@ -124,22 +129,20 @@ public class Superstructure extends SubsystemBase {
 
     if (eject) {
       outputCommand.addCommands(
-          new SetIntakeSubsystemState(WristIntake.getInstance(), WristIntakeState.OUTTAKE));
+          new SetIntakeSubsystemState(m_wristIntake, WristIntakeState.OUTTAKE));
       outputCommand.addCommands(new WaitCommand(.25));
     }
 
     for (int i = 0; i < m_order.size(); i++) {
-      if (m_order.get(i) == Wrist.getInstance() || m_order.get(i) == Elevator.getInstance()) {
+      if (m_order.get(i) == m_wrist || m_order.get(i) == m_elevator) {
         if (!eject) {
           outputCommand.addCommands(
-              new SetIntakeSubsystemState(
-                  WristIntake.getInstance(), desiredState.wristIntakeState));
+              new SetIntakeSubsystemState(m_wristIntake, desiredState.wristIntakeState));
         }
         outputCommand.addCommands(
-            new SetServoSubsystemState(Elevator.getInstance(), desiredState)
-                .alongWith(new SetServoSubsystemState(Wrist.getInstance(), desiredState)));
-        m_order.remove(
-            m_order.get(i) == Wrist.getInstance() ? Elevator.getInstance() : Wrist.getInstance());
+            new SetServoSubsystemState(m_elevator, desiredState)
+                .alongWith(new SetServoSubsystemState(m_wrist, desiredState)));
+        m_order.remove(m_order.get(i) == m_wrist ? m_elevator : m_wrist);
       } else {
         outputCommand.addCommands(new SetServoSubsystemState(m_order.get(i), desiredState));
       }
@@ -243,50 +246,36 @@ public class Superstructure extends SubsystemBase {
               -.2347,
               0,
               .254,
-              new Rotation3d(
-                  Math.toRadians(-Arm.getInstance().getPosition() + 90), 0, Math.toRadians(90))),
+              new Rotation3d(Math.toRadians(-m_arm.getPosition() + 90), 0, Math.toRadians(90))),
           new Pose3d(
               -.2347
                   + MathUtil.clamp(
-                          Elevator.getInstance().getPosition(),
-                          0,
-                          Elevator.getInstance().m_constants.kMaxPosition / 2)
-                      * Math.cos(Math.toRadians(Arm.getInstance().getPosition())),
+                          m_elevator.getPosition(), 0, m_elevator.m_constants.kMaxPosition / 2)
+                      * Math.cos(Math.toRadians(m_arm.getPosition())),
               0,
               .254
                   + .005
                   + MathUtil.clamp(
-                          Elevator.getInstance().getPosition(),
-                          0,
-                          Elevator.getInstance().m_constants.kMaxPosition / 2)
-                      * Math.sin(Math.toRadians(Arm.getInstance().getPosition())),
-              new Rotation3d(
-                  Math.toRadians(-Arm.getInstance().getPosition() + 90), 0, Math.toRadians(90))),
+                          m_elevator.getPosition(), 0, m_elevator.m_constants.kMaxPosition / 2)
+                      * Math.sin(Math.toRadians(m_arm.getPosition())),
+              new Rotation3d(Math.toRadians(-m_arm.getPosition() + 90), 0, Math.toRadians(90))),
           new Pose3d(
-              -.2347
-                  + Elevator.getInstance().getPosition()
-                      * Math.cos(Math.toRadians(Arm.getInstance().getPosition())),
+              -.2347 + m_elevator.getPosition() * Math.cos(Math.toRadians(m_arm.getPosition())),
               0,
               .254
                   + .005
-                  + Elevator.getInstance().getPosition()
-                      * Math.sin(Math.toRadians(Arm.getInstance().getPosition())),
-              new Rotation3d(
-                  Math.toRadians(-Arm.getInstance().getPosition() + 90), 0, Math.toRadians(90))),
+                  + m_elevator.getPosition() * Math.sin(Math.toRadians(m_arm.getPosition())),
+              new Rotation3d(Math.toRadians(-m_arm.getPosition() + 90), 0, Math.toRadians(90))),
           new Pose3d(
               -0.2574
-                  + (Elevator.getInstance().getPosition() + .54)
-                      * Math.cos(Math.toRadians(Arm.getInstance().getPosition())),
+                  + (m_elevator.getPosition() + .54)
+                      * Math.cos(Math.toRadians(m_arm.getPosition())),
               0,
               0.2715
-                  + (Elevator.getInstance().getPosition() + .54)
-                      * Math.sin(Math.toRadians(Arm.getInstance().getPosition())),
+                  + (m_elevator.getPosition() + .54)
+                      * Math.sin(Math.toRadians(m_arm.getPosition())),
               new Rotation3d(
-                  Math.toRadians(
-                      -Arm.getInstance().getPosition()
-                          - Wrist.getInstance().getPosition()
-                          + 90
-                          + 155),
+                  Math.toRadians(-m_arm.getPosition() - m_wrist.getPosition() + 90 + 155),
                   0,
                   Math.toRadians(90)))
         });
