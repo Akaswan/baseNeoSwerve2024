@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
-import frc.robot.utilities.LoggedTunableNumber;
+import frc.robot.utilities.LoggedShuffleboardTunableNumber;
 import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 
@@ -40,11 +40,11 @@ public abstract class ServoSubsystem extends SubsystemBase {
   protected double m_profileStartPosition = 0;
   protected double m_profileStartVelocity = 0;
 
-  protected LoggedTunableNumber m_kp;
-  protected LoggedTunableNumber m_ki;
-  protected LoggedTunableNumber m_kd;
-  protected LoggedTunableNumber m_kMaxAcceleration;
-  protected LoggedTunableNumber m_kMaxVelocity;
+  protected LoggedShuffleboardTunableNumber m_kp;
+  protected LoggedShuffleboardTunableNumber m_ki;
+  protected LoggedShuffleboardTunableNumber m_kd;
+  protected LoggedShuffleboardTunableNumber m_kMaxAcceleration;
+  protected LoggedShuffleboardTunableNumber m_kMaxVelocity;
 
   protected ServoSubsystemState m_currentState = null;
   protected ServoSubsystemState m_desiredState = null;
@@ -85,7 +85,7 @@ public abstract class ServoSubsystem extends SubsystemBase {
     m_encoder.setPositionConversionFactor(m_constants.kPositionConversionFactor);
 
     m_kp =
-        new LoggedTunableNumber(
+        new LoggedShuffleboardTunableNumber(
             m_constants.kName + " p",
             m_constants.kKp,
             RobotContainer.mechTuningTab,
@@ -95,7 +95,7 @@ public abstract class ServoSubsystem extends SubsystemBase {
             m_constants.kSubsystemType.ordinal());
 
     m_ki =
-        new LoggedTunableNumber(
+        new LoggedShuffleboardTunableNumber(
             m_constants.kName + " i",
             m_constants.kKi,
             RobotContainer.mechTuningTab,
@@ -105,7 +105,7 @@ public abstract class ServoSubsystem extends SubsystemBase {
             m_constants.kSubsystemType.ordinal());
 
     m_kd =
-        new LoggedTunableNumber(
+        new LoggedShuffleboardTunableNumber(
             m_constants.kName + " d",
             m_constants.kKd,
             RobotContainer.mechTuningTab,
@@ -115,7 +115,7 @@ public abstract class ServoSubsystem extends SubsystemBase {
             m_constants.kSubsystemType.ordinal());
 
     m_kMaxAcceleration =
-        new LoggedTunableNumber(
+        new LoggedShuffleboardTunableNumber(
             m_constants.kName + " Max Acceleration",
             m_constants.kMaxAcceleration,
             RobotContainer.mechTuningTab,
@@ -125,7 +125,7 @@ public abstract class ServoSubsystem extends SubsystemBase {
             m_constants.kSubsystemType.ordinal());
 
     m_kMaxVelocity =
-        new LoggedTunableNumber(
+        new LoggedShuffleboardTunableNumber(
             m_constants.kName + " Max Velocity",
             m_constants.kMaxVelocity,
             RobotContainer.mechTuningTab,
@@ -248,12 +248,12 @@ public abstract class ServoSubsystem extends SubsystemBase {
     outputTelemetry();
 
     if (Constants.kTuningMode) {
-        m_pidController.setP(m_kp.get(), m_constants.kDefaultSlot);
-        m_pidController.setI(m_ki.get(), m_constants.kDefaultSlot);
-        m_pidController.setD(m_kd.get(), m_constants.kDefaultSlot);
-        m_profile =
-            new TrapezoidProfile(
-                new TrapezoidProfile.Constraints(m_kMaxVelocity.get(), m_kMaxAcceleration.get()));
+      m_pidController.setP(m_kp.get(), m_constants.kDefaultSlot);
+      m_pidController.setI(m_ki.get(), m_constants.kDefaultSlot);
+      m_pidController.setD(m_kd.get(), m_constants.kDefaultSlot);
+      m_profile =
+          new TrapezoidProfile(
+              new TrapezoidProfile.Constraints(m_kMaxVelocity.get(), m_kMaxAcceleration.get()));
     }
 
     Logger.recordOutput(

@@ -28,7 +28,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Limelight;
 import frc.robot.utilities.GeometryUtils;
-import frc.robot.utilities.LoggedTunableNumber;
+import frc.robot.utilities.LoggedShuffleboardTunableNumber;
 import frc.robot.utilities.SwerveModuleConstants;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,8 +54,8 @@ public class SwerveDrive extends SubsystemBase {
 
   private boolean m_xWheels = false;
 
-  public static final LoggedTunableNumber drivekp =
-      new LoggedTunableNumber(
+  public static final LoggedShuffleboardTunableNumber drivekp =
+      new LoggedShuffleboardTunableNumber(
           "Drive P",
           DriveConstants.drivekp,
           RobotContainer.driveTuningTab,
@@ -63,8 +63,8 @@ public class SwerveDrive extends SubsystemBase {
           Map.of("min", 0),
           0,
           0);
-  public static final LoggedTunableNumber driveki =
-      new LoggedTunableNumber(
+  public static final LoggedShuffleboardTunableNumber driveki =
+      new LoggedShuffleboardTunableNumber(
           "Drive I",
           DriveConstants.driveki,
           RobotContainer.driveTuningTab,
@@ -72,8 +72,8 @@ public class SwerveDrive extends SubsystemBase {
           Map.of("min", 0),
           1,
           0);
-  public static final LoggedTunableNumber drivekd =
-      new LoggedTunableNumber(
+  public static final LoggedShuffleboardTunableNumber drivekd =
+      new LoggedShuffleboardTunableNumber(
           "Drive D",
           DriveConstants.drivekd,
           RobotContainer.driveTuningTab,
@@ -81,8 +81,8 @@ public class SwerveDrive extends SubsystemBase {
           Map.of("min", 0),
           2,
           0);
-  public static final LoggedTunableNumber drivekff =
-      new LoggedTunableNumber(
+  public static final LoggedShuffleboardTunableNumber drivekff =
+      new LoggedShuffleboardTunableNumber(
           "Drive FF",
           DriveConstants.drivekff,
           RobotContainer.driveTuningTab,
@@ -90,8 +90,8 @@ public class SwerveDrive extends SubsystemBase {
           Map.of("min", 0),
           3,
           0);
-  public static final LoggedTunableNumber driveRampRate =
-      new LoggedTunableNumber(
+  public static final LoggedShuffleboardTunableNumber driveRampRate =
+      new LoggedShuffleboardTunableNumber(
           "Drive RampRate",
           DriveConstants.driverampRate,
           RobotContainer.driveTuningTab,
@@ -100,8 +100,8 @@ public class SwerveDrive extends SubsystemBase {
           4,
           0);
 
-  public static final LoggedTunableNumber turnkp =
-      new LoggedTunableNumber(
+  public static final LoggedShuffleboardTunableNumber turnkp =
+      new LoggedShuffleboardTunableNumber(
           "Turn P",
           DriveConstants.turnkp,
           RobotContainer.driveTuningTab,
@@ -109,8 +109,8 @@ public class SwerveDrive extends SubsystemBase {
           Map.of("min", 0),
           0,
           1);
-  public static final LoggedTunableNumber turnki =
-      new LoggedTunableNumber(
+  public static final LoggedShuffleboardTunableNumber turnki =
+      new LoggedShuffleboardTunableNumber(
           "Turn I",
           DriveConstants.turnki,
           RobotContainer.driveTuningTab,
@@ -118,8 +118,8 @@ public class SwerveDrive extends SubsystemBase {
           Map.of("min", 0),
           1,
           1);
-  public static final LoggedTunableNumber turnkd =
-      new LoggedTunableNumber(
+  public static final LoggedShuffleboardTunableNumber turnkd =
+      new LoggedShuffleboardTunableNumber(
           "Turn D",
           DriveConstants.turnkd,
           RobotContainer.driveTuningTab,
@@ -127,8 +127,8 @@ public class SwerveDrive extends SubsystemBase {
           Map.of("min", 0),
           2,
           1);
-  public static final LoggedTunableNumber turnkff =
-      new LoggedTunableNumber(
+  public static final LoggedShuffleboardTunableNumber turnkff =
+      new LoggedShuffleboardTunableNumber(
           "Turn FF",
           DriveConstants.turnkff,
           RobotContainer.driveTuningTab,
@@ -137,8 +137,8 @@ public class SwerveDrive extends SubsystemBase {
           3,
           1);
 
-  public static final LoggedTunableNumber apriltagTrustMultiplier =
-      new LoggedTunableNumber(
+  public static final LoggedShuffleboardTunableNumber apriltagTrustMultiplier =
+      new LoggedShuffleboardTunableNumber(
           "April Tag Trust Multiplier",
           DriveConstants.kAprilTagTrustMultiplier,
           RobotContainer.driveTuningTab,

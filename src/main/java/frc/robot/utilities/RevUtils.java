@@ -24,7 +24,8 @@ public final class RevUtils {
 
     motorController.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 10);
     motorController.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20);
-    motorController.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 50); // May want to increase
+    motorController.setPeriodicFramePeriod(
+        CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 50); // May want to increase
 
     motorController.setSmartCurrentLimit(60, 35);
     motorController.burnFlash();

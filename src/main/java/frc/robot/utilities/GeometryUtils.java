@@ -22,8 +22,8 @@ import java.util.Map;
 public class GeometryUtils {
   private static final double kEps = 1E-9;
 
-  private static LoggedTunableNumber m_discretizeFudgeFactor =
-      new LoggedTunableNumber(
+  private static LoggedShuffleboardTunableNumber m_discretizeFudgeFactor =
+      new LoggedShuffleboardTunableNumber(
           "Discretize Fudge Factor",
           1,
           RobotContainer.driveTuningTab,

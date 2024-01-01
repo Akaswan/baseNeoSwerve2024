@@ -17,7 +17,7 @@ import java.util.Map;
  * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or
  * value not in dashboard.
  */
-public class LoggedTunableNumber {
+public class LoggedShuffleboardTunableNumber {
   private final String key;
   private boolean hasDefault = false;
   private double defaultValue;
@@ -29,7 +29,7 @@ public class LoggedTunableNumber {
    *
    * @param dashboardKey Key on dashboard
    */
-  public LoggedTunableNumber(String dashboardKey) {
+  public LoggedShuffleboardTunableNumber(String dashboardKey) {
     this.key = dashboardKey;
   }
 
@@ -39,7 +39,7 @@ public class LoggedTunableNumber {
    * @param dashboardKey Key on dashboard
    * @param defaultValue Default value
    */
-  public LoggedTunableNumber(
+  public LoggedShuffleboardTunableNumber(
       String dashboardKey,
       double defaultValue,
       ShuffleboardTab tab,

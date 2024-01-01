@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
-import frc.robot.utilities.LoggedTunableNumber;
+import frc.robot.utilities.LoggedShuffleboardTunableNumber;
 import frc.robot.utilities.RevUtils;
 import frc.robot.utilities.SwerveModuleConstants;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class SwerveModule extends SubsystemBase {
   private double m_simDriveEncoderPosition;
   private double m_simDriveEncoderVelocity;
 
-  private LoggedTunableNumber m_angleOffset;
+  private LoggedShuffleboardTunableNumber m_angleOffset;
   private double m_lastAngleOffset;
 
   private final SparkMaxPIDController m_driveController;
@@ -70,7 +70,7 @@ public class SwerveModule extends SubsystemBase {
 
     m_angleEncoder = new CANCoder(swerveModuleConstants.cancoderID, "rio");
     m_angleOffset =
-        new LoggedTunableNumber(
+        new LoggedShuffleboardTunableNumber(
             "Module " + m_moduleNumber + " Offset",
             swerveModuleConstants.angleOffset,
             RobotContainer.driveTuningTab,
