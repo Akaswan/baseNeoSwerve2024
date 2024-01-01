@@ -1,14 +1,10 @@
 package frc.robot.subsystems.superstructure.wrist;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.Constants.WristConstants;
 import frc.robot.subsystems.superstructure.Arm;
-import frc.robot.subsystems.superstructure.Elevator;
 import frc.robot.subsystems.templates.ServoSubsystem;
 import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
-import org.littletonrobotics.junction.Logger;
 
 public class Wrist extends ServoSubsystem {
 
@@ -31,22 +27,7 @@ public class Wrist extends ServoSubsystem {
   }
 
   @Override
-  public void outputTelemetry() {
-    Logger.recordOutput(
-        "Wrist/Mech3d",
-        new Pose3d(
-            -0.2574
-                + (Elevator.getInstance().getPosition() + .54)
-                    * Math.cos(Math.toRadians(Arm.getInstance().getPosition())),
-            0,
-            0.2715
-                + (Elevator.getInstance().getPosition() + .54)
-                    * Math.sin(Math.toRadians(Arm.getInstance().getPosition())),
-            new Rotation3d(
-                Math.toRadians(-Arm.getInstance().getPosition() - getPosition() + 90 + 155),
-                0,
-                Math.toRadians(90))));
-  }
+  public void outputTelemetry() {}
 
   @Override
   public void subsystemPeriodic() {

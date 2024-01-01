@@ -14,14 +14,17 @@ import frc.robot.subsystems.superstructure.Superstructure.SuperstructureState;
 public class QueueSuperstructureCommand extends InstantCommand {
 
   private SuperstructureState m_superStructureState;
+  private boolean m_eject;
 
-  public QueueSuperstructureCommand(SuperstructureState superstructureState) {
+  public QueueSuperstructureCommand(SuperstructureState superstructureState, boolean eject) {
     m_superStructureState = superstructureState;
+    m_eject = eject;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Superstructure.getInstance().queueCommand(new SetSuperstructureState(m_superStructureState));
+    Superstructure.getInstance()
+        .queueCommand(new SetSuperstructureState(m_superStructureState, m_eject));
   }
 }

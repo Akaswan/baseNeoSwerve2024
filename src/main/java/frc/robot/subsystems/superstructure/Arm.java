@@ -1,8 +1,6 @@
 package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -12,7 +10,6 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.templates.ServoSubsystem;
 import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
-import org.littletonrobotics.junction.Logger;
 
 public class Arm extends ServoSubsystem {
 
@@ -20,7 +17,7 @@ public class Arm extends ServoSubsystem {
 
   private ArmFeedforward m_feedforward;
   public static Mechanism2d mech = new Mechanism2d(3, 3);
-  public static MechanismRoot2d root = mech.getRoot("SuperStructure", 1, 0);
+  public static MechanismRoot2d root = mech.getRoot("SuperStructure", 1.3, .3);
   public static MechanismLigament2d armLig;
   public static MechanismLigament2d wristLig;
 
@@ -45,16 +42,7 @@ public class Arm extends ServoSubsystem {
   }
 
   @Override
-  public void outputTelemetry() {
-    Logger.recordOutput(
-        "Arm/Mech3d",
-        new Pose3d(
-            -.2347,
-            0,
-            .254,
-            new Rotation3d(
-                Math.toRadians(-m_currentState.getPosition() + 90), 0, Math.toRadians(90))));
-  }
+  public void outputTelemetry() {}
 
   @Override
   public void subsystemPeriodic() {

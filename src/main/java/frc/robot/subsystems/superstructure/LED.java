@@ -13,6 +13,8 @@ public class LED extends SubsystemBase {
 
   private AddressableLEDBuffer m_ledBuffer;
 
+  private LEDState m_currentState;
+
   private int m_rainbowFirstPixelHue = 0;
 
   private boolean rainbow = false;
@@ -27,12 +29,26 @@ public class LED extends SubsystemBase {
     m_led.start();
   }
 
+  public void setState(LEDState desiredState) {
+    m_currentState = desiredState;
+    if (desiredState == LEDState.RAINBOW) {
+      rainbow = true;
+    } else {
+      rainbow = false;
+      setRGB(desiredState.red, desiredState.green, desiredState.blue);
+    }
+  }
+
   public void setRGB(int r, int g, int b) {
     for (int i = 0; i < m_ledBuffer.getLength(); i++) {
       m_ledBuffer.setRGB(i, r, g, b);
     }
 
     m_led.setData(m_ledBuffer);
+  }
+
+  public LEDState getCurrentState() {
+    return m_currentState;
   }
 
   private void rainbow() {
@@ -53,20 +69,21 @@ public class LED extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (rainbow) {
-      rainbow();
-    }
+    if (rainbow) rainbow();
   }
 
   public enum LEDState {
-    BLUE(0, 0, 255, "Blue");
+    BLUE(0, 0, 255, "Blue"),
+    RED(255, 0, 0, "Red"),
+    GREEN(0, 255, 0, "Green"),
+    RAINBOW(0, 0, 0, "Rainbow");
 
-    public double red;
-    public double green;
-    public double blue;
+    public int red;
+    public int green;
+    public int blue;
     public String name;
 
-    private LEDState(double red, double green, double blue, String name) {
+    private LEDState(int red, int green, int blue, String name) {
       this.red = red;
       this.green = green;
       this.blue = blue;

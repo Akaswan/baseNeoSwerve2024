@@ -1,13 +1,20 @@
 package frc.robot.subsystems.superstructure;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.RobotContainer;
 import frc.robot.commands.superstructure.SetIntakeSubsystemState;
 import frc.robot.commands.superstructure.SetServoSubsystemState;
 import frc.robot.subsystems.superstructure.Arm.ArmState;
 import frc.robot.subsystems.superstructure.Elevator.ElevatorState;
+import frc.robot.subsystems.superstructure.LED.LEDState;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
 import frc.robot.subsystems.superstructure.wrist.Wrist.WristState;
 import frc.robot.subsystems.superstructure.wrist.WristIntake;
@@ -16,6 +23,7 @@ import frc.robot.subsystems.templates.IntakeSubsystem.IntakeSubsystemState;
 import frc.robot.subsystems.templates.ServoSubsystem;
 import frc.robot.subsystems.templates.ServoSubsystem.ServoSubsystemState;
 import java.util.ArrayList;
+import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
 
 public class Superstructure extends SubsystemBase {
@@ -107,13 +115,37 @@ public class Superstructure extends SubsystemBase {
     //   order = swapOrder(order);
     // }
 
-    for (int i = 0; i < order.length; i++) {
-      if (order[i] == Wrist.getInstance())
-        outputCommand.addCommands(
-            new SetIntakeSubsystemState(
-                WristIntake.getInstance(), desiredState.getWristIntakeState()));
-      outputCommand.addCommands(new SetServoSubsystemState(order[i], desiredState, order));
+    ArrayList<ServoSubsystem> m_order = new ArrayList<>(Arrays.asList(order));
+
+    outputCommand.addCommands(
+        new InstantCommand(
+            () ->
+                RobotContainer.m_superStructureLED.setState(desiredState.superstructureLEDState)));
+
+    if (eject) {
+      outputCommand.addCommands(
+          new SetIntakeSubsystemState(WristIntake.getInstance(), WristIntakeState.OUTTAKE));
+      outputCommand.addCommands(new WaitCommand(.25));
     }
+
+    for (int i = 0; i < m_order.size(); i++) {
+      if (m_order.get(i) == Wrist.getInstance() || m_order.get(i) == Elevator.getInstance()) {
+        if (!eject) {
+          outputCommand.addCommands(
+              new SetIntakeSubsystemState(
+                  WristIntake.getInstance(), desiredState.wristIntakeState));
+        }
+        outputCommand.addCommands(
+            new SetServoSubsystemState(Elevator.getInstance(), desiredState)
+                .alongWith(new SetServoSubsystemState(Wrist.getInstance(), desiredState)));
+        m_order.remove(
+            m_order.get(i) == Wrist.getInstance() ? Elevator.getInstance() : Wrist.getInstance());
+      } else {
+        outputCommand.addCommands(new SetServoSubsystemState(m_order.get(i), desiredState));
+      }
+    }
+
+    outputCommand.addCommands(new InstantCommand(() -> setCurrentState(desiredState)));
 
     // m_scheduledSequentialCommandGroup = outputCommand;
     return outputCommand;
@@ -125,72 +157,71 @@ public class Superstructure extends SubsystemBase {
         WristState.TRANSITION,
         ElevatorState.TRANSITION,
         WristIntakeState.STANDBY,
+        LEDState.BLUE,
         "Transition"),
-    HOME(ArmState.HOME, WristState.HOME, ElevatorState.HOME, WristIntakeState.STANDBY, "Home"),
+    HOME(
+        ArmState.HOME,
+        WristState.HOME,
+        ElevatorState.HOME,
+        WristIntakeState.STANDBY,
+        LEDState.GREEN,
+        "Home"),
     GROUND_PICKUP(
         ArmState.HOME,
         WristState.GROUND_PICKUP,
         ElevatorState.HOME,
         WristIntakeState.INTAKE,
+        LEDState.RED,
         "Ground Pickup"),
     SUBSTATION_PICKUP(
         ArmState.SUBSTATION_PICKUP,
         WristState.SUBSTATION_PICKUP,
         ElevatorState.SUBSTATION_PICKUP,
         WristIntakeState.INTAKE,
+        LEDState.RED,
         "Substation Pickup"),
     SCORE_HIGH(
         ArmState.SCORE_HIGH,
         WristState.SCORE_HIGH,
         ElevatorState.SCORE_HIGH,
         WristIntakeState.OUTTAKE,
+        LEDState.BLUE,
         "Score High"),
     SCORE_MID(
         ArmState.SCORE_MID,
         WristState.SCORE_MID,
         ElevatorState.SCORE_MID,
         WristIntakeState.OUTTAKE,
+        LEDState.BLUE,
         "Score Mid"),
     SCORE_LOW(
         ArmState.SCORE_LOW,
         WristState.SCORE_LOW,
         ElevatorState.SCORE_LOW,
         WristIntakeState.OUTTAKE,
+        LEDState.BLUE,
         "Score Low");
 
-    ServoSubsystemState armState;
-    ServoSubsystemState elevatorState;
-    ServoSubsystemState wristState;
-    IntakeSubsystemState wristIntakeState;
-    String name;
+    public ServoSubsystemState armState;
+    public ServoSubsystemState elevatorState;
+    public ServoSubsystemState wristState;
+    public IntakeSubsystemState wristIntakeState;
+    public LEDState superstructureLEDState;
+    public String name;
 
     private SuperstructureState(
         ServoSubsystemState armState,
         ServoSubsystemState wristState,
         ServoSubsystemState elevatorState,
         IntakeSubsystemState wristIntakeState,
+        LEDState superstructureLEDState,
         String name) {
       this.armState = armState;
       this.wristState = wristState;
       this.elevatorState = elevatorState;
       this.wristIntakeState = wristIntakeState;
+      this.superstructureLEDState = superstructureLEDState;
       this.name = name;
-    }
-
-    public ServoSubsystemState getArmState() {
-      return armState;
-    }
-
-    public ServoSubsystemState getElevatorState() {
-      return elevatorState;
-    }
-
-    public ServoSubsystemState getWristState() {
-      return wristState;
-    }
-
-    public IntakeSubsystemState getWristIntakeState() {
-      return wristIntakeState;
     }
 
     public String getName() {
@@ -205,7 +236,62 @@ public class Superstructure extends SubsystemBase {
         m_commandQueue.get(0).schedule();
     }
 
-    Logger.recordOutput("Current State", m_currentState);
-    Logger.recordOutput("Desired State", m_desiredState);
+    Logger.recordOutput(
+        "Superstructure/Mech3d",
+        new Pose3d[] {
+          new Pose3d(
+              -.2347,
+              0,
+              .254,
+              new Rotation3d(
+                  Math.toRadians(-Arm.getInstance().getPosition() + 90), 0, Math.toRadians(90))),
+          new Pose3d(
+              -.2347
+                  + MathUtil.clamp(
+                          Elevator.getInstance().getPosition(),
+                          0,
+                          Elevator.getInstance().m_constants.kMaxPosition / 2)
+                      * Math.cos(Math.toRadians(Arm.getInstance().getPosition())),
+              0,
+              .254
+                  + .005
+                  + MathUtil.clamp(
+                          Elevator.getInstance().getPosition(),
+                          0,
+                          Elevator.getInstance().m_constants.kMaxPosition / 2)
+                      * Math.sin(Math.toRadians(Arm.getInstance().getPosition())),
+              new Rotation3d(
+                  Math.toRadians(-Arm.getInstance().getPosition() + 90), 0, Math.toRadians(90))),
+          new Pose3d(
+              -.2347
+                  + Elevator.getInstance().getPosition()
+                      * Math.cos(Math.toRadians(Arm.getInstance().getPosition())),
+              0,
+              .254
+                  + .005
+                  + Elevator.getInstance().getPosition()
+                      * Math.sin(Math.toRadians(Arm.getInstance().getPosition())),
+              new Rotation3d(
+                  Math.toRadians(-Arm.getInstance().getPosition() + 90), 0, Math.toRadians(90))),
+          new Pose3d(
+              -0.2574
+                  + (Elevator.getInstance().getPosition() + .54)
+                      * Math.cos(Math.toRadians(Arm.getInstance().getPosition())),
+              0,
+              0.2715
+                  + (Elevator.getInstance().getPosition() + .54)
+                      * Math.sin(Math.toRadians(Arm.getInstance().getPosition())),
+              new Rotation3d(
+                  Math.toRadians(
+                      -Arm.getInstance().getPosition()
+                          - Wrist.getInstance().getPosition()
+                          + 90
+                          + 155),
+                  0,
+                  Math.toRadians(90)))
+        });
+
+    Logger.recordOutput("Superstructure/Current State", m_currentState);
+    Logger.recordOutput("Superstructure/Desired State", m_desiredState);
   }
 }

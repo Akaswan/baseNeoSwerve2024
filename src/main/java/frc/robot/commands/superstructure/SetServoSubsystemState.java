@@ -19,14 +19,10 @@ public class SetServoSubsystemState extends Command {
   private ServoSubsystemState m_state;
   private SuperstructureState m_superStructureState;
 
-  private ServoSubsystem[] m_order;
-
-  public SetServoSubsystemState(
-      ServoSubsystem subsystem, SuperstructureState superStructureState, ServoSubsystem[] order) {
+  public SetServoSubsystemState(ServoSubsystem subsystem, SuperstructureState superStructureState) {
     m_subsystem = subsystem;
     m_superStructureState = superStructureState;
     m_state = null;
-    m_order = order;
 
     addRequirements(m_subsystem);
     setName(m_subsystem.getSubsystemType().name());
@@ -38,13 +34,13 @@ public class SetServoSubsystemState extends Command {
     if (m_state == null) {
       switch (m_subsystem.getSubsystemType()) {
         case ARM:
-          m_state = m_superStructureState.getArmState();
+          m_state = m_superStructureState.armState;
           break;
         case ELEVATOR:
-          m_state = m_superStructureState.getElevatorState();
+          m_state = m_superStructureState.elevatorState;
           break;
         case WRIST:
-          m_state = m_superStructureState.getWristState();
+          m_state = m_superStructureState.wristState;
           break;
       }
     }
@@ -65,11 +61,7 @@ public class SetServoSubsystemState extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    if (m_order[m_order.length - 1] == m_subsystem) {
-      m_manager.setCurrentState(m_superStructureState);
-    }
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

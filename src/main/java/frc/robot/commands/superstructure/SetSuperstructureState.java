@@ -23,9 +23,9 @@ public class SetSuperstructureState extends Command {
   private Superstructure m_manager = Superstructure.getInstance();
   private boolean m_eject;
 
-  public SetSuperstructureState(SuperstructureState desiredState) {
+  public SetSuperstructureState(SuperstructureState desiredState, boolean eject) {
     m_desiredState = desiredState;
-    // m_eject = eject;
+    m_eject = eject;
     addRequirements(m_manager);
   }
 
@@ -83,11 +83,11 @@ public class SetSuperstructureState extends Command {
 
     if (m_currentState == SuperstructureState.SCORE_HIGH
         || m_currentState == SuperstructureState.SCORE_MID
-        || m_currentState == SuperstructureState.SUBSTATION_PICKUP) {
+        || m_currentState == SuperstructureState.SUBSTATION_PICKUP
+        || m_currentState == SuperstructureState.SCORE_LOW) {
       order = new ServoSubsystem[] {m_wrist, m_elevator, m_arm};
     } else if (m_currentState == SuperstructureState.HOME
-        || m_currentState == SuperstructureState.GROUND_PICKUP
-        || m_currentState == SuperstructureState.SCORE_LOW) {
+        || m_currentState == SuperstructureState.GROUND_PICKUP) {
       order = new ServoSubsystem[] {m_arm, m_elevator, m_wrist};
     } else {
       order = new ServoSubsystem[] {m_arm, m_elevator, m_wrist};

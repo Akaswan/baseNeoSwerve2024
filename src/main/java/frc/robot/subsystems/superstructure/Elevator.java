@@ -1,13 +1,9 @@
 package frc.robot.subsystems.superstructure;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.subsystems.templates.ServoSubsystem;
 import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
-import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends ServoSubsystem {
 
@@ -31,34 +27,7 @@ public class Elevator extends ServoSubsystem {
   }
 
   @Override
-  public void outputTelemetry() {
-    Logger.recordOutput(
-        "Elevator/2nd Stage Mech3d",
-        new Pose3d(
-            -.2347
-                + MathUtil.clamp(m_currentState.getPosition(), 0, m_constants.kMaxPosition / 2)
-                    * Math.cos(Math.toRadians(Arm.getInstance().getPosition())),
-            0,
-            .254
-                + .005
-                + MathUtil.clamp(m_currentState.getPosition(), 0, m_constants.kMaxPosition / 2)
-                    * Math.sin(Math.toRadians(Arm.getInstance().getPosition())),
-            new Rotation3d(
-                Math.toRadians(-Arm.getInstance().getPosition() + 90), 0, Math.toRadians(90))));
-    Logger.recordOutput(
-        "Elevator/3rd Stage Mech3d",
-        new Pose3d(
-            -.2347
-                + m_currentState.getPosition()
-                    * Math.cos(Math.toRadians(Arm.getInstance().getPosition())),
-            0,
-            .254
-                + .005
-                + m_currentState.getPosition()
-                    * Math.sin(Math.toRadians(Arm.getInstance().getPosition())),
-            new Rotation3d(
-                Math.toRadians(-Arm.getInstance().getPosition() + 90), 0, Math.toRadians(90))));
-  }
+  public void outputTelemetry() {}
 
   @Override
   public void subsystemPeriodic() {
