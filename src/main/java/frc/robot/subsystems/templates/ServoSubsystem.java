@@ -82,7 +82,6 @@ public abstract class ServoSubsystem extends SubsystemBase {
   }
 
   public void runToSetpoint() {
-
     m_setpoint =
         m_profile.calculate(
             Timer.getFPGATimestamp() - m_profileStartTime,

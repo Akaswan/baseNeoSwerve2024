@@ -18,6 +18,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.drivebase.TeleopSwerve;
 import frc.robot.commands.superstructure.ManualServoSubsystem;
+import frc.robot.commands.superstructure.QueueSuperstructureCommand;
 import frc.robot.commands.superstructure.SetSuperstructureState;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.superstructure.Arm;
@@ -167,18 +168,31 @@ public class RobotContainer {
     //     .onTrue(new InstantCommand(() -> m_drivebase.setAngleToSnap(AngleToSnap.FORWARD)));
     // m_driverController.x().onTrue(new InstantCommand(m_drivebase::toggleXWheels));
 
-    m_operatorController.a().onTrue(new SetSuperstructureState(SuperstructureState.HOME));
+    m_operatorController.a().onTrue(new QueueSuperstructureCommand(SuperstructureState.HOME));
     m_operatorController
         .x()
-        .onTrue(new SetSuperstructureState(SuperstructureState.SUBSTATION_PICKUP));
-    m_operatorController.b().onTrue(new SetSuperstructureState(SuperstructureState.GROUND_PICKUP));
-    m_operatorController.povUp().onTrue(new SetSuperstructureState(SuperstructureState.SCORE_HIGH));
+        .onTrue(new QueueSuperstructureCommand(SuperstructureState.SUBSTATION_PICKUP));
+    m_operatorController.x().onFalse(new QueueSuperstructureCommand(SuperstructureState.HOME));
+    m_operatorController
+        .b()
+        .onTrue(new QueueSuperstructureCommand(SuperstructureState.GROUND_PICKUP));
+    m_operatorController.b().onFalse(new QueueSuperstructureCommand(SuperstructureState.HOME));
+    m_operatorController
+        .povUp()
+        .onTrue(new QueueSuperstructureCommand(SuperstructureState.SCORE_HIGH));
+    m_operatorController.povUp().onFalse(new QueueSuperstructureCommand(SuperstructureState.HOME));
     m_operatorController
         .povRight()
-        .onTrue(new SetSuperstructureState(SuperstructureState.SCORE_MID));
+        .onTrue(new QueueSuperstructureCommand(SuperstructureState.SCORE_MID));
+    m_operatorController
+        .povRight()
+        .onFalse(new QueueSuperstructureCommand(SuperstructureState.HOME));
     m_operatorController
         .povDown()
-        .onTrue(new SetSuperstructureState(SuperstructureState.SCORE_LOW));
+        .onTrue(new QueueSuperstructureCommand(SuperstructureState.SCORE_LOW));
+    m_operatorController
+        .povDown()
+        .onFalse(new QueueSuperstructureCommand(SuperstructureState.HOME));
   }
 
   public Command getAutonomousCommand() {

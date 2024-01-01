@@ -21,9 +21,11 @@ public class SetSuperstructureState extends Command {
   private Elevator m_elevator = Elevator.getInstance();
   private Wrist m_wrist = Wrist.getInstance();
   private Superstructure m_manager = Superstructure.getInstance();
+  private boolean m_eject;
 
   public SetSuperstructureState(SuperstructureState desiredState) {
     m_desiredState = desiredState;
+    // m_eject = eject;
     addRequirements(m_manager);
   }
 
@@ -91,7 +93,7 @@ public class SetSuperstructureState extends Command {
       order = new ServoSubsystem[] {m_arm, m_elevator, m_wrist};
     }
 
-    m_manager.setSuperstructureState(order, m_desiredState).schedule();
+    m_manager.setSuperstructureState(order, m_desiredState, m_eject).schedule();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -100,7 +102,9 @@ public class SetSuperstructureState extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_manager.commandFinished();
+  }
 
   // Returns true when the command should end.
   @Override

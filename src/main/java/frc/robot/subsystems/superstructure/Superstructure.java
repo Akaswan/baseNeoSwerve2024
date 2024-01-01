@@ -16,19 +16,29 @@ import frc.robot.subsystems.templates.IntakeSubsystem.IntakeSubsystemState;
 import frc.robot.subsystems.templates.ServoSubsystem;
 import frc.robot.subsystems.templates.ServoSubsystem.ServoSubsystemState;
 import java.util.ArrayList;
-import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
 
 public class Superstructure extends SubsystemBase {
 
-  private SuperstructureState m_lastHeldState;
   private SuperstructureState m_currentState;
   private SuperstructureState m_desiredState;
 
-  private Command m_scheduledCommand;
   private SequentialCommandGroup m_scheduledSequentialCommandGroup = new SequentialCommandGroup();
 
+  private Command m_scheduledCommand;
+  /*
+   * First item = command scheduled right now
+   * Subsequent items = commands in queue
+   * No items = no command in queue
+   */
+  private ArrayList<Command> m_commandQueue = new ArrayList<>();
+
   private static Superstructure m_instance = null;
+
+  public Superstructure(SuperstructureState initialState) {
+    m_currentState = initialState;
+    m_desiredState = initialState;
+  }
 
   public static synchronized Superstructure getInstance() {
     if (m_instance == null) {
@@ -38,14 +48,7 @@ public class Superstructure extends SubsystemBase {
     return m_instance;
   }
 
-  public Superstructure(SuperstructureState initialState) {
-    m_currentState = initialState;
-    m_desiredState = initialState;
-    m_lastHeldState = initialState;
-  }
-
   public void setDesiredState(SuperstructureState desiredState) {
-    m_lastHeldState = m_desiredState;
     m_desiredState = desiredState;
   }
 
@@ -61,41 +64,47 @@ public class Superstructure extends SubsystemBase {
     return m_currentState;
   }
 
-  public SuperstructureState getLastHeldState() {
-    return m_lastHeldState;
-  }
-
   public void setScheduledCommand(Command command) {
     m_scheduledCommand = command;
+  }
+
+  public void queueCommand(Command command) {
+    m_commandQueue.add(command);
+  }
+
+  public void commandFinished() {
+    if (!m_commandQueue.isEmpty()) {
+      m_commandQueue.remove(0);
+    }
   }
 
   public Command getScheduledCommand() {
     return m_scheduledCommand != null ? m_scheduledCommand : new Command() {};
   }
 
-  public ServoSubsystem[] swapOrder(ServoSubsystem[] originalOrder) {
-    ArrayList<ServoSubsystem> newOrder = new ArrayList<>(Arrays.asList(originalOrder));
-    int interruptedIndex = 0;
-    for (int i = 0; i < originalOrder.length; i++) {
-      if (originalOrder[i].getName().toUpperCase().equals(getScheduledCommand().getName())) {
-        interruptedIndex = i;
-        break;
-      }
-    }
-    ServoSubsystem removedItem = newOrder.remove(interruptedIndex);
-    newOrder.add(0, removedItem);
-    return newOrder.toArray(originalOrder);
-  }
+  // public ServoSubsystem[] swapOrder(ServoSubsystem[] originalOrder) {
+  //   ArrayList<ServoSubsystem> newOrder = new ArrayList<>(Arrays.asList(originalOrder));
+  //   int interruptedIndex = 0;
+  //   for (int i = 0; i < originalOrder.length; i++) {
+  //     if (originalOrder[i].getName().toUpperCase().equals(getScheduledCommand().getName())) {
+  //       interruptedIndex = i;
+  //       break;
+  //     }
+  //   }
+  //   ServoSubsystem removedItem = newOrder.remove(interruptedIndex);
+  //   newOrder.add(0, removedItem);
+  //   return newOrder.toArray(originalOrder);
+  // }
 
   public SequentialCommandGroup setSuperstructureState(
-      ServoSubsystem[] order, SuperstructureState desiredState) {
+      ServoSubsystem[] order, SuperstructureState desiredState, boolean eject) {
     SequentialCommandGroup outputCommand = new SequentialCommandGroup();
     // setDesiredState(desiredState);
     // setCurrentState(SuperstructureState.TRANSITION);
 
-    if (CommandScheduler.getInstance().isScheduled(m_scheduledSequentialCommandGroup)) {
-      order = swapOrder(order);
-    }
+    // if (CommandScheduler.getInstance().isScheduled(m_scheduledSequentialCommandGroup)) {
+    //   order = swapOrder(order);
+    // }
 
     for (int i = 0; i < order.length; i++) {
       if (order[i] == Wrist.getInstance())
@@ -190,6 +199,13 @@ public class Superstructure extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (!m_commandQueue.isEmpty()) {
+      if (!CommandScheduler.getInstance().isScheduled(m_commandQueue.get(0)))
+        m_commandQueue.get(0).schedule();
+    }
+
+    System.out.println(m_commandQueue.toString());
+
     Logger.recordOutput("Current State", m_currentState);
     Logger.recordOutput("Desired State", m_desiredState);
   }

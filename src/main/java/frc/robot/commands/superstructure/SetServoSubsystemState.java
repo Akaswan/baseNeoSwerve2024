@@ -51,7 +51,7 @@ public class SetServoSubsystemState extends Command {
 
     m_subsystem.setState(m_state);
 
-    m_manager.setScheduledCommand(this);
+    // m_manager.setScheduledCommand(this);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -61,25 +61,12 @@ public class SetServoSubsystemState extends Command {
       m_manager.setDesiredState(m_superStructureState);
     if (m_manager.getCurrentState() != SuperstructureState.TRANSITION)
       m_manager.setCurrentState(SuperstructureState.TRANSITION);
-
-    // if (SuperstructureState.TRANSITION.getArmState() != RobotContainer.m_arm.getCurrentState()) {
-    //   SuperstructureState.TRANSITION.setArmState(RobotContainer.m_arm.getCurrentState());
-    // }
-    // if (SuperstructureState.TRANSITION.getWristState()
-    //     != RobotContainer.m_wrist.getCurrentState()) {
-    //   SuperstructureState.TRANSITION.setWristState(RobotContainer.m_wrist.getCurrentState());
-    // }
-    // if (SuperstructureState.TRANSITION.getElevatorState()
-    //     != RobotContainer.m_elevator.getCurrentState()) {
-    //
-    // SuperstructureState.TRANSITION.setElevatorState(RobotContainer.m_elevator.getCurrentState());
-    // }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    if (m_order[2] == m_subsystem) {
+    if (m_order[m_order.length - 1] == m_subsystem) {
       m_manager.setCurrentState(m_superStructureState);
     }
   }
