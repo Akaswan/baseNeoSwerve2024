@@ -13,7 +13,7 @@ public class WristIntake extends IntakeSubsystem {
     super(constants);
   }
 
-  public static synchronized WristIntake getInstance() {
+  public static WristIntake getInstance() {
     if (m_instance == null) {
       m_instance = new WristIntake(WristConstants.kWristIntakeConstants);
     }

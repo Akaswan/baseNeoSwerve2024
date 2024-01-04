@@ -20,8 +20,8 @@ import frc.robot.subsystems.superstructure.wrist.Wrist.WristState;
 import frc.robot.subsystems.superstructure.wrist.WristIntake;
 import frc.robot.subsystems.superstructure.wrist.WristIntake.WristIntakeState;
 import frc.robot.subsystems.templates.IntakeSubsystem.IntakeSubsystemState;
-import frc.robot.subsystems.templates.ServoSubsystem;
-import frc.robot.subsystems.templates.ServoSubsystem.ServoSubsystemState;
+import frc.robot.subsystems.templates.ServoSubsystemSparkMax;
+import frc.robot.subsystems.templates.ServoSubsystemSparkMax.ServoSubsystemState;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
@@ -54,7 +54,7 @@ public class Superstructure extends SubsystemBase {
     m_desiredState = initialState;
   }
 
-  public static synchronized Superstructure getInstance() {
+  public static Superstructure getInstance() {
     if (m_instance == null) {
       m_instance = new Superstructure(SuperstructureState.HOME);
     }
@@ -111,7 +111,7 @@ public class Superstructure extends SubsystemBase {
   // }
 
   public SequentialCommandGroup setSuperstructureState(
-      ServoSubsystem[] order, SuperstructureState desiredState, boolean eject) {
+      ServoSubsystemSparkMax[] order, SuperstructureState desiredState, boolean eject) {
     SequentialCommandGroup outputCommand = new SequentialCommandGroup();
     // setDesiredState(desiredState);
     // setCurrentState(SuperstructureState.TRANSITION);
@@ -120,7 +120,7 @@ public class Superstructure extends SubsystemBase {
     //   order = swapOrder(order);
     // }
 
-    ArrayList<ServoSubsystem> m_order = new ArrayList<>(Arrays.asList(order));
+    ArrayList<ServoSubsystemSparkMax> m_order = new ArrayList<>(Arrays.asList(order));
 
     outputCommand.addCommands(
         new InstantCommand(

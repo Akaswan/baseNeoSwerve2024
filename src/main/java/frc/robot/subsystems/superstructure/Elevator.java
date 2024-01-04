@@ -2,23 +2,23 @@ package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.subsystems.templates.ServoSubsystem;
-import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
+import frc.robot.subsystems.templates.ServoSubsystemSparkMax;
+import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemSparkMaxConstants;
 
-public class Elevator extends ServoSubsystem {
+public class Elevator extends ServoSubsystemSparkMax {
 
   private ElevatorFeedforward m_feedforward;
 
   private static Elevator m_instance = null;
 
-  public Elevator(ServoSubsystemConstants constants) {
+  public Elevator(ServoSubsystemSparkMaxConstants constants) {
     super(constants);
 
     m_feedforward =
         new ElevatorFeedforward(constants.kKs, constants.kKg, constants.kKv, constants.kKa);
   }
 
-  public static synchronized Elevator getInstance() {
+  public static Elevator getInstance() {
     if (m_instance == null) {
       m_instance = new Elevator(ElevatorConstants.kElevatorConstants);
     }

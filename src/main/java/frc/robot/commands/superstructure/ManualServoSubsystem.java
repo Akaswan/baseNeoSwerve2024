@@ -6,14 +6,14 @@ package frc.robot.commands.superstructure;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.templates.ServoSubsystem;
-import frc.robot.subsystems.templates.ServoSubsystem.ServoSubsystemType;
+import frc.robot.subsystems.templates.ServoSubsystemSparkMax;
+import frc.robot.subsystems.templates.ServoSubsystemSparkMax.ServoSubsystemType;
 
 public class ManualServoSubsystem extends Command {
 
-  private ServoSubsystem m_subsystem;
+  private ServoSubsystemSparkMax m_subsystem;
 
-  public ManualServoSubsystem(ServoSubsystem subsystem) {
+  public ManualServoSubsystem(ServoSubsystemSparkMax subsystem) {
     m_subsystem = subsystem;
 
     addRequirements(m_subsystem);

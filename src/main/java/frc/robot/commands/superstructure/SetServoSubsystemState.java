@@ -7,19 +7,20 @@ package frc.robot.commands.superstructure;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.Superstructure.SuperstructureState;
-import frc.robot.subsystems.templates.ServoSubsystem;
-import frc.robot.subsystems.templates.ServoSubsystem.ServoSubsystemState;
+import frc.robot.subsystems.templates.ServoSubsystemSparkMax;
+import frc.robot.subsystems.templates.ServoSubsystemSparkMax.ServoSubsystemState;
 
 public class SetServoSubsystemState extends Command {
   /** Creates a new SetMechState. */
-  private ServoSubsystem m_subsystem;
+  private ServoSubsystemSparkMax m_subsystem;
 
   private Superstructure m_superstructure = Superstructure.getInstance();
 
   private ServoSubsystemState m_state;
   private SuperstructureState m_superStructureState;
 
-  public SetServoSubsystemState(ServoSubsystem subsystem, SuperstructureState superStructureState) {
+  public SetServoSubsystemState(
+      ServoSubsystemSparkMax subsystem, SuperstructureState superStructureState) {
     m_subsystem = subsystem;
     m_superStructureState = superStructureState;
     m_state = null;

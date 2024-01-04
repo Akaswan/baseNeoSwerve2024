@@ -10,13 +10,13 @@ import frc.robot.subsystems.superstructure.Elevator;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.Superstructure.SuperstructureState;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
-import frc.robot.subsystems.templates.ServoSubsystem;
+import frc.robot.subsystems.templates.ServoSubsystemSparkMax;
 
 public class SetSuperstructureState extends Command {
   /** Creates a new SetSuperstructureState. */
   private SuperstructureState m_desiredState;
 
-  private ServoSubsystem[] order;
+  private ServoSubsystemSparkMax[] order;
   private Arm m_arm = Arm.getInstance();
   private Elevator m_elevator = Elevator.getInstance();
   private Wrist m_wrist = Wrist.getInstance();
@@ -94,9 +94,9 @@ public class SetSuperstructureState extends Command {
     // }
 
     if (m_currentState.elevatorState.getPosition() > 0) {
-      order = new ServoSubsystem[] {m_wrist, m_elevator, m_arm};
+      order = new ServoSubsystemSparkMax[] {m_wrist, m_elevator, m_arm};
     } else {
-      order = new ServoSubsystem[] {m_arm, m_elevator, m_wrist};
+      order = new ServoSubsystemSparkMax[] {m_arm, m_elevator, m_wrist};
     }
 
     m_superstructure.setSuperstructureState(order, m_desiredState, m_eject).schedule();

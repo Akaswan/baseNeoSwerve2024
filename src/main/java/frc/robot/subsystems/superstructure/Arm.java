@@ -8,10 +8,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.subsystems.templates.ServoSubsystem;
-import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
+import frc.robot.subsystems.templates.ServoSubsystemSparkMax;
+import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemSparkMaxConstants;
 
-public class Arm extends ServoSubsystem {
+public class Arm extends ServoSubsystemSparkMax {
 
   private static Arm m_instance = null;
 
@@ -22,7 +22,7 @@ public class Arm extends ServoSubsystem {
   public static MechanismLigament2d armLig;
   public static MechanismLigament2d wristLig;
 
-  public static synchronized Arm getInstance() {
+  public static Arm getInstance() {
     if (m_instance == null) {
       m_instance = new Arm(ArmConstants.kArmConstants);
     }
@@ -30,7 +30,7 @@ public class Arm extends ServoSubsystem {
     return m_instance;
   }
 
-  public Arm(ServoSubsystemConstants constants) {
+  public Arm(ServoSubsystemSparkMaxConstants constants) {
     super(constants);
 
     m_feedforward = new ArmFeedforward(constants.kKs, constants.kKg, constants.kKv, constants.kKa);

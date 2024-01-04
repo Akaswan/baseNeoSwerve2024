@@ -4,8 +4,7 @@
 
 package frc.robot.subsystems.swerve;
 
-import com.ctre.phoenix.ErrorCode;
-import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -234,7 +233,7 @@ public class SwerveDrive extends SubsystemBase {
         );
   }
 
-  public static synchronized SwerveDrive getInstance() {
+  public static SwerveDrive getInstance() {
     if (m_instance == null) {
       m_instance =
           new SwerveDrive(
@@ -371,12 +370,12 @@ public class SwerveDrive extends SubsystemBase {
 
   public Rotation2d getYaw() {
     return (invertGyro)
-        ? Rotation2d.fromDegrees(360 - m_pigeon.getYaw())
-        : Rotation2d.fromDegrees(m_pigeon.getYaw());
+        ? Rotation2d.fromDegrees(360 - m_pigeon.getYaw().getValue())
+        : Rotation2d.fromDegrees(m_pigeon.getYaw().getValue());
   }
 
   public double getYawDegrees() {
-    return Math.IEEEremainder(m_pigeon.getYaw(), 360);
+    return Math.IEEEremainder(m_pigeon.getYaw().getValue(), 360);
   }
 
   public void setAngleToSnap(AngleToSnap rotation) {
@@ -411,7 +410,8 @@ public class SwerveDrive extends SubsystemBase {
   public void periodic() {
     poseEstimator.update(getYaw(), getModulePositions());
 
-    Logger.recordOutput("Drivebase/Gyro Connected", m_pigeon.getLastError().equals(ErrorCode.OK));
+    Logger.recordOutput(
+        "Drivebase/Gyro Connected", !m_pigeon.getFault_BootupGyroscope().getValue());
     Logger.recordOutput("Drivebase/Gyro", getYaw());
     Logger.recordOutput("Drivebase/SwerveStates", getModuleStates());
     Logger.recordOutput("Drivebase/Pose", getPose());
@@ -447,10 +447,12 @@ public class SwerveDrive extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    m_pigeon.addYaw(
-        Units.radiansToDegrees(
-            DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
-                * 0.02));
+    m_pigeon.setYaw(
+        m_pigeon.getYaw().getValue()
+            + Units.radiansToDegrees(
+                DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates())
+                        .omegaRadiansPerSecond
+                    * 0.02));
   }
 
   public void tuningPeriodic() {

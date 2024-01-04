@@ -19,10 +19,10 @@ import frc.robot.subsystems.superstructure.Elevator.ElevatorState;
 import frc.robot.subsystems.superstructure.wrist.Wrist.WristState;
 import frc.robot.subsystems.superstructure.wrist.WristIntake.WristIntakeState;
 import frc.robot.subsystems.templates.IntakeSubsystem.IntakeSubsystemType;
-import frc.robot.subsystems.templates.ServoSubsystem.ServoSubsystemType;
-import frc.robot.subsystems.templates.SubsystemConstants.CANSparkMaxConstants;
+import frc.robot.subsystems.templates.ServoSubsystemSparkMax.ServoSubsystemType;
 import frc.robot.subsystems.templates.SubsystemConstants.IntakeSubsystemConstants;
-import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
+import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemSparkMaxConstants;
+import frc.robot.subsystems.templates.SubsystemConstants.SparkMaxConstants;
 import frc.robot.utilities.SwerveModuleConstants;
 
 /**
@@ -168,7 +168,7 @@ public final class Constants {
 
   public static final class ArmConstants {
 
-    public static final CANSparkMaxConstants kArmMasterConstants = new CANSparkMaxConstants();
+    public static final SparkMaxConstants kArmMasterConstants = new SparkMaxConstants();
 
     static {
       kArmMasterConstants.kID = 5;
@@ -178,10 +178,10 @@ public final class Constants {
       kArmMasterConstants.kInverted = false;
     }
 
-    public static final CANSparkMaxConstants[] kArmSlaveConstants = new CANSparkMaxConstants[1];
+    public static final SparkMaxConstants[] kArmSlaveConstants = new SparkMaxConstants[1];
 
     static {
-      kArmSlaveConstants[0] = new CANSparkMaxConstants();
+      kArmSlaveConstants[0] = new SparkMaxConstants();
       kArmSlaveConstants[0].kID = 20;
       kArmSlaveConstants[0].kIdleMode = IdleMode.kBrake;
       kArmSlaveConstants[0].kMotorType = MotorType.kBrushless;
@@ -189,7 +189,8 @@ public final class Constants {
       kArmSlaveConstants[0].kInverted = false;
     }
 
-    public static final ServoSubsystemConstants kArmConstants = new ServoSubsystemConstants();
+    public static final ServoSubsystemSparkMaxConstants kArmConstants =
+        new ServoSubsystemSparkMaxConstants();
 
     static {
       kArmConstants.kName = "Arm";
@@ -233,7 +234,7 @@ public final class Constants {
 
   public static final class ElevatorConstants {
 
-    public static final CANSparkMaxConstants kElevatorMasterConstants = new CANSparkMaxConstants();
+    public static final SparkMaxConstants kElevatorMasterConstants = new SparkMaxConstants();
 
     static {
       kElevatorMasterConstants.kID = 6;
@@ -243,11 +244,10 @@ public final class Constants {
       kElevatorMasterConstants.kInverted = false;
     }
 
-    public static final CANSparkMaxConstants[] kElevatorSlaveConstants =
-        new CANSparkMaxConstants[1];
+    public static final SparkMaxConstants[] kElevatorSlaveConstants = new SparkMaxConstants[1];
 
     static {
-      kElevatorSlaveConstants[0] = new CANSparkMaxConstants();
+      kElevatorSlaveConstants[0] = new SparkMaxConstants();
       kElevatorSlaveConstants[0].kID = 40;
       kElevatorSlaveConstants[0].kIdleMode = IdleMode.kBrake;
       kElevatorSlaveConstants[0].kMotorType = MotorType.kBrushless;
@@ -255,7 +255,8 @@ public final class Constants {
       kElevatorSlaveConstants[0].kInverted = false;
     }
 
-    public static final ServoSubsystemConstants kElevatorConstants = new ServoSubsystemConstants();
+    public static final ServoSubsystemSparkMaxConstants kElevatorConstants =
+        new ServoSubsystemSparkMaxConstants();
 
     static {
       kElevatorConstants.kName = "Elevator";
@@ -299,7 +300,7 @@ public final class Constants {
 
   public static final class WristConstants {
 
-    public static final CANSparkMaxConstants kWristMasterConstants = new CANSparkMaxConstants();
+    public static final SparkMaxConstants kWristMasterConstants = new SparkMaxConstants();
 
     static {
       kWristMasterConstants.kID = 7;
@@ -309,9 +310,10 @@ public final class Constants {
       kWristMasterConstants.kInverted = false;
     }
 
-    public static final CANSparkMaxConstants[] kWristSlaveConstants = new CANSparkMaxConstants[0];
+    public static final SparkMaxConstants[] kWristSlaveConstants = new SparkMaxConstants[0];
 
-    public static final ServoSubsystemConstants kWristConstants = new ServoSubsystemConstants();
+    public static final ServoSubsystemSparkMaxConstants kWristConstants =
+        new ServoSubsystemSparkMaxConstants();
 
     static {
       kWristConstants.kName = "Wrist";
@@ -352,8 +354,7 @@ public final class Constants {
       kWristConstants.kTransitionState = WristState.TRANSITION;
     }
 
-    public static final CANSparkMaxConstants kWristIntakeMasterConstants =
-        new CANSparkMaxConstants();
+    public static final SparkMaxConstants kWristIntakeMasterConstants = new SparkMaxConstants();
 
     static {
       kWristMasterConstants.kID = 45;
@@ -363,8 +364,7 @@ public final class Constants {
       kWristMasterConstants.kInverted = false;
     }
 
-    public static final CANSparkMaxConstants[] kWristIntakeSlaveConstants =
-        new CANSparkMaxConstants[0];
+    public static final SparkMaxConstants[] kWristIntakeSlaveConstants = new SparkMaxConstants[0];
 
     public static final IntakeSubsystemConstants kWristIntakeConstants =
         new IntakeSubsystemConstants();
@@ -380,6 +380,78 @@ public final class Constants {
       kWristIntakeConstants.kInitialState = WristIntakeState.IDLE;
     }
   }
+
+  // public static final class TalonFXElevatorConstants {
+
+  //   public static final TalonFXConstants kTalonFXElevatorMasterConstants = new
+  // TalonFXConstants();
+
+  //   static {
+  //     kTalonFXElevatorMasterConstants.kID = 69;
+  //     kTalonFXElevatorMasterConstants.kMaxVelocity = 50.0;
+  //     kTalonFXElevatorMasterConstants.kMaxAcceleration = 45.0;
+  //     kTalonFXElevatorMasterConstants.kMaxJerk = 5.0;
+  //     kTalonFXElevatorMasterConstants.kKp = 0.5;
+  //     kTalonFXElevatorMasterConstants.kKi = 0.2;
+  //     kTalonFXElevatorMasterConstants.kKd = 0.3;
+  //     kTalonFXElevatorMasterConstants.kKs = 0.2;
+  //     kTalonFXElevatorMasterConstants.kKg = 0.1;
+  //     kTalonFXElevatorMasterConstants.kKv = 0.1;
+  //     kTalonFXElevatorMasterConstants.kKa = 0.2;
+  //     kTalonFXElevatorMasterConstants.kGravityType = GravityTypeValue.Elevator_Static;
+  //     kTalonFXElevatorMasterConstants.kNuetralMode = NeutralModeValue.Brake;
+  //   }
+
+  //   public static final TalonFXConstants[] kTalonFXElevatorSlaveConstants = new
+  // TalonFXConstants[1];
+
+  //   static {
+  //     kTalonFXElevatorSlaveConstants[0] = new TalonFXConstants();
+  //     kTalonFXElevatorSlaveConstants[0].kID = 68;
+  //     kTalonFXElevatorSlaveConstants[0].kMaxVelocity = 50.0;
+  //     kTalonFXElevatorSlaveConstants[0].kMaxAcceleration = 45.0;
+  //     kTalonFXElevatorSlaveConstants[0].kMaxJerk = 5.0;
+  //     kTalonFXElevatorSlaveConstants[0].kKp = 0.5;
+  //     kTalonFXElevatorSlaveConstants[0].kKi = 0.2;
+  //     kTalonFXElevatorSlaveConstants[0].kKd = 0.3;
+  //     kTalonFXElevatorSlaveConstants[0].kKs = 0.2;
+  //     kTalonFXElevatorSlaveConstants[0].kKg = 0.1;
+  //     kTalonFXElevatorSlaveConstants[0].kKv = 0.1;
+  //     kTalonFXElevatorSlaveConstants[0].kKa = 0.2;
+  //     kTalonFXElevatorSlaveConstants[0].kGravityType = GravityTypeValue.Elevator_Static;
+  //     kTalonFXElevatorSlaveConstants[0].kNuetralMode = NeutralModeValue.Brake;
+  //   }
+
+  //   public static final ServoSubsystemTalonFXConstants kTalonFXElevatorConstants =
+  //       new ServoSubsystemTalonFXConstants();
+
+  //   static {
+  //     kTalonFXElevatorConstants.kName = "TalonFXElevator";
+
+  //     kTalonFXElevatorConstants.kSubsystemType = ServoSubsystemType.ELEVATOR;
+
+  //     kTalonFXElevatorConstants.kMasterConstants = kTalonFXElevatorMasterConstants;
+  //     kTalonFXElevatorConstants.kSlaveConstants = kTalonFXElevatorSlaveConstants;
+
+  //     kTalonFXElevatorConstants.kHomePosition = 0.0;
+  //     kTalonFXElevatorConstants.kPositionConversionFactor = 10;
+
+  //     kTalonFXElevatorConstants.kSetpointTolerance = 0.1;
+
+  //     kTalonFXElevatorConstants.kDefaultSlot = 0;
+
+  //     kTalonFXElevatorConstants.kMaxPosition = 1;
+  //     kTalonFXElevatorConstants.kMinPosition = 0.0;
+
+  //     kTalonFXElevatorConstants.kManualAxis = XboxController.Axis.kLeftY.value;
+  //     kTalonFXElevatorConstants.kManualMultiplier = .05;
+  //     kTalonFXElevatorConstants.kManualDeadBand = .1;
+
+  //     kTalonFXElevatorConstants.kInitialState = TalonFXElevatorState.HOME;
+  //     kTalonFXElevatorConstants.kManualState = TalonFXElevatorState.MANUAL;
+  //     kTalonFXElevatorConstants.kTransitionState = TalonFXElevatorState.TRANSITION;
+  //   }
+  // }
 
   public static enum Mode {
     /** Running on a real robot. */

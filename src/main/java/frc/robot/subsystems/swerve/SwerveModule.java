@@ -4,7 +4,8 @@
 
 package frc.robot.subsystems.swerve;
 
-import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
+import frc.robot.utilities.CtreUtils;
 import frc.robot.utilities.LoggedShuffleboardTunableNumber;
 import frc.robot.utilities.RevUtils;
 import frc.robot.utilities.SwerveModuleConstants;
@@ -30,7 +32,7 @@ public class SwerveModule extends SubsystemBase {
 
   private CANSparkMax m_driveMotor;
   private CANSparkMax m_turningMotor;
-  private CANCoder m_angleEncoder;
+  private CANcoder m_angleEncoder;
 
   public final RelativeEncoder m_driveEncoder;
   private final RelativeEncoder m_turnEncoder;
@@ -68,7 +70,7 @@ public class SwerveModule extends SubsystemBase {
         new CANSparkMax(
             swerveModuleConstants.turningMotorChannel, CANSparkMaxLowLevel.MotorType.kBrushless);
 
-    m_angleEncoder = new CANCoder(swerveModuleConstants.cancoderID, "rio");
+    m_angleEncoder = new CANcoder(swerveModuleConstants.cancoderID, "rio");
     m_angleOffset =
         new LoggedShuffleboardTunableNumber(
             "Module " + m_moduleNumber + " Offset",
@@ -93,7 +95,8 @@ public class SwerveModule extends SubsystemBase {
     m_turningMotor.enableVoltageCompensation(12.6);
     m_turningMotor.setInverted(true); // MK4i Steer Motor is inverted
 
-    m_angleEncoder.configFactoryDefault();
+    m_angleEncoder.getConfigurator().apply(new CANcoderConfiguration());
+    m_angleEncoder.getConfigurator().apply(CtreUtils.generateCanCoderConfig());
 
     m_driveEncoder = m_driveMotor.getEncoder();
     m_driveEncoder.setPositionConversionFactor(DriveConstants.kDriveRevToMeters);
@@ -127,7 +130,7 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public void resetAngleToAbsolute() {
-    double angle = m_angleEncoder.getAbsolutePosition() - m_angleOffset.get();
+    double angle = m_angleEncoder.getAbsolutePosition().getValueAsDouble() - m_angleOffset.get();
     m_turnEncoder.setPosition(angle);
   }
 

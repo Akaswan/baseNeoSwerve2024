@@ -3,22 +3,22 @@ package frc.robot.subsystems.superstructure.wrist;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import frc.robot.Constants.WristConstants;
 import frc.robot.subsystems.superstructure.Arm;
-import frc.robot.subsystems.templates.ServoSubsystem;
-import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
+import frc.robot.subsystems.templates.ServoSubsystemSparkMax;
+import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemSparkMaxConstants;
 
-public class Wrist extends ServoSubsystem {
+public class Wrist extends ServoSubsystemSparkMax {
 
   private ArmFeedforward m_feedforward;
 
   private static Wrist m_instance = null;
 
-  public Wrist(ServoSubsystemConstants constants) {
+  public Wrist(ServoSubsystemSparkMaxConstants constants) {
     super(constants);
 
     m_feedforward = new ArmFeedforward(constants.kKs, constants.kKg, constants.kKv, constants.kKa);
   }
 
-  public static synchronized Wrist getInstance() {
+  public static Wrist getInstance() {
     if (m_instance == null) {
       m_instance = new Wrist(WristConstants.kWristConstants);
     }

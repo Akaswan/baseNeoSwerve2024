@@ -18,14 +18,14 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemConstants;
+import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemSparkMaxConstants;
 import frc.robot.utilities.LoggedShuffleboardTunableNumber;
 import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 
-public abstract class ServoSubsystem extends SubsystemBase {
+public abstract class ServoSubsystemSparkMax extends SubsystemBase {
 
-  public ServoSubsystemConstants m_constants;
+  public ServoSubsystemSparkMaxConstants m_constants;
 
   protected final SparkMaxPIDController m_pidController;
 
@@ -53,7 +53,7 @@ public abstract class ServoSubsystem extends SubsystemBase {
 
   protected double m_arbFeedforward = 0;
 
-  protected ServoSubsystem(final ServoSubsystemConstants constants) {
+  protected ServoSubsystemSparkMax(final ServoSubsystemSparkMaxConstants constants) {
 
     m_constants = constants;
 

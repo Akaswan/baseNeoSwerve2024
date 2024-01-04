@@ -35,7 +35,7 @@ public class Limelight extends SubsystemBase {
   public int fidId;
   public String camName;
 
-  public static synchronized Limelight getInstance() {
+  public static Limelight getInstance() {
     if (m_instance == null) {
       m_instance = new Limelight();
     }
