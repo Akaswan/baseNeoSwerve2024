@@ -6,10 +6,12 @@ package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -30,8 +32,8 @@ public class SwerveModule extends SubsystemBase {
   private final int POS_SLOT = 0;
   private final int VEL_SLOT = 0;
 
-  private CANSparkMax m_driveMotor;
-  private CANSparkMax m_turningMotor;
+  private CANSparkFlex m_driveMotor;
+  private CANSparkFlex m_turningMotor;
   private CANcoder m_angleEncoder;
 
   public final RelativeEncoder m_driveEncoder;
@@ -43,8 +45,8 @@ public class SwerveModule extends SubsystemBase {
   private LoggedShuffleboardTunableNumber m_angleOffset;
   private double m_lastAngleOffset;
 
-  private final SparkMaxPIDController m_driveController;
-  private SparkMaxPIDController m_turnController;
+  private final SparkPIDController m_driveController;
+  private SparkPIDController m_turnController;
 
   double m_currentAngle;
   double m_lastAngle;
@@ -64,11 +66,11 @@ public class SwerveModule extends SubsystemBase {
     m_moduleNumber = moduleNumber;
 
     m_driveMotor =
-        new CANSparkMax(
-            swerveModuleConstants.driveMotorChannel, CANSparkMaxLowLevel.MotorType.kBrushless);
+        new CANSparkFlex(
+            swerveModuleConstants.driveMotorChannel, MotorType.kBrushless);
     m_turningMotor =
-        new CANSparkMax(
-            swerveModuleConstants.turningMotorChannel, CANSparkMaxLowLevel.MotorType.kBrushless);
+        new CANSparkFlex(
+            swerveModuleConstants.turningMotorChannel, MotorType.kBrushless);
 
     m_angleEncoder = new CANcoder(swerveModuleConstants.cancoderID, "rio");
     m_angleOffset =

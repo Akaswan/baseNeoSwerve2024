@@ -20,5 +20,6 @@
       ]
     }
   },
-  "folder": "Tuning"
+  "folder": "Tuning",
+  "choreoAuto": false
 }

@@ -5,11 +5,12 @@
 package frc.robot.subsystems.templates;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
+import com.revrobotics.SparkPIDController.ArbFFUnits;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -27,7 +28,7 @@ public abstract class ServoSubsystemSparkMax extends SubsystemBase {
 
   public ServoSubsystemSparkMaxConstants m_constants;
 
-  protected final SparkMaxPIDController m_pidController;
+  protected final SparkPIDController m_pidController;
 
   protected final CANSparkMax m_master;
   protected final CANSparkMax[] m_slaves;

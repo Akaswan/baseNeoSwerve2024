@@ -1,7 +1,8 @@
 package frc.robot.utilities;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants.DriveConstants;
@@ -13,7 +14,7 @@ public final class RevUtils {
    *
    * @param motorController the motor controller to tune
    */
-  public static void setDriveMotorConfig(CANSparkMax motorController) {
+  public static void setDriveMotorConfig(CANSparkFlex motorController) {
 
     motorController.getPIDController().setFF(DriveConstants.drivekff);
     motorController.getPIDController().setP(DriveConstants.drivekp);
@@ -22,10 +23,10 @@ public final class RevUtils {
 
     motorController.setOpenLoopRampRate(DriveConstants.driverampRate);
 
-    motorController.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 10);
-    motorController.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20);
+    motorController.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10);
+    motorController.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
     motorController.setPeriodicFramePeriod(
-        CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 50); // May want to increase
+        PeriodicFrame.kStatus2, 50); // May want to increase
 
     motorController.setSmartCurrentLimit(60, 35);
     motorController.burnFlash();
@@ -36,16 +37,16 @@ public final class RevUtils {
    *
    * @param motorController the motor controller to tune
    */
-  public static void setTurnMotorConfig(CANSparkMax motorController) {
+  public static void setTurnMotorConfig(CANSparkFlex motorController) {
 
     motorController.getPIDController().setFF(DriveConstants.turnkff);
     motorController.getPIDController().setP(DriveConstants.turnkp);
     motorController.getPIDController().setI(DriveConstants.turnki);
     motorController.getPIDController().setD(DriveConstants.turnkd);
 
-    motorController.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100);
-    motorController.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20);
-    motorController.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 20);
+    motorController.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 100);
+    motorController.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
+    motorController.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
 
     motorController.setSmartCurrentLimit(40, 25);
     motorController.burnFlash();

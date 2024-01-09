@@ -17,7 +17,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -229,6 +231,7 @@ public class SwerveDrive extends SubsystemBase {
             new ReplanningConfig() // Default path replanning config. See the API for the options
             // here
             ),
+        this::shouldFlip, // Not sure what this means, if its talking when to flip, or should it flip when red alliance. Needs testing
         this // Reference to this subsystem to set requirements
         );
   }
@@ -244,6 +247,10 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     return m_instance;
+  }
+
+  public boolean shouldFlip() {
+    return DriverStation.getAlliance().get() == Alliance.Blue ? false : true;
   }
 
   public void zeroGyroscope() {

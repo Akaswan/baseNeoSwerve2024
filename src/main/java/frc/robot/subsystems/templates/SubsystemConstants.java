@@ -1,7 +1,8 @@
 package frc.robot.subsystems.templates;
 
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+
 import frc.robot.subsystems.templates.IntakeSubsystem.IntakeSubsystemState;
 import frc.robot.subsystems.templates.IntakeSubsystem.IntakeSubsystemType;
 import frc.robot.subsystems.templates.ServoSubsystemSparkMax.ServoSubsystemState;

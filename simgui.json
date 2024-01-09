@@ -1,0 +1,62 @@
+{
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Info/Field": "Field2d",
+      "/Shuffleboard/Main/Auto Picker": "String Chooser",
+      "/SmartDashboard/Mech2d": "Mechanism2d"
+    },
+    "windows": {
+      "/Shuffleboard/Info/Field": {
+        "Robot": {
+          "length": 0.8999999761581421,
+          "width": 0.8999999761581421
+        },
+        "height": 8.010000228881836,
+        "image": "C:\\Users\\Ari\\Downloads\\PathPlanner-Windows-v2024.0.0-beta-6\\data\\flutter_assets\\images\\field23.png",
+        "path": {
+          "arrows": false,
+          "style": "Line"
+        },
+        "width": 16.540000915527344,
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Main/Auto Picker": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Mech2d": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "AdvantageKit": {
+        "RealOutputs": {
+          "Arm": {
+            "open": true
+          },
+          "Elevator": {
+            "open": true
+          }
+        },
+        "open": true
+      },
+      "PathPlanner": {
+        "open": true
+      },
+      "Shuffleboard": {
+        "Drive Tuning": {
+          "open": true
+        },
+        "open": true
+      }
+    }
+  }
+}
