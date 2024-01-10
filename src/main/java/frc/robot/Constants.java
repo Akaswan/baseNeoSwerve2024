@@ -51,6 +51,16 @@ public final class Constants {
     public static final int kOperatorControllerPort = 0;
   }
 
+  public static final class AutoConstants {
+    public static Translation2d[] kNotePlacements = new Translation2d[] {
+      new Translation2d(7.68, 7.44),
+      new Translation2d(7.68, 5.78),
+      new Translation2d(7.68, 4.10),
+      new Translation2d(7.68, 2.44),
+      new Translation2d(7.68, 0.78)
+    };
+  }
+
   public static final class DriveConstants {
 
     public static double drivekp = 0.15751;
