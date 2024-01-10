@@ -92,7 +92,7 @@ public class Limelight extends SubsystemBase {
     m_tl = currentData.getEntry("tl");
     m_cl = currentData.getEntry("cl");
     m_tcornxy = currentData.getEntry("m_tcornxy");
-    m_botpose = currentData.getEntry("botpose");
+    m_botpose = currentData.getEntry("botpose_wpiblue");
     m_targetpose_robotspace = currentData.getEntry("targetpose_robotspace");
   }
 
