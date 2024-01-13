@@ -43,18 +43,22 @@ public class CenterNoteAuto extends Command {
     }
     
 
-    List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(
-        new Pose2d(AutoConstants.kNotePlacements[indexToUse].getX() - 1, AutoConstants.kNotePlacements[indexToUse].getY(), Rotation2d.fromDegrees(0)),
-        new Pose2d(AutoConstants.kNotePlacements[indexToUse], Rotation2d.fromDegrees(0))
-    );
+    // List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(
+    //     new Pose2d(AutoConstants.kNotePlacements[indexToUse].getX() - 1, AutoConstants.kNotePlacements[indexToUse].getY(), Rotation2d.fromDegrees(0)),
+    //     new Pose2d(AutoConstants.kNotePlacements[indexToUse], Rotation2d.fromDegrees(0))
+    // );
 
-    PathPlannerPath path = new PathPlannerPath(
-        bezierPoints,
-        new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // The constraints for this path. If using a differential drivetrain, the angular constraints have no effect.
-        new GoalEndState(0.0, Rotation2d.fromDegrees(0)) // Goal end state. You can set a holonomic rotation here. If using a differential drivetrain, the rotation will have no effect.
-    );
+    // PathPlannerPath path = new PathPlannerPath(
+    //     bezierPoints,
+    //     new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // The constraints for this path. If using a differential drivetrain, the angular constraints have no effect.
+    //     new GoalEndState(0.0, Rotation2d.fromDegrees(0)) // Goal end state. You can set a holonomic rotation here. If using a differential drivetrain, the rotation will have no effect.
+    // );
 
-    AutoBuilder.pathfindThenFollowPath(path, new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI)).schedule();
+    PathPlannerPath path = PathPlannerPath.fromPathFile("Note 5");
+
+    AutoBuilder.pathfindToPose(path.getPreviewStartingHolonomicPose(), new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI)).andThen(
+      AutoBuilder.followPath(path)
+    ).schedule();
     // AutoBuilder.followPath(path).schedule();
 
 
