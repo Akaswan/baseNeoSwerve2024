@@ -56,9 +56,12 @@ public class CenterNoteAuto extends Command {
 
     PathPlannerPath path = PathPlannerPath.fromPathFile("Note 5");
 
-    AutoBuilder.pathfindToPose(path.getPreviewStartingHolonomicPose(), new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI)).andThen(
-      AutoBuilder.followPath(path)
-    ).schedule();
+    // AutoBuilder.pathfindToPose(path.getPreviewStartingHolonomicPose(), new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI)).andThen(
+    //   AutoBuilder.followPath(path)
+    // ).schedule();
+
+    AutoBuilder.pathfindThenFollowPath(path, new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI)).schedule();
+
     // AutoBuilder.followPath(path).schedule();
 
 

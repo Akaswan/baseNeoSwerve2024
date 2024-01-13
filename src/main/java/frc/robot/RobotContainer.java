@@ -78,7 +78,7 @@ public class RobotContainer {
     autoChooser =
         new LoggedDashboardChooser<>(
             "Auto Picker", AutoBuilder.buildAutoChooser(), mainTab, 0, 0, 2, 1);
-    autoChooser.addOption("Center Command", new SequentialCommandGroup(new InstantCommand(() -> m_drivebase.updateEstimatorWithPose(new Pose2d(1.45, 3.21, Rotation2d.fromDegrees(122.92)))), 
+    autoChooser.addOption("Center Command", new SequentialCommandGroup(new InstantCommand(() -> m_drivebase.updateEstimatorWithPose(new Pose2d(2, 0.76, Rotation2d.fromDegrees(122.92)))), 
     new CenterNoteAuto(m_drivebase)));
 
     // CONFIGURE DEFAULT COMMANDS \\
