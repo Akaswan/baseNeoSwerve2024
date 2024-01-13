@@ -14,15 +14,13 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.subsystems.superstructure.Arm.ArmState;
-import frc.robot.subsystems.superstructure.Elevator.ElevatorState;
-import frc.robot.subsystems.superstructure.wrist.Wrist.WristState;
-import frc.robot.subsystems.superstructure.wrist.WristIntake.WristIntakeState;
-import frc.robot.subsystems.templates.IntakeSubsystem.IntakeSubsystemType;
-import frc.robot.subsystems.templates.ServoSubsystemSparkMax.ServoSubsystemType;
-import frc.robot.subsystems.templates.SubsystemConstants.IntakeSubsystemConstants;
-import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemSparkMaxConstants;
+import frc.robot.subsystems.launcher.LauncherFlywheel.LauncherFlywheelState;
+import frc.robot.subsystems.launcher.LauncherWrist.LauncherWristState;
+import frc.robot.subsystems.templates.VelocitySubsystem.VelocitySubsystemType;
+import frc.robot.subsystems.templates.PositionSubsystem.PositionSubsystemType;
+import frc.robot.subsystems.templates.SubsystemConstants.PositionSubsystemConstants;
 import frc.robot.subsystems.templates.SubsystemConstants.SparkMaxConstants;
+import frc.robot.subsystems.templates.SubsystemConstants.VelocitySubsystemConstants;
 import frc.robot.utilities.SwerveModuleConstants;
 
 /**
@@ -39,7 +37,7 @@ public final class Constants {
 
   public static final boolean kInfoMode = true;
 
-  public static final boolean kTuningMode = true;
+  public static final boolean kTuningMode = false;
 
   // // DRIVEBASE \\ \\
 
@@ -176,292 +174,103 @@ public final class Constants {
     };
   }
 
-  public static final class ArmConstants {
+  public static final class LauncherConstants {
 
-    public static final SparkMaxConstants kArmMasterConstants = new SparkMaxConstants();
+    public static final SparkMaxConstants kLauncherFlywheelMasterConstants = new SparkMaxConstants();
 
     static {
-      kArmMasterConstants.kID = 5;
-      kArmMasterConstants.kIdleMode = IdleMode.kBrake;
-      kArmMasterConstants.kMotorType = MotorType.kBrushless;
-      kArmMasterConstants.kCurrentLimit = 80;
-      kArmMasterConstants.kInverted = false;
+      kLauncherFlywheelMasterConstants.kID = 34;
+      kLauncherFlywheelMasterConstants.kIdleMode = IdleMode.kBrake;
+      kLauncherFlywheelMasterConstants.kMotorType = MotorType.kBrushless;
+      kLauncherFlywheelMasterConstants.kCurrentLimit = 80;
+      kLauncherFlywheelMasterConstants.kInverted = false;
     }
 
-    public static final SparkMaxConstants[] kArmSlaveConstants = new SparkMaxConstants[1];
+    public static final SparkMaxConstants[] kLauncherFlywheelSlaveConstants = new SparkMaxConstants[0];
+
+    public static final VelocitySubsystemConstants kLauncherFlywheelConstants =
+        new VelocitySubsystemConstants();
 
     static {
-      kArmSlaveConstants[0] = new SparkMaxConstants();
-      kArmSlaveConstants[0].kID = 20;
-      kArmSlaveConstants[0].kIdleMode = IdleMode.kBrake;
-      kArmSlaveConstants[0].kMotorType = MotorType.kBrushless;
-      kArmSlaveConstants[0].kCurrentLimit = 80;
-      kArmSlaveConstants[0].kInverted = false;
+      kLauncherFlywheelConstants.kName = "Launcher Flywheel";
+
+      kLauncherFlywheelConstants.kSubsystemType = VelocitySubsystemType.LAUNCHER_FLYWHEEL;
+
+      kLauncherFlywheelConstants.kMasterConstants = kLauncherFlywheelMasterConstants;
+      kLauncherFlywheelConstants.kSlaveConstants = kLauncherFlywheelSlaveConstants;
+
+      kLauncherFlywheelConstants.kVelocityConversionFactor = 3 / 60; // division by 60 to get rotations per second
+
+      kLauncherFlywheelConstants.kKp = 0.01;
+      kLauncherFlywheelConstants.kKi = 0.0;
+      kLauncherFlywheelConstants.kKd = 0.0;
+
+      kLauncherFlywheelConstants.kDefaultSlot = 0;
+
+      kLauncherFlywheelConstants.kKs = 0.0;
+      kLauncherFlywheelConstants.kKv = 0.0;
+      kLauncherFlywheelConstants.kKa = 0.0;
+
+      kLauncherFlywheelConstants.kInitialState = LauncherFlywheelState.OFF;
+      kLauncherFlywheelConstants.kTransitionState = LauncherFlywheelState.TRANSITION;
     }
 
-    public static final ServoSubsystemSparkMaxConstants kArmConstants =
-        new ServoSubsystemSparkMaxConstants();
+  public static final SparkMaxConstants kLauncherWristMasterConstants = new SparkMaxConstants();
 
     static {
-      kArmConstants.kName = "Arm";
-
-      kArmConstants.kSubsystemType = ServoSubsystemType.ARM;
-
-      kArmConstants.kMasterConstants = kArmMasterConstants;
-      kArmConstants.kSlaveConstants = kArmSlaveConstants;
-
-      kArmConstants.kHomePosition = 0.0;
-      kArmConstants.kPositionConversionFactor = 360 / 100;
-
-      kArmConstants.kKp = 0.2;
-      kArmConstants.kKi = 0.0;
-      kArmConstants.kKd = 0.0;
-      kArmConstants.kSetpointTolerance = 0.1;
-      kArmConstants.kSmartMotionTolerance = 0.1;
-
-      kArmConstants.kDefaultSlot = 0;
-
-      kArmConstants.kMaxVelocity = 720;
-      kArmConstants.kMaxAcceleration = 700;
-
-      kArmConstants.kKs = 0.0;
-      kArmConstants.kKg = 0.0;
-      kArmConstants.kKv = 0.0;
-      kArmConstants.kKa = 0.0;
-
-      kArmConstants.kMaxPosition = 108;
-      kArmConstants.kMinPosition = -8.5;
-
-      kArmConstants.kManualAxis = XboxController.Axis.kRightY.value;
-      kArmConstants.kManualMultiplier = 1;
-      kArmConstants.kManualDeadBand = .1;
-
-      kArmConstants.kInitialState = ArmState.HOME;
-      kArmConstants.kManualState = ArmState.MANUAL;
-      kArmConstants.kTransitionState = ArmState.TRANSITION;
-    }
-  }
-
-  public static final class ElevatorConstants {
-
-    public static final SparkMaxConstants kElevatorMasterConstants = new SparkMaxConstants();
-
-    static {
-      kElevatorMasterConstants.kID = 6;
-      kElevatorMasterConstants.kIdleMode = IdleMode.kBrake;
-      kElevatorMasterConstants.kMotorType = MotorType.kBrushless;
-      kElevatorMasterConstants.kCurrentLimit = 80;
-      kElevatorMasterConstants.kInverted = false;
-    }
-
-    public static final SparkMaxConstants[] kElevatorSlaveConstants = new SparkMaxConstants[1];
-
-    static {
-      kElevatorSlaveConstants[0] = new SparkMaxConstants();
-      kElevatorSlaveConstants[0].kID = 40;
-      kElevatorSlaveConstants[0].kIdleMode = IdleMode.kBrake;
-      kElevatorSlaveConstants[0].kMotorType = MotorType.kBrushless;
-      kElevatorSlaveConstants[0].kCurrentLimit = 80;
-      kElevatorSlaveConstants[0].kInverted = false;
-    }
-
-    public static final ServoSubsystemSparkMaxConstants kElevatorConstants =
-        new ServoSubsystemSparkMaxConstants();
-
-    static {
-      kElevatorConstants.kName = "Elevator";
-
-      kElevatorConstants.kSubsystemType = ServoSubsystemType.ELEVATOR;
-
-      kElevatorConstants.kMasterConstants = kElevatorMasterConstants;
-      kElevatorConstants.kSlaveConstants = kElevatorSlaveConstants;
-
-      kElevatorConstants.kHomePosition = 0.0;
-      kElevatorConstants.kPositionConversionFactor = 10;
-
-      kElevatorConstants.kKp = 0.2;
-      kElevatorConstants.kKi = 0.0;
-      kElevatorConstants.kKd = 0.0;
-      kElevatorConstants.kSetpointTolerance = 0.1;
-      kElevatorConstants.kSmartMotionTolerance = 0.1;
-
-      kElevatorConstants.kDefaultSlot = 0;
-
-      kElevatorConstants.kMaxVelocity = 10;
-      kElevatorConstants.kMaxAcceleration = 7.5;
-
-      kElevatorConstants.kKs = 0.0;
-      kElevatorConstants.kKg = 0.0;
-      kElevatorConstants.kKv = 0.0;
-      kElevatorConstants.kKa = 0.0;
-
-      kElevatorConstants.kMaxPosition = 1;
-      kElevatorConstants.kMinPosition = 0.0;
-
-      kElevatorConstants.kManualAxis = XboxController.Axis.kLeftY.value;
-      kElevatorConstants.kManualMultiplier = .05;
-      kElevatorConstants.kManualDeadBand = .1;
-
-      kElevatorConstants.kInitialState = ElevatorState.HOME;
-      kElevatorConstants.kManualState = ElevatorState.MANUAL;
-      kElevatorConstants.kTransitionState = ElevatorState.TRANSITION;
-    }
-  }
-
-  public static final class WristConstants {
-
-    public static final SparkMaxConstants kWristMasterConstants = new SparkMaxConstants();
-
-    static {
-      kWristMasterConstants.kID = 7;
-      kWristMasterConstants.kIdleMode = IdleMode.kBrake;
-      kWristMasterConstants.kMotorType = MotorType.kBrushless;
-      kWristMasterConstants.kCurrentLimit = 80;
-      kWristMasterConstants.kInverted = false;
+      kLauncherWristMasterConstants.kID = 7;
+      kLauncherWristMasterConstants.kIdleMode = IdleMode.kBrake;
+      kLauncherWristMasterConstants.kMotorType = MotorType.kBrushless;
+      kLauncherWristMasterConstants.kCurrentLimit = 80;
+      kLauncherWristMasterConstants.kInverted = false;
     }
 
     public static final SparkMaxConstants[] kWristSlaveConstants = new SparkMaxConstants[0];
 
-    public static final ServoSubsystemSparkMaxConstants kWristConstants =
-        new ServoSubsystemSparkMaxConstants();
+    public static final PositionSubsystemConstants kLauncherWristConstants =
+        new PositionSubsystemConstants();
 
     static {
-      kWristConstants.kName = "Wrist";
+      kLauncherWristConstants.kName = "Launcher Wrist";
 
-      kWristConstants.kSubsystemType = ServoSubsystemType.WRIST;
+      kLauncherWristConstants.kSubsystemType = PositionSubsystemType.LAUNCHER_WRIST;
 
-      kWristConstants.kMasterConstants = kWristMasterConstants;
-      kWristConstants.kSlaveConstants = kWristSlaveConstants;
+      kLauncherWristConstants.kMasterConstants = kLauncherWristMasterConstants;
+      kLauncherWristConstants.kSlaveConstants = kWristSlaveConstants;
 
-      kWristConstants.kHomePosition = 155;
-      kWristConstants.kPositionConversionFactor = 360 / 100;
+      kLauncherWristConstants.kHomePosition = 155;
+      kLauncherWristConstants.kPositionConversionFactor = 360 / 100;
 
-      kWristConstants.kKp = 0.2;
-      kWristConstants.kKi = 0.0;
-      kWristConstants.kKd = 0.0;
-      kWristConstants.kSetpointTolerance = 0.1;
-      kWristConstants.kSmartMotionTolerance = 0.1;
+      kLauncherWristConstants.kKp = 0.2;
+      kLauncherWristConstants.kKi = 0.0;
+      kLauncherWristConstants.kKd = 0.0;
+      kLauncherWristConstants.kSetpointTolerance = 0.1;
+      kLauncherWristConstants.kSmartMotionTolerance = 0.1;
 
-      kWristConstants.kDefaultSlot = 0;
+      kLauncherWristConstants.kDefaultSlot = 0;
 
-      kWristConstants.kMaxVelocity = 2000;
-      kWristConstants.kMaxAcceleration = 2000;
+      kLauncherWristConstants.kMaxVelocity = 2000;
+      kLauncherWristConstants.kMaxAcceleration = 2000;
 
-      kWristConstants.kKs = 0.0;
-      kWristConstants.kKg = 0.0;
-      kWristConstants.kKv = 0.0;
-      kWristConstants.kKa = 0.0;
+      kLauncherWristConstants.kKs = 0.0;
+      kLauncherWristConstants.kKg = 0.0;
+      kLauncherWristConstants.kKv = 0.0;
+      kLauncherWristConstants.kKa = 0.0;
 
-      kWristConstants.kMaxPosition = 155;
-      kWristConstants.kMinPosition = -85;
+      kLauncherWristConstants.kMaxPosition = 155;
+      kLauncherWristConstants.kMinPosition = -85;
 
-      kWristConstants.kManualAxis = XboxController.Axis.kRightX.value;
-      kWristConstants.kManualMultiplier = 1;
-      kWristConstants.kManualDeadBand = .1;
+      kLauncherWristConstants.kManualAxis = XboxController.Axis.kRightX.value;
+      kLauncherWristConstants.kManualMultiplier = 1;
+      kLauncherWristConstants.kManualDeadBand = .1;
 
-      kWristConstants.kInitialState = WristState.HOME;
-      kWristConstants.kManualState = WristState.MANUAL;
-      kWristConstants.kTransitionState = WristState.TRANSITION;
-    }
-
-    public static final SparkMaxConstants kWristIntakeMasterConstants = new SparkMaxConstants();
-
-    static {
-      kWristMasterConstants.kID = 45;
-      kWristMasterConstants.kIdleMode = IdleMode.kBrake;
-      kWristMasterConstants.kMotorType = MotorType.kBrushless;
-      kWristMasterConstants.kCurrentLimit = 80;
-      kWristMasterConstants.kInverted = false;
-    }
-
-    public static final SparkMaxConstants[] kWristIntakeSlaveConstants = new SparkMaxConstants[0];
-
-    public static final IntakeSubsystemConstants kWristIntakeConstants =
-        new IntakeSubsystemConstants();
-
-    static {
-      kWristIntakeConstants.kName = "WristIntake";
-
-      kWristIntakeConstants.kSubsystemType = IntakeSubsystemType.WRIST_INTAKE;
-
-      kWristIntakeConstants.kMasterConstants = kWristIntakeMasterConstants;
-      kWristIntakeConstants.kSlaveConstants = kWristIntakeSlaveConstants;
-
-      kWristIntakeConstants.kInitialState = WristIntakeState.IDLE;
+      kLauncherWristConstants.kInitialState = LauncherWristState.DOWN;
+      kLauncherWristConstants.kManualState = LauncherWristState.MANUAL;
+      kLauncherWristConstants.kTransitionState = LauncherWristState.TRANSITION;
     }
   }
 
-  // public static final class TalonFXElevatorConstants {
 
-  //   public static final TalonFXConstants kTalonFXElevatorMasterConstants = new
-  // TalonFXConstants();
-
-  //   static {
-  //     kTalonFXElevatorMasterConstants.kID = 69;
-  //     kTalonFXElevatorMasterConstants.kMaxVelocity = 50.0;
-  //     kTalonFXElevatorMasterConstants.kMaxAcceleration = 45.0;
-  //     kTalonFXElevatorMasterConstants.kMaxJerk = 5.0;
-  //     kTalonFXElevatorMasterConstants.kKp = 0.5;
-  //     kTalonFXElevatorMasterConstants.kKi = 0.2;
-  //     kTalonFXElevatorMasterConstants.kKd = 0.3;
-  //     kTalonFXElevatorMasterConstants.kKs = 0.2;
-  //     kTalonFXElevatorMasterConstants.kKg = 0.1;
-  //     kTalonFXElevatorMasterConstants.kKv = 0.1;
-  //     kTalonFXElevatorMasterConstants.kKa = 0.2;
-  //     kTalonFXElevatorMasterConstants.kGravityType = GravityTypeValue.Elevator_Static;
-  //     kTalonFXElevatorMasterConstants.kNuetralMode = NeutralModeValue.Brake;
-  //   }
-
-  //   public static final TalonFXConstants[] kTalonFXElevatorSlaveConstants = new
-  // TalonFXConstants[1];
-
-  //   static {
-  //     kTalonFXElevatorSlaveConstants[0] = new TalonFXConstants();
-  //     kTalonFXElevatorSlaveConstants[0].kID = 68;
-  //     kTalonFXElevatorSlaveConstants[0].kMaxVelocity = 50.0;
-  //     kTalonFXElevatorSlaveConstants[0].kMaxAcceleration = 45.0;
-  //     kTalonFXElevatorSlaveConstants[0].kMaxJerk = 5.0;
-  //     kTalonFXElevatorSlaveConstants[0].kKp = 0.5;
-  //     kTalonFXElevatorSlaveConstants[0].kKi = 0.2;
-  //     kTalonFXElevatorSlaveConstants[0].kKd = 0.3;
-  //     kTalonFXElevatorSlaveConstants[0].kKs = 0.2;
-  //     kTalonFXElevatorSlaveConstants[0].kKg = 0.1;
-  //     kTalonFXElevatorSlaveConstants[0].kKv = 0.1;
-  //     kTalonFXElevatorSlaveConstants[0].kKa = 0.2;
-  //     kTalonFXElevatorSlaveConstants[0].kGravityType = GravityTypeValue.Elevator_Static;
-  //     kTalonFXElevatorSlaveConstants[0].kNuetralMode = NeutralModeValue.Brake;
-  //   }
-
-  //   public static final ServoSubsystemTalonFXConstants kTalonFXElevatorConstants =
-  //       new ServoSubsystemTalonFXConstants();
-
-  //   static {
-  //     kTalonFXElevatorConstants.kName = "TalonFXElevator";
-
-  //     kTalonFXElevatorConstants.kSubsystemType = ServoSubsystemType.ELEVATOR;
-
-  //     kTalonFXElevatorConstants.kMasterConstants = kTalonFXElevatorMasterConstants;
-  //     kTalonFXElevatorConstants.kSlaveConstants = kTalonFXElevatorSlaveConstants;
-
-  //     kTalonFXElevatorConstants.kHomePosition = 0.0;
-  //     kTalonFXElevatorConstants.kPositionConversionFactor = 10;
-
-  //     kTalonFXElevatorConstants.kSetpointTolerance = 0.1;
-
-  //     kTalonFXElevatorConstants.kDefaultSlot = 0;
-
-  //     kTalonFXElevatorConstants.kMaxPosition = 1;
-  //     kTalonFXElevatorConstants.kMinPosition = 0.0;
-
-  //     kTalonFXElevatorConstants.kManualAxis = XboxController.Axis.kLeftY.value;
-  //     kTalonFXElevatorConstants.kManualMultiplier = .05;
-  //     kTalonFXElevatorConstants.kManualDeadBand = .1;
-
-  //     kTalonFXElevatorConstants.kInitialState = TalonFXElevatorState.HOME;
-  //     kTalonFXElevatorConstants.kManualState = TalonFXElevatorState.MANUAL;
-  //     kTalonFXElevatorConstants.kTransitionState = TalonFXElevatorState.TRANSITION;
-  //   }
-  // }
 
   public static enum Mode {
     /** Running on a real robot. */

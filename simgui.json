@@ -5,6 +5,16 @@
         "header": {
           "open": true
         }
+      },
+      "SPARK MAX [34]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [5]": {
+        "header": {
+          "open": true
+        }
       }
     }
   },
@@ -53,7 +63,20 @@
           },
           "Elevator": {
             "open": true
-          }
+          },
+          "Launcher Flywheel": {
+            "open": true
+          },
+          "Launcher Superstructure": {
+            "open": true
+          },
+          "Launcher Wrist": {
+            "open": true
+          },
+          "LauncherLauncherSuperstructure": {
+            "open": true
+          },
+          "open": true
         },
         "open": true
       },

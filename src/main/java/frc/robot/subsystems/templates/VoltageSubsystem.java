@@ -8,19 +8,19 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.templates.SubsystemConstants.IntakeSubsystemConstants;
+import frc.robot.subsystems.templates.SubsystemConstants.VoltageSubsystemConstants;
 
-public abstract class IntakeSubsystem extends SubsystemBase {
+public abstract class VoltageSubsystem extends SubsystemBase {
 
-  public IntakeSubsystemConstants m_constants;
+  public VoltageSubsystemConstants m_constants;
 
   protected final CANSparkMax m_master;
   protected final CANSparkMax[] m_slaves;
   protected final RelativeEncoder m_encoder;
 
-  protected IntakeSubsystemState m_currentState = null;
+  protected VoltageSubsystemState m_currentState = null;
 
-  protected IntakeSubsystem(final IntakeSubsystemConstants constants) {
+  protected VoltageSubsystem(final VoltageSubsystemConstants constants) {
 
     m_constants = constants;
 
@@ -50,11 +50,11 @@ public abstract class IntakeSubsystem extends SubsystemBase {
     setName(m_constants.kName);
   }
 
-  public IntakeSubsystemState getCurrentState() {
+  public VoltageSubsystemState getCurrentState() {
     return m_currentState;
   }
 
-  public void setState(IntakeSubsystemState desiredState) {
+  public void setState(VoltageSubsystemState desiredState) {
     m_currentState = desiredState;
     m_master.setVoltage(m_currentState.getVoltage());
   }
@@ -67,7 +67,7 @@ public abstract class IntakeSubsystem extends SubsystemBase {
     return RobotBase.isReal() ? m_master.getBusVoltage() : m_currentState.getVoltage();
   }
 
-  public IntakeSubsystemType getSubsystemType() {
+  public VoltageSubsystemType getSubsystemType() {
     return m_constants.kSubsystemType;
   }
 
@@ -81,11 +81,11 @@ public abstract class IntakeSubsystem extends SubsystemBase {
 
   public abstract void outputTelemetry();
 
-  public enum IntakeSubsystemType {
+  public enum VoltageSubsystemType {
     WRIST_INTAKE
   }
 
-  public interface IntakeSubsystemState {
+  public interface VoltageSubsystemState {
     String getName();
 
     double getVoltage();

@@ -19,14 +19,14 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.templates.SubsystemConstants.ServoSubsystemSparkMaxConstants;
+import frc.robot.subsystems.templates.SubsystemConstants.PositionSubsystemConstants;
 import frc.robot.utilities.LoggedShuffleboardTunableNumber;
 import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 
-public abstract class ServoSubsystemSparkMax extends SubsystemBase {
+public abstract class PositionSubsystem extends SubsystemBase {
 
-  public ServoSubsystemSparkMaxConstants m_constants;
+  public PositionSubsystemConstants m_constants;
 
   protected final SparkPIDController m_pidController;
 
@@ -47,14 +47,14 @@ public abstract class ServoSubsystemSparkMax extends SubsystemBase {
   protected LoggedShuffleboardTunableNumber m_kMaxAcceleration;
   protected LoggedShuffleboardTunableNumber m_kMaxVelocity;
 
-  protected ServoSubsystemState m_currentState = null;
-  protected ServoSubsystemState m_desiredState = null;
+  protected PositionSubsystemState m_currentState = null;
+  protected PositionSubsystemState m_desiredState = null;
 
   protected double m_profileStartTime = -1;
 
   protected double m_arbFeedforward = 0;
 
-  protected ServoSubsystemSparkMax(final ServoSubsystemSparkMaxConstants constants) {
+  protected PositionSubsystem(final PositionSubsystemConstants constants) {
 
     m_constants = constants;
 
@@ -84,6 +84,7 @@ public abstract class ServoSubsystemSparkMax extends SubsystemBase {
     m_encoder = m_master.getEncoder();
     m_encoder.setPosition(m_constants.kHomePosition);
     m_encoder.setPositionConversionFactor(m_constants.kPositionConversionFactor);
+    m_encoder.setVelocityConversionFactor(m_constants.kPositionConversionFactor / 60);
 
     m_kp =
         new LoggedShuffleboardTunableNumber(
@@ -205,7 +206,7 @@ public abstract class ServoSubsystemSparkMax extends SubsystemBase {
         ArbFFUnits.kVoltage);
   }
 
-  public ServoSubsystemState getCurrentState() {
+  public PositionSubsystemState getCurrentState() {
     return m_currentState;
   }
 
@@ -213,7 +214,7 @@ public abstract class ServoSubsystemSparkMax extends SubsystemBase {
     m_arbFeedforward = feedforward;
   }
 
-  public void setState(ServoSubsystemState desiredState) {
+  public void setDesiredState(PositionSubsystemState desiredState) {
     m_desiredState = desiredState;
     m_profileStartTime = Timer.getFPGATimestamp();
     m_profileStartPosition = getPosition();
@@ -221,7 +222,7 @@ public abstract class ServoSubsystemSparkMax extends SubsystemBase {
   }
 
   public boolean atSetpoint() {
-    return Math.abs(m_desiredState.getPosition() - getPosition()) < m_constants.kSetpointTolerance;
+    return Math.abs(m_desiredState.getPosition() - getPosition()) <= m_constants.kSetpointTolerance;
   }
 
   public double getPosition() {
@@ -232,7 +233,7 @@ public abstract class ServoSubsystemSparkMax extends SubsystemBase {
     return RobotBase.isReal() ? m_encoder.getVelocity() : m_currentState.getVelocity();
   }
 
-  public ServoSubsystemType getSubsystemType() {
+  public PositionSubsystemType getSubsystemType() {
     return m_constants.kSubsystemType;
   }
 
@@ -279,13 +280,11 @@ public abstract class ServoSubsystemSparkMax extends SubsystemBase {
 
   public abstract void outputTelemetry();
 
-  public enum ServoSubsystemType {
-    ARM,
-    ELEVATOR,
-    WRIST
+  public enum PositionSubsystemType {
+    LAUNCHER_WRIST
   }
 
-  public interface ServoSubsystemState {
+  public interface PositionSubsystemState {
     String getName();
 
     double getPosition();

@@ -3,10 +3,12 @@ package frc.robot.subsystems.templates;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import frc.robot.subsystems.templates.IntakeSubsystem.IntakeSubsystemState;
-import frc.robot.subsystems.templates.IntakeSubsystem.IntakeSubsystemType;
-import frc.robot.subsystems.templates.ServoSubsystemSparkMax.ServoSubsystemState;
-import frc.robot.subsystems.templates.ServoSubsystemSparkMax.ServoSubsystemType;
+import frc.robot.subsystems.templates.VoltageSubsystem.VoltageSubsystemState;
+import frc.robot.subsystems.templates.VoltageSubsystem.VoltageSubsystemType;
+import frc.robot.subsystems.templates.PositionSubsystem.PositionSubsystemState;
+import frc.robot.subsystems.templates.PositionSubsystem.PositionSubsystemType;
+import frc.robot.subsystems.templates.VelocitySubsystem.VelocitySubsystemState;
+import frc.robot.subsystems.templates.VelocitySubsystem.VelocitySubsystemType;
 
 public class SubsystemConstants {
 
@@ -18,39 +20,19 @@ public class SubsystemConstants {
     public boolean kInverted = false;
   }
 
-  // public static class TalonFXConstants {
-  //   public int kID = 0;
-
-  //   public double kMaxVelocity = 0.0;
-  //   public double kMaxAcceleration = 0.0;
-  //   public double kMaxJerk = 0.0;
-
-  //   public double kKp = 0.0;
-  //   public double kKi = 0.0;
-  //   public double kKd = 0.0;
-
-  //   public double kKs = 0.0;
-  //   public double kKg = 0.0;
-  //   public double kKv = 0.0;
-  //   public double kKa = 0.0;
-  //   public GravityTypeValue kGravityType = null;
-
-  //   public NeutralModeValue kNuetralMode = null;
-  // }
-
-  public static class ServoSubsystemSparkMaxConstants {
+  public static class PositionSubsystemConstants {
 
     // Subsystem Constants \\
     public String kName = "ERROR_ASSIGN_A_NAME";
 
-    public ServoSubsystemType kSubsystemType = null;
+    public PositionSubsystemType kSubsystemType = null;
 
     public SparkMaxConstants kMasterConstants = new SparkMaxConstants();
     public SparkMaxConstants[] kSlaveConstants = new SparkMaxConstants[0];
 
-    public ServoSubsystemState kInitialState = null;
-    public ServoSubsystemState kManualState = null;
-    public ServoSubsystemState kTransitionState = null;
+    public PositionSubsystemState kInitialState = null;
+    public PositionSubsystemState kManualState = null;
+    public PositionSubsystemState kTransitionState = null;
 
     // Servo Motor Subsystem Constants \\
     public double kHomePosition = 0.0;
@@ -87,50 +69,48 @@ public class SubsystemConstants {
     public double kManualDeadBand = 0;
   }
 
-  // public static class ServoSubsystemTalonFXConstants {
-
-  //   // Subsystem Constants \\
-  //   public String kName = "ERROR_ASSIGN_A_NAME";
-
-  //   public ServoSubsystemType kSubsystemType = null;
-
-  //   public TalonFXConstants kMasterConstants = new TalonFXConstants();
-  //   public TalonFXConstants[] kSlaveConstants = new TalonFXConstants[0];
-
-  //   public ServoSubsystemTalonFX.ServoSubsystemState kInitialState = null;
-  //   public ServoSubsystemTalonFX.ServoSubsystemState kManualState = null;
-  //   public ServoSubsystemTalonFX.ServoSubsystemState kTransitionState = null;
-
-  //   // Servo Motor Subsystem Constants \\
-  //   public double kHomePosition = 0.0;
-  //   public double kPositionConversionFactor =
-  //       1.0; // To find degrees: 360/gear ration ex 360/100 for 100:1
-
-  //   public double kSetpointTolerance = 0.0; // Tolerance for atSetpoint()
-
-  //   public int kDefaultSlot =
-  //       0; // PID Slot, make more if more than one set of pid constants are used
-
-  //   // Max/Min positions the subsystem should be able to move
-  //   public double kMaxPosition = Double.POSITIVE_INFINITY;
-  //   public double kMinPosition = Double.NEGATIVE_INFINITY;
-
-  //   // Manual constants
-  //   public int kManualAxis = 0;
-  //   public double kManualMultiplier = 0;
-  //   public double kManualDeadBand = 0;
-  // }
-
-  public static class IntakeSubsystemConstants {
+  public static class VoltageSubsystemConstants {
 
     // Subsystem Constants \\
     public String kName = "ERROR_ASSIGN_A_NAME";
 
-    public IntakeSubsystemType kSubsystemType = null;
+    public VoltageSubsystemType kSubsystemType = null;
 
     public SparkMaxConstants kMasterConstants = new SparkMaxConstants();
     public SparkMaxConstants[] kSlaveConstants = new SparkMaxConstants[0];
 
-    public IntakeSubsystemState kInitialState = null;
+    public VoltageSubsystemState kInitialState = null;
+  }
+
+  public static class VelocitySubsystemConstants {
+
+    // Subsystem Constants \\
+    public String kName = "ERROR_ASSIGN_A_NAME";
+
+    public VelocitySubsystemType kSubsystemType = null;
+
+    public SparkMaxConstants kMasterConstants = new SparkMaxConstants();
+    public SparkMaxConstants[] kSlaveConstants = new SparkMaxConstants[0];
+
+    public VelocitySubsystemState kInitialState = null;
+    public VelocitySubsystemState kTransitionState = null;
+
+    public double kVelocityConversionFactor =
+        1.0; // To find degrees: 360/gear ratio ex 360/100 for 100:1
+
+    // PID Constants
+    public double kKp = 0.0;
+    public double kKi = 0.0;
+    public double kKd = 0.0;
+
+    public double kSetpointTolerance = 0.0; // Tolerance for atSetpoint()
+
+    public int kDefaultSlot =
+        0; // PID Slot, make more if more than one set of pid constants are used
+
+    // Feedforward constants
+    public double kKs = 0.0;
+    public double kKv = 0.0;
+    public double kKa = 0.0;
   }
 }

@@ -5,101 +5,24 @@
 package frc.robot.commands.superstructure;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.superstructure.Arm;
-import frc.robot.subsystems.superstructure.Elevator;
-import frc.robot.subsystems.superstructure.Superstructure;
-import frc.robot.subsystems.superstructure.Superstructure.SuperstructureState;
-import frc.robot.subsystems.superstructure.wrist.Wrist;
-import frc.robot.subsystems.templates.ServoSubsystemSparkMax;
+import frc.robot.subsystems.launcher.LauncherSuperstructure;
+import frc.robot.subsystems.launcher.LauncherSuperstructure.LauncherSuperstructureState;
+import frc.robot.subsystems.templates.SuperstructureSubsystem;
 
 public class SetSuperstructureState extends Command {
   /** Creates a new SetSuperstructureState. */
-  private SuperstructureState m_desiredState;
+  private LauncherSuperstructureState m_desiredState;
+  private SuperstructureSubsystem m_superstructure = LauncherSuperstructure.getInstance();
 
-  private ServoSubsystemSparkMax[] order;
-  private Arm m_arm = Arm.getInstance();
-  private Elevator m_elevator = Elevator.getInstance();
-  private Wrist m_wrist = Wrist.getInstance();
-  private Superstructure m_superstructure = Superstructure.getInstance();
-  private boolean m_eject;
-
-  public SetSuperstructureState(SuperstructureState desiredState, boolean eject) {
+  public SetSuperstructureState(LauncherSuperstructureState desiredState) {
     m_desiredState = desiredState;
-    m_eject = eject;
     addRequirements(m_superstructure);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    SuperstructureState m_currentState = m_superstructure.getCurrentState();
-
-    //   // switch (desiredState) {
-    //   //   case GROUND_PICKUP:
-    //   //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
-    //   // SuperstructureState.SCORE_MID || m_currentState ==
-    // SuperstructureState.SUBSTATION_PICKUP)
-    // {
-    //   //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
-    //   //     } else if (m_currentState == SuperstructureState.HOME || m_currentState ==
-    //   // SuperstructureState.SCORE_LOW) {
-    //   //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
-    //   //     }
-    //   //     break;
-    //   //   case HOME:
-    //   //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
-    //   // SuperstructureState.SCORE_MID || m_currentState ==
-    // SuperstructureState.SUBSTATION_PICKUP)
-    // {
-    //   //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
-    //   //     } else if (m_currentState == SuperstructureState.GROUND_PICKUP || m_currentState ==
-    //   // SuperstructureState.SCORE_LOW) {
-    //   //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
-    //   //     }
-    //   //     break;
-    //   //   case SCORE_HIGH:
-    //   //     if (m_currentState == SuperstructureState.SCORE_HIGH ||m_currentState ==
-    //   // SuperstructureState.SCORE_MID || m_currentState ==
-    // SuperstructureState.SUBSTATION_PICKUP)
-    // {
-    //   //       order = new ServoMotorSubsystem[]{elevator, arm, wrist};
-    //   //     } else if (m_currentState == SuperstructureState.GROUND_PICKUP || m_currentState ==
-    //   // SuperstructureState.SCORE_LOW) {
-    //   //       order = new ServoMotorSubsystem[]{arm, elevator, wrist};
-    //   //     }
-    //   //     break;
-    //   //   case SCORE_LOW:
-    //   //     break;
-    //   //   case SCORE_MID:
-    //   //     break;
-    //   //   case SUBSTATION_PICKUP:
-    //   //     break;
-    //   //   case TRANSITION:
-    //   //     break;
-    //   //   default:
-    //   //     order = new ServoMotorSubsystem[] {arm, elevator, wrist};
-    //   //     break;
-    //   // }
-
-    // if (m_currentState == SuperstructureState.SCORE_HIGH
-    //     || m_currentState == SuperstructureState.SCORE_MID
-    //     || m_currentState == SuperstructureState.SUBSTATION_PICKUP
-    //     || m_currentState == SuperstructureState.SCORE_LOW) {
-    //   order = new ServoSubsystem[] {m_wrist, m_elevator, m_arm};
-    // } else if (m_currentState == SuperstructureState.HOME
-    //     || m_currentState == SuperstructureState.GROUND_PICKUP) {
-    //   order = new ServoSubsystem[] {m_arm, m_elevator, m_wrist};
-    // } else {
-    //   order = new ServoSubsystem[] {m_arm, m_elevator, m_wrist};
-    // }
-
-    if (m_currentState.elevatorState.getPosition() > 0) {
-      order = new ServoSubsystemSparkMax[] {m_wrist, m_elevator, m_arm};
-    } else {
-      order = new ServoSubsystemSparkMax[] {m_arm, m_elevator, m_wrist};
-    }
-
-    m_superstructure.setSuperstructureState(order, m_desiredState, m_eject).schedule();
+    m_superstructure.setSuperstructureState(m_desiredState).schedule();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -108,9 +31,7 @@ public class SetSuperstructureState extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    m_superstructure.commandFinished();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

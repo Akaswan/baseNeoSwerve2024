@@ -7,8 +7,6 @@ package frc.robot;
 import static frc.robot.Constants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -23,15 +21,10 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.auto.CenterNoteAuto;
 import frc.robot.commands.drivebase.TeleopSwerve;
-import frc.robot.commands.superstructure.ManualServoSubsystem;
-import frc.robot.commands.superstructure.QueueSuperstructureCommand;
-import frc.robot.commands.superstructure.SetSuperstructureState;
+import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Limelight;
-import frc.robot.subsystems.superstructure.Arm;
-import frc.robot.subsystems.superstructure.Elevator;
-import frc.robot.subsystems.superstructure.LED;
-import frc.robot.subsystems.superstructure.Superstructure.SuperstructureState;
-import frc.robot.subsystems.superstructure.wrist.Wrist;
+import frc.robot.subsystems.launcher.LauncherSuperstructure;
+import frc.robot.subsystems.launcher.LauncherSuperstructure.LauncherSuperstructureState;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.utilities.Alert;
 import frc.robot.utilities.Alert.AlertType;
@@ -65,10 +58,8 @@ public class RobotContainer {
 
   // SUBSYSTEMS \\
   private SwerveDrive m_drivebase = SwerveDrive.getInstance();
-  private Arm m_arm = Arm.getInstance();
-  private Elevator m_elevator = Elevator.getInstance();
-  private Wrist m_wrist = Wrist.getInstance();
   public static LED m_superStructureLED = new LED(new AddressableLED(0), 20);
+  private LauncherSuperstructure m_launcherSuperstructure = LauncherSuperstructure.getInstance();
 
   // SENDABLE CHOOSER \\
   public static LoggedDashboardChooser<Command> autoChooser;
@@ -83,14 +74,6 @@ public class RobotContainer {
 
     // NAMED COMMANDS FOR AUTO \\
     // you would never do this while following a path, its just to show how to implement
-    NamedCommands.registerCommand(
-        "scoreHigh",
-        new SetSuperstructureState(SuperstructureState.SCORE_HIGH, false)
-            .andThen(new SetSuperstructureState(SuperstructureState.HOME, true)));
-    NamedCommands.registerCommand(
-        "groundPickup", new SetSuperstructureState(SuperstructureState.GROUND_PICKUP, false));
-    NamedCommands.registerCommand(
-        "home", new SetSuperstructureState(SuperstructureState.HOME, false));
 
     autoChooser =
         new LoggedDashboardChooser<>(
@@ -109,9 +92,6 @@ public class RobotContainer {
             true,
             DriveConstants.kRegularSpeed,
             true));
-    Elevator.getInstance().setDefaultCommand(new ManualServoSubsystem(m_elevator));
-    Arm.getInstance().setDefaultCommand(new ManualServoSubsystem(m_arm));
-    Wrist.getInstance().setDefaultCommand(new ManualServoSubsystem(m_wrist));
 
     configureButtonBindings();
   }
@@ -178,40 +158,9 @@ public class RobotContainer {
     //     .y()
     //     .onTrue(new InstantCommand(() -> m_drivebase.setAngleToSnap(AngleToSnap.FORWARD)));
     // m_driverController.x().onTrue(new InstantCommand(m_drivebase::toggleXWheels));
-
-    m_operatorController
-        .a()
-        .onTrue(new QueueSuperstructureCommand(SuperstructureState.HOME, false));
-    m_operatorController
-        .x()
-        .onTrue(new QueueSuperstructureCommand(SuperstructureState.SUBSTATION_PICKUP, false));
-    m_operatorController
-        .x()
-        .onFalse(new QueueSuperstructureCommand(SuperstructureState.HOME, false));
-    m_operatorController
-        .b()
-        .onTrue(new QueueSuperstructureCommand(SuperstructureState.GROUND_PICKUP, false));
-    m_operatorController
-        .b()
-        .onFalse(new QueueSuperstructureCommand(SuperstructureState.HOME, false));
-    m_operatorController
-        .povUp()
-        .onTrue(new QueueSuperstructureCommand(SuperstructureState.SCORE_HIGH, false));
-    m_operatorController
-        .povUp()
-        .onFalse(new QueueSuperstructureCommand(SuperstructureState.HOME, true));
-    m_operatorController
-        .povRight()
-        .onTrue(new QueueSuperstructureCommand(SuperstructureState.SCORE_MID, false));
-    m_operatorController
-        .povRight()
-        .onFalse(new QueueSuperstructureCommand(SuperstructureState.HOME, true));
-    m_operatorController
-        .povDown()
-        .onTrue(new QueueSuperstructureCommand(SuperstructureState.SCORE_LOW, false));
-    m_operatorController
-        .povDown()
-        .onFalse(new QueueSuperstructureCommand(SuperstructureState.HOME, true));
+    m_operatorController.a().onTrue(m_launcherSuperstructure.setSuperstructureState(LauncherSuperstructureState.LAUNCH));
+    m_operatorController.b().onTrue(m_launcherSuperstructure.setSuperstructureState(LauncherSuperstructureState.IDLE));
+    m_operatorController.x().onTrue(m_launcherSuperstructure.setSuperstructureState(LauncherSuperstructureState.OFF));
   }
 
   public Command getAutonomousCommand() {
