@@ -92,6 +92,7 @@ public class RobotContainer {
             true,
             DriveConstants.kRegularSpeed,
             true));
+    // m_launcherWrist.setDefaultCommand(new ManualPositionSubsystem(m_launcherWrist));
 
     configureButtonBindings();
   }
@@ -158,6 +159,7 @@ public class RobotContainer {
     //     .y()
     //     .onTrue(new InstantCommand(() -> m_drivebase.setAngleToSnap(AngleToSnap.FORWARD)));
     // m_driverController.x().onTrue(new InstantCommand(m_drivebase::toggleXWheels));
+
     m_operatorController.a().onTrue(m_launcherSuperstructure.setSuperstructureState(LauncherSuperstructureState.LAUNCH));
     m_operatorController.b().onTrue(m_launcherSuperstructure.setSuperstructureState(LauncherSuperstructureState.IDLE));
     m_operatorController.x().onTrue(m_launcherSuperstructure.setSuperstructureState(LauncherSuperstructureState.OFF));

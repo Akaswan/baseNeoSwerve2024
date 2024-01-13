@@ -13,7 +13,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.subsystems.launcher.LauncherFlywheel.LauncherFlywheelState;
 import frc.robot.subsystems.launcher.LauncherWrist.LauncherWristState;
 import frc.robot.subsystems.templates.VelocitySubsystem.VelocitySubsystemType;
@@ -260,7 +259,7 @@ public final class Constants {
       kLauncherWristConstants.kMaxPosition = 155;
       kLauncherWristConstants.kMinPosition = -85;
 
-      kLauncherWristConstants.kManualAxis = XboxController.Axis.kRightX.value;
+      kLauncherWristConstants.kManualControlMode = ManualControlMode.TRIGGERS;
       kLauncherWristConstants.kManualMultiplier = 1;
       kLauncherWristConstants.kManualDeadBand = .1;
 
@@ -271,6 +270,14 @@ public final class Constants {
   }
 
 
+  public static enum ManualControlMode {
+    TRIGGERS,
+    BUMPERS,
+    LEFT_X,
+    LEFT_Y,
+    RIGHT_X,
+    RIGHT_Y
+  }
 
   public static enum Mode {
     /** Running on a real robot. */

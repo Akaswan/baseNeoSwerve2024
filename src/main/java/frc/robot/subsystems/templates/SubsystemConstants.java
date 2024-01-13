@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import frc.robot.subsystems.templates.VoltageSubsystem.VoltageSubsystemState;
 import frc.robot.subsystems.templates.VoltageSubsystem.VoltageSubsystemType;
+import frc.robot.Constants.ManualControlMode;
 import frc.robot.subsystems.templates.PositionSubsystem.PositionSubsystemState;
 import frc.robot.subsystems.templates.PositionSubsystem.PositionSubsystemType;
 import frc.robot.subsystems.templates.VelocitySubsystem.VelocitySubsystemState;
@@ -64,7 +65,7 @@ public class SubsystemConstants {
     public double kMinPosition = Double.NEGATIVE_INFINITY;
 
     // Manual constants
-    public int kManualAxis = 0;
+    public ManualControlMode kManualControlMode = null;
     public double kManualMultiplier = 0;
     public double kManualDeadBand = 0;
   }

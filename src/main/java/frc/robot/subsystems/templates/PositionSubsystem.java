@@ -176,8 +176,30 @@ public abstract class PositionSubsystem extends SubsystemBase {
     }
   }
 
-  public void manualControl(double throttle) {
-    double m_throttle = MathUtil.applyDeadband(throttle, m_constants.kManualDeadBand);
+  public void manualControl() {
+    double m_throttle = 0;
+
+    switch (m_constants.kManualControlMode) {
+      case BUMPERS:
+         m_throttle =
+          RobotContainer.m_operatorController.getHID().getLeftBumper()
+              ? 1
+              : 0 + (RobotContainer.m_operatorController.getHID().getRightBumper() ? -1 : 0);
+      case LEFT_X:
+        m_throttle = -RobotContainer.m_driverController.getLeftX();
+      case LEFT_Y:
+        m_throttle = -RobotContainer.m_driverController.getLeftY();
+      case RIGHT_X:
+        m_throttle = -RobotContainer.m_driverController.getRightX();
+      case RIGHT_Y:
+        m_throttle = -RobotContainer.m_driverController.getRightY();
+      case TRIGGERS:
+        m_throttle =
+          RobotContainer.m_driverController.getRightTriggerAxis()
+              - RobotContainer.m_driverController.getLeftTriggerAxis();
+    }
+
+    m_throttle = MathUtil.applyDeadband(m_throttle, m_constants.kManualDeadBand);
 
     if (m_currentState != m_constants.kManualState)
       m_constants.kManualState.setPosition(getPosition());
