@@ -4,26 +4,19 @@
 
 package frc.robot.commands.auto;
 
-import java.util.List;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
 public class CenterNoteAuto extends Command {
   /** Creates a new CenterNoteAuto. */
   
   private SwerveDrive m_drivebase;
-  private boolean[] m_availableNotes = new boolean[] {false, false, false, true, true};
-  private int indexToUse = -1;
+  // private boolean[] m_availableNotes = new boolean[] {false, false, false, true, true};
+  // private int indexToUse = -1;
 
   public CenterNoteAuto(SwerveDrive drivebase) {
     m_drivebase = drivebase;
@@ -35,12 +28,12 @@ public class CenterNoteAuto extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    for (int i = 0; i < m_availableNotes.length; i++) {
-      if (m_availableNotes[i]) {
-        indexToUse = i;
-        break;
-      }
-    }
+    // for (int i = 0; i < m_availableNotes.length; i++) {
+    //   if (m_availableNotes[i]) {
+    //     indexToUse = i;
+    //     break;
+    //   }
+    // }
     
 
     // List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(

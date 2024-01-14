@@ -54,12 +54,17 @@ public final class Constants {
     public static double drivekp = 0.15751;
     public static double driveki = 0.0;
     public static double drivekd = 0.0;
-    public static double drivekff = 0.23983;
+    public static double driveks = 0.0;
+    public static double drivekv = 0.0;
+    public static double driveka = 0.0;
     public static double driverampRate = 1.0;
 
     public static double turnkp = 0.1;
     public static double turnki = 0.0;
     public static double turnkd = 0.0;
+    public static double turnks = 0.0;
+    public static double turnkv = 0.0;
+    public static double turnka = 0.0;
     public static double turnkff = 0.0;
 
     public static double kDriveModifier = 2;

@@ -82,15 +82,6 @@ public class SwerveDrive extends SubsystemBase {
           Map.of("min", 0),
           2,
           0);
-  public static final LoggedShuffleboardTunableNumber drivekff =
-      new LoggedShuffleboardTunableNumber(
-          "Drive FF",
-          DriveConstants.drivekff,
-          RobotContainer.driveTuningTab,
-          BuiltInWidgets.kTextView,
-          Map.of("min", 0),
-          3,
-          0);
   public static final LoggedShuffleboardTunableNumber driveRampRate =
       new LoggedShuffleboardTunableNumber(
           "Drive RampRate",

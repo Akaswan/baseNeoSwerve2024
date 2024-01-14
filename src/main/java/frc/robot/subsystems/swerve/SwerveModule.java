@@ -5,13 +5,11 @@
 package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.revrobotics.CANSparkFlex;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-
+import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -29,15 +27,12 @@ import frc.robot.utilities.SwerveModuleConstants;
 import java.util.Map;
 
 public class SwerveModule extends SubsystemBase {
-  private final int POS_SLOT = 0;
-  private final int VEL_SLOT = 0;
-
-  private CANSparkFlex m_driveMotor;
-  private CANSparkFlex m_turningMotor;
+  private TalonFX m_driveMotor;
+  private TalonFX m_turningMotor;
   private CANcoder m_angleEncoder;
 
-  public final RelativeEncoder m_driveEncoder;
-  private final RelativeEncoder m_turnEncoder;
+  // public final RelativeEncoder m_driveEncoder;
+  // private final RelativeEncoder m_turnEncoder;
 
   private double m_simDriveEncoderPosition;
   private double m_simDriveEncoderVelocity;
@@ -45,8 +40,8 @@ public class SwerveModule extends SubsystemBase {
   private LoggedShuffleboardTunableNumber m_angleOffset;
   private double m_lastAngleOffset;
 
-  private final SparkPIDController m_driveController;
-  private SparkPIDController m_turnController;
+  // private final SparkPIDController m_driveController;
+  // private SparkPIDController m_turnController;
 
   double m_currentAngle;
   double m_lastAngle;
@@ -66,11 +61,11 @@ public class SwerveModule extends SubsystemBase {
     m_moduleNumber = moduleNumber;
 
     m_driveMotor =
-        new CANSparkFlex(
-            swerveModuleConstants.driveMotorChannel, MotorType.kBrushless);
+        new TalonFX(
+            swerveModuleConstants.driveMotorChannel);
     m_turningMotor =
-        new CANSparkFlex(
-            swerveModuleConstants.turningMotorChannel, MotorType.kBrushless);
+        new TalonFX(
+            swerveModuleConstants.turningMotorChannel);
 
     m_angleEncoder = new CANcoder(swerveModuleConstants.cancoderID, "rio");
     m_angleOffset =
@@ -84,33 +79,17 @@ public class SwerveModule extends SubsystemBase {
             2);
     m_lastAngleOffset = m_angleOffset.get();
 
-    m_driveMotor.restoreFactoryDefaults();
-    RevUtils.setDriveMotorConfig(m_driveMotor);
-    m_driveMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    m_driveMotor.getConfigurator().apply(new TalonFXConfiguration());
     m_driveMotor.setInverted(true); // MK4i drive motor is inverted
+    m_driveMotor.getConfigurator().apply(CtreUtils.generateDriveMotorConfig());
+    m_driveMotor.setPosition(0);
 
-    m_turningMotor.restoreFactoryDefaults();
-    RevUtils.setTurnMotorConfig(m_turningMotor);
-    m_turningMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-
-    m_turningMotor.setSmartCurrentLimit(25);
-    m_turningMotor.enableVoltageCompensation(12.6);
-    m_turningMotor.setInverted(true); // MK4i Steer Motor is inverted
+    m_turningMotor.getConfigurator().apply(new TalonFXConfiguration());
+    m_turningMotor.setInverted(true);
+    m_turningMotor.getConfigurator().apply(CtreUtils.generateTurnMotorConfig());
 
     m_angleEncoder.getConfigurator().apply(new CANcoderConfiguration());
     m_angleEncoder.getConfigurator().apply(CtreUtils.generateCanCoderConfig());
-
-    m_driveEncoder = m_driveMotor.getEncoder();
-    m_driveEncoder.setPositionConversionFactor(DriveConstants.kDriveRevToMeters);
-    m_driveEncoder.setVelocityConversionFactor(DriveConstants.kDriveRpmToMetersPerSecond);
-    m_driveEncoder.setPosition(0);
-
-    m_turnEncoder = m_turningMotor.getEncoder();
-    m_turnEncoder.setPositionConversionFactor(DriveConstants.kTurnRotationsToDegrees);
-    m_turnEncoder.setVelocityConversionFactor(DriveConstants.kTurnRotationsToDegrees / 60);
-
-    m_driveController = m_driveMotor.getPIDController();
-    m_turnController = m_turningMotor.getPIDController();
   }
 
   /**
@@ -133,11 +112,11 @@ public class SwerveModule extends SubsystemBase {
 
   public void resetAngleToAbsolute() {
     double angle = m_angleEncoder.getAbsolutePosition().getValueAsDouble() - m_angleOffset.get();
-    m_turnEncoder.setPosition(angle);
+    m_turningMotor.setPosition(angle);
   }
 
   public double getHeadingDegrees() {
-    if (RobotBase.isReal()) return m_turnEncoder.getPosition();
+    if (RobotBase.isReal()) return m_turningMotor.getPosition().getValue();
     else return m_currentAngle;
   }
 
@@ -146,12 +125,12 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public double getDriveMeters() {
-    if (RobotBase.isReal()) return m_driveEncoder.getPosition();
+    if (RobotBase.isReal()) return m_driveMotor.getPosition().getValue();
     else return m_simDriveEncoderPosition;
   }
 
   public double getDriveMetersPerSecond() {
-    if (RobotBase.isReal()) return m_driveEncoder.getVelocity();
+    if (RobotBase.isReal()) return m_driveMotor.getVelocity().getValue();
     else return m_simDriveEncoderVelocity;
   }
 
@@ -162,9 +141,7 @@ public class SwerveModule extends SubsystemBase {
       double percentOutput = desiredState.speedMetersPerSecond / DriveConstants.kMaxMetersPerSecond;
       m_driveMotor.set(percentOutput);
     } else {
-      int DRIVE_PID_SLOT = VEL_SLOT;
-      m_driveController.setReference(
-          desiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity, DRIVE_PID_SLOT);
+      m_driveMotor.setControl(new VelocityVoltage(desiredState.speedMetersPerSecond));
     }
 
     double angle =
@@ -175,7 +152,7 @@ public class SwerveModule extends SubsystemBase {
             ? m_lastAngle
             : desiredState.angle.getDegrees();
     angle = desiredState.angle.getDegrees();
-    m_turnController.setReference(angle, CANSparkMax.ControlType.kPosition, POS_SLOT);
+    m_turningMotor.setControl(new PositionVoltage(angle));
     m_lastAngle = angle;
 
     if (RobotBase.isSimulation()) {
@@ -198,16 +175,16 @@ public class SwerveModule extends SubsystemBase {
   public void tuningInit() {}
 
   public void tuningPeriodic() {
-    m_driveController.setP(SwerveDrive.drivekp.get());
-    m_driveController.setI(SwerveDrive.driveki.get());
-    m_driveController.setD(SwerveDrive.drivekd.get());
-    m_driveController.setFF(SwerveDrive.drivekff.get());
-    m_driveMotor.setOpenLoopRampRate(SwerveDrive.driveRampRate.get());
+    // m_driveController.setP(SwerveDrive.drivekp.get());
+    // m_driveController.setI(SwerveDrive.driveki.get());
+    // m_driveController.setD(SwerveDrive.drivekd.get());
+    // m_driveController.setFF(SwerveDrive.drivekff.get());
+    // m_driveMotor.setOpenLoopRampRate(SwerveDrive.driveRampRate.get());
 
-    m_turnController.setP(SwerveDrive.drivekp.get());
-    m_turnController.setI(SwerveDrive.driveki.get());
-    m_turnController.setD(SwerveDrive.drivekd.get());
-    m_turnController.setFF(SwerveDrive.drivekff.get());
+    // m_turnController.setP(SwerveDrive.drivekp.get());
+    // m_turnController.setI(SwerveDrive.driveki.get());
+    // m_turnController.setD(SwerveDrive.drivekd.get());
+    // m_turnController.setFF(SwerveDrive.drivekff.get());
 
     if (m_lastAngleOffset != m_angleOffset.get()) {
       resetAngleToAbsolute();
