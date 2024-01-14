@@ -75,8 +75,7 @@
           },
           "LauncherLauncherSuperstructure": {
             "open": true
-          },
-          "open": true
+          }
         },
         "open": true
       },
@@ -87,6 +86,9 @@
         "Drive Tuning": {
           "open": true
         },
+        "open": true
+      },
+      "SmartDashboard": {
         "open": true
       }
     }

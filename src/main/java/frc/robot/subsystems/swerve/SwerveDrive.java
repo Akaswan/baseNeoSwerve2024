@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
@@ -413,6 +414,13 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
+  public double calculateAngleToSpeaker() {
+    double hypot = getPose().getTranslation().getDistance(DriveConstants.kSpeakerPosition);
+    double adjacent = getPose().getTranslation().getX() - DriveConstants.kSpeakerPosition.getX();
+
+    return getPose().getY() > DriveConstants.kSpeakerPosition.getY() ? Math.toDegrees(Math.acos(adjacent / hypot)) : -Math.toDegrees(Math.acos(adjacent / hypot));
+  }
+
   @Override
   public void periodic() {
     poseEstimator.update(getYaw(), getModulePositions());
@@ -429,6 +437,8 @@ public class SwerveDrive extends SubsystemBase {
 
     m_field.setRobotPose(poseEstimator.getEstimatedPosition());
     m_field.getObject("path").setPoses(ppPath);
+
+    SmartDashboard.putNumber("Angle To Speaker", calculateAngleToSpeaker());
   }
 
   public void realPeriodic() {

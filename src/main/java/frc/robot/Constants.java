@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
 import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -171,9 +175,42 @@ public final class Constants {
       new SwerveModuleState(0, Rotation2d.fromDegrees(135)),
       new SwerveModuleState(0, Rotation2d.fromDegrees(-135)),
     };
+
+    public static final Translation2d kSpeakerPosition = new Translation2d(0, 5.56);
   }
 
   public static final class LauncherConstants {
+
+    // IN METERS
+    public static final TreeMap<Double, Double> kDistanceRPMMap = new TreeMap<>();
+    static {
+      kDistanceRPMMap.put(1.0, 2000.0);
+      kDistanceRPMMap.put(1.5, 2500.0);
+      kDistanceRPMMap.put(2.0, 3000.0);
+      kDistanceRPMMap.put(2.5, 3500.0);
+      kDistanceRPMMap.put(3.0, 4000.0);
+      kDistanceRPMMap.put(3.5, 4500.0);
+      kDistanceRPMMap.put(4.0, 5000.0);
+      kDistanceRPMMap.put(4.5, 5500.0);
+      kDistanceRPMMap.put(5.0, 6000.0);
+      kDistanceRPMMap.put(5.5, 6500.0);
+    }
+
+    // IN DEGREES
+    public static final TreeMap<Double, Double> kDistancePitchMap = new TreeMap<>();
+    static {
+      kDistancePitchMap.put(1.0, 60.0);
+      kDistancePitchMap.put(1.5, 55.0);
+      kDistancePitchMap.put(2.0, 50.0);
+      kDistancePitchMap.put(2.5, 45.0);
+      kDistancePitchMap.put(3.0, 40.0);
+      kDistancePitchMap.put(3.5, 35.0);
+      kDistancePitchMap.put(4.0, 30.0);
+      kDistancePitchMap.put(4.5, 25.0);
+      kDistancePitchMap.put(5.0, 20.0);
+      kDistancePitchMap.put(5.5, 15.0);
+      kDistancePitchMap.put(6.0, 10.0);
+    }
 
     public static final SparkMaxConstants kLauncherFlywheelMasterConstants = new SparkMaxConstants();
 
