@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 import com.pathplanner.lib.util.PIDConstants;
@@ -184,6 +182,7 @@ public final class Constants {
     // IN METERS
     public static final TreeMap<Double, Double> kDistanceRPMMap = new TreeMap<>();
     static {
+      kDistanceRPMMap.put(0.0, 1000.0);
       kDistanceRPMMap.put(1.0, 2000.0);
       kDistanceRPMMap.put(1.5, 2500.0);
       kDistanceRPMMap.put(2.0, 3000.0);
@@ -199,6 +198,7 @@ public final class Constants {
     // IN DEGREES
     public static final TreeMap<Double, Double> kDistancePitchMap = new TreeMap<>();
     static {
+      kDistancePitchMap.put(0.0, 90.0);
       kDistancePitchMap.put(1.0, 60.0);
       kDistancePitchMap.put(1.5, 55.0);
       kDistancePitchMap.put(2.0, 50.0);
