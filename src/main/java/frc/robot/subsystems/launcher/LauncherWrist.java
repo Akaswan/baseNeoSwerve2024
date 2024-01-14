@@ -35,7 +35,7 @@ public class LauncherWrist extends PositionSubsystem {
     public void outputTelemetry() {}
 
     public double calculatePitch() {
-        double distance = SwerveDrive.getInstance().getPose().getTranslation().getDistance(DriveConstants.kSpeakerPosition);
+        double distance = SwerveDrive.getInstance().getPose().getTranslation().getDistance(DriveConstants.kBlueSpeakerPosition);
 
         if (distance > 0 && distance < LauncherConstants.kDistancePitchMap.lastKey()) {
             double lowerPitch = LauncherConstants.kDistancePitchMap.get(LauncherConstants.kDistancePitchMap.floorKey(distance));

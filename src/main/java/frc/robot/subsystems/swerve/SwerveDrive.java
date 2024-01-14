@@ -415,10 +415,10 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public double calculateAngleToSpeaker() {
-    double hypot = getPose().getTranslation().getDistance(DriveConstants.kSpeakerPosition);
-    double adjacent = getPose().getTranslation().getX() - DriveConstants.kSpeakerPosition.getX();
+    double hypot = getPose().getTranslation().getDistance(DriveConstants.kredSpeakerPosition);
+    double adjacent = getPose().getTranslation().getX() - DriveConstants.kBlueSpeakerPosition.getX();
 
-    return getPose().getY() > DriveConstants.kSpeakerPosition.getY() ? Math.toDegrees(Math.acos(adjacent / hypot)) : -Math.toDegrees(Math.acos(adjacent / hypot));
+    return getPose().getY() > DriveConstants.kBlueSpeakerPosition.getY() ? Math.toDegrees(Math.acos(adjacent / hypot)) : -Math.toDegrees(Math.acos(adjacent / hypot));
   }
 
   @Override

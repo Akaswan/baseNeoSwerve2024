@@ -174,7 +174,8 @@ public final class Constants {
       new SwerveModuleState(0, Rotation2d.fromDegrees(-135)),
     };
 
-    public static final Translation2d kSpeakerPosition = new Translation2d(0, 5.56);
+    public static final Translation2d kBlueSpeakerPosition = new Translation2d(0, 5.56);
+    public static final Translation2d kRedSpeakerPosition = new Translation2d(0, 2.65);
   }
 
   public static final class LauncherConstants {

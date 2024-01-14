@@ -34,7 +34,7 @@ public class LauncherFlywheel extends VelocitySubsystem {
     public void outputTelemetry() {}
 
     public double calculateRPM() {
-        double distance = SwerveDrive.getInstance().getPose().getTranslation().getDistance(DriveConstants.kSpeakerPosition);
+        double distance = SwerveDrive.getInstance().getPose().getTranslation().getDistance(DriveConstants.kBlueSpeakerPosition);
 
         if (distance > 0 && distance < LauncherConstants.kDistanceRPMMap.lastKey()) {
             double lowerRPM = LauncherConstants.kDistanceRPMMap.get(LauncherConstants.kDistanceRPMMap.floorKey(distance));
