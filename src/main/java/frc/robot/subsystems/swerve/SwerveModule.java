@@ -5,6 +5,8 @@
 package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -174,17 +176,27 @@ public class SwerveModule extends SubsystemBase {
 
   public void tuningInit() {}
 
-  public void tuningPeriodic() {
-    // m_driveController.setP(SwerveDrive.drivekp.get());
-    // m_driveController.setI(SwerveDrive.driveki.get());
-    // m_driveController.setD(SwerveDrive.drivekd.get());
-    // m_driveController.setFF(SwerveDrive.drivekff.get());
-    // m_driveMotor.setOpenLoopRampRate(SwerveDrive.driveRampRate.get());
+  public void tuningPeriodic(boolean applyConfigs) {
 
-    // m_turnController.setP(SwerveDrive.drivekp.get());
-    // m_turnController.setI(SwerveDrive.driveki.get());
-    // m_turnController.setD(SwerveDrive.drivekd.get());
-    // m_turnController.setFF(SwerveDrive.drivekff.get());
+    if (applyConfigs) {
+      System.out.println("Bruh");
+      m_driveMotor.getConfigurator().apply(new TalonFXConfiguration()
+        .withSlot0(
+          new Slot0Configs()
+            .withKP(SwerveDrive.drivekp.get())
+            .withKI(SwerveDrive.driveki.get())
+            .withKD(SwerveDrive.drivekd.get()))
+        .withOpenLoopRamps(
+          new OpenLoopRampsConfigs().withVoltageOpenLoopRampPeriod(SwerveDrive.driveRampRate.get())
+        )
+      );
+      m_driveMotor.getConfigurator().apply(
+          new Slot0Configs()
+            .withKP(SwerveDrive.turnkp.get())
+            .withKI(SwerveDrive.turnki.get())
+            .withKD(SwerveDrive.turnkd.get())
+      );
+    }
 
     if (m_lastAngleOffset != m_angleOffset.get()) {
       resetAngleToAbsolute();

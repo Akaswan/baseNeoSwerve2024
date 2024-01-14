@@ -27,7 +27,7 @@ public final class Constants {
 
   public static final boolean kInfoMode = true;
 
-  public static final boolean kTuningMode = false;
+  public static final boolean kTuningMode = true;
 
   // // DRIVEBASE \\ \\
 
@@ -65,7 +65,6 @@ public final class Constants {
     public static double turnks = 0.0;
     public static double turnkv = 0.0;
     public static double turnka = 0.0;
-    public static double turnkff = 0.0;
 
     public static double kDriveModifier = 2;
     public static double kTurnModifier = 2;

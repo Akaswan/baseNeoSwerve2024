@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -54,6 +55,8 @@ public class SwerveDrive extends SubsystemBase {
   private AngleToSnap m_angleToSnap = AngleToSnap.NONE;
 
   private boolean m_xWheels = false;
+
+  public static final GenericEntry applyTuning = RobotContainer.driveTuningTab.add("Apply Tuning", false).withWidget(BuiltInWidgets.kToggleButton).withPosition(5, 0).getEntry();
 
   public static final LoggedShuffleboardTunableNumber drivekp =
       new LoggedShuffleboardTunableNumber(
@@ -118,15 +121,6 @@ public class SwerveDrive extends SubsystemBase {
           BuiltInWidgets.kTextView,
           Map.of("min", 0),
           2,
-          1);
-  public static final LoggedShuffleboardTunableNumber turnkff =
-      new LoggedShuffleboardTunableNumber(
-          "Turn FF",
-          DriveConstants.turnkff,
-          RobotContainer.driveTuningTab,
-          BuiltInWidgets.kTextView,
-          Map.of("min", 0),
-          3,
           1);
 
   public static final LoggedShuffleboardTunableNumber apriltagTrustMultiplier =
@@ -454,10 +448,11 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void tuningPeriodic() {
-
     for (SwerveModule module : m_SwerveMods) {
-      module.tuningPeriodic();
+      module.tuningPeriodic(applyTuning.get().getBoolean());
     }
+
+    if (applyTuning.get().getBoolean() == true) applyTuning.setBoolean(false);
   }
 
   public void tuningInit() {

@@ -37,6 +37,7 @@ public final class CtreUtils {
     motorConfig.Slot0.kV = DriveConstants.drivekv;
     motorConfig.Slot0.kA = DriveConstants.driveka;
     motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    motorConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = DriveConstants.driverampRate;
 
     motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     motorConfig.CurrentLimits.SupplyCurrentLimit = 60;
