@@ -5,21 +5,12 @@
 package frc.robot;
 
 import com.pathplanner.lib.util.PIDConstants;
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.subsystems.launcher.LauncherFlywheel.LauncherFlywheelState;
-import frc.robot.subsystems.launcher.LauncherWrist.LauncherWristState;
-import frc.robot.subsystems.templates.VelocitySubsystem.VelocitySubsystemType;
-import frc.robot.subsystems.templates.PositionSubsystem.PositionSubsystemType;
-import frc.robot.subsystems.templates.SubsystemConstants.PositionSubsystemConstants;
-import frc.robot.subsystems.templates.SubsystemConstants.SparkMaxConstants;
-import frc.robot.subsystems.templates.SubsystemConstants.VelocitySubsystemConstants;
 import frc.robot.utilities.SwerveModuleConstants;
 
 /**
@@ -172,103 +163,6 @@ public final class Constants {
       new SwerveModuleState(0, Rotation2d.fromDegrees(-135)),
     };
   }
-
-  public static final class LauncherConstants {
-
-    public static final SparkMaxConstants kLauncherFlywheelMasterConstants = new SparkMaxConstants();
-
-    static {
-      kLauncherFlywheelMasterConstants.kID = 34;
-      kLauncherFlywheelMasterConstants.kIdleMode = IdleMode.kBrake;
-      kLauncherFlywheelMasterConstants.kMotorType = MotorType.kBrushless;
-      kLauncherFlywheelMasterConstants.kCurrentLimit = 80;
-      kLauncherFlywheelMasterConstants.kInverted = false;
-    }
-
-    public static final SparkMaxConstants[] kLauncherFlywheelSlaveConstants = new SparkMaxConstants[0];
-
-    public static final VelocitySubsystemConstants kLauncherFlywheelConstants =
-        new VelocitySubsystemConstants();
-
-    static {
-      kLauncherFlywheelConstants.kName = "Launcher Flywheel";
-
-      kLauncherFlywheelConstants.kSubsystemType = VelocitySubsystemType.LAUNCHER_FLYWHEEL;
-
-      kLauncherFlywheelConstants.kMasterConstants = kLauncherFlywheelMasterConstants;
-      kLauncherFlywheelConstants.kSlaveConstants = kLauncherFlywheelSlaveConstants;
-
-      kLauncherFlywheelConstants.kVelocityConversionFactor = 3 / 60; // division by 60 to get rotations per second
-
-      kLauncherFlywheelConstants.kKp = 0.01;
-      kLauncherFlywheelConstants.kKi = 0.0;
-      kLauncherFlywheelConstants.kKd = 0.0;
-
-      kLauncherFlywheelConstants.kDefaultSlot = 0;
-
-      kLauncherFlywheelConstants.kKs = 0.0;
-      kLauncherFlywheelConstants.kKv = 0.0;
-      kLauncherFlywheelConstants.kKa = 0.0;
-
-      kLauncherFlywheelConstants.kInitialState = LauncherFlywheelState.OFF;
-      kLauncherFlywheelConstants.kTransitionState = LauncherFlywheelState.TRANSITION;
-    }
-
-  public static final SparkMaxConstants kLauncherWristMasterConstants = new SparkMaxConstants();
-
-    static {
-      kLauncherWristMasterConstants.kID = 7;
-      kLauncherWristMasterConstants.kIdleMode = IdleMode.kBrake;
-      kLauncherWristMasterConstants.kMotorType = MotorType.kBrushless;
-      kLauncherWristMasterConstants.kCurrentLimit = 80;
-      kLauncherWristMasterConstants.kInverted = false;
-    }
-
-    public static final SparkMaxConstants[] kWristSlaveConstants = new SparkMaxConstants[0];
-
-    public static final PositionSubsystemConstants kLauncherWristConstants =
-        new PositionSubsystemConstants();
-
-    static {
-      kLauncherWristConstants.kName = "Launcher Wrist";
-
-      kLauncherWristConstants.kSubsystemType = PositionSubsystemType.LAUNCHER_WRIST;
-
-      kLauncherWristConstants.kMasterConstants = kLauncherWristMasterConstants;
-      kLauncherWristConstants.kSlaveConstants = kWristSlaveConstants;
-
-      kLauncherWristConstants.kHomePosition = 155;
-      kLauncherWristConstants.kPositionConversionFactor = 360 / 100;
-
-      kLauncherWristConstants.kKp = 0.2;
-      kLauncherWristConstants.kKi = 0.0;
-      kLauncherWristConstants.kKd = 0.0;
-      kLauncherWristConstants.kSetpointTolerance = 0.1;
-      kLauncherWristConstants.kSmartMotionTolerance = 0.1;
-
-      kLauncherWristConstants.kDefaultSlot = 0;
-
-      kLauncherWristConstants.kMaxVelocity = 2000;
-      kLauncherWristConstants.kMaxAcceleration = 2000;
-
-      kLauncherWristConstants.kKs = 0.0;
-      kLauncherWristConstants.kKg = 0.0;
-      kLauncherWristConstants.kKv = 0.0;
-      kLauncherWristConstants.kKa = 0.0;
-
-      kLauncherWristConstants.kMaxPosition = 155;
-      kLauncherWristConstants.kMinPosition = -85;
-
-      kLauncherWristConstants.kManualControlMode = ManualControlMode.TRIGGERS;
-      kLauncherWristConstants.kManualMultiplier = 1;
-      kLauncherWristConstants.kManualDeadBand = .1;
-
-      kLauncherWristConstants.kInitialState = LauncherWristState.DOWN;
-      kLauncherWristConstants.kManualState = LauncherWristState.MANUAL;
-      kLauncherWristConstants.kTransitionState = LauncherWristState.TRANSITION;
-    }
-  }
-
 
   public static enum ManualControlMode {
     TRIGGERS,
