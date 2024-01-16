@@ -56,7 +56,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private boolean m_xWheels = false;
 
-  public static final GenericEntry applyTuning = RobotContainer.driveTuningTab.add("Apply Tuning", false).withWidget(BuiltInWidgets.kToggleButton).withPosition(5, 0).getEntry();
+  public static GenericEntry applyTuning = null;
 
   public static final LoggedShuffleboardTunableNumber drivekp =
       new LoggedShuffleboardTunableNumber(
@@ -184,6 +184,8 @@ public class SwerveDrive extends SubsystemBase {
             VecBuilder.fill(0.9, 0.9, 0.9));
 
     m_pigeon.setYaw(0);
+
+    if (Constants.kTuningMode) applyTuning = RobotContainer.driveTuningTab.add("Apply Tuning", false).withWidget(BuiltInWidgets.kToggleButton).withPosition(5, 0).getEntry();
 
     robotRelativeChassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
