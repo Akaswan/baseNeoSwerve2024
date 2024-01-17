@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
 import frc.robot.utilities.CtreUtils;
-import frc.robot.utilities.LoggedShuffleboardTunableNumber;
 import frc.robot.utilities.RevUtils;
 import frc.robot.utilities.SwerveModuleConstants;
 import java.util.Map;
@@ -42,8 +41,7 @@ public class SwerveModule extends SubsystemBase {
   private double m_simDriveEncoderPosition;
   private double m_simDriveEncoderVelocity;
 
-  private LoggedShuffleboardTunableNumber m_angleOffset;
-  private double m_lastAngleOffset;
+  private double m_angleOffset;
 
   private final SparkPIDController m_driveController;
   private SparkPIDController m_turnController;
@@ -73,16 +71,7 @@ public class SwerveModule extends SubsystemBase {
             swerveModuleConstants.turningMotorChannel, MotorType.kBrushless);
 
     m_angleEncoder = new CANcoder(swerveModuleConstants.cancoderID, "rio");
-    m_angleOffset =
-        new LoggedShuffleboardTunableNumber(
-            "Module " + m_moduleNumber + " Offset",
-            swerveModuleConstants.angleOffset,
-            RobotContainer.driveTuningTab,
-            BuiltInWidgets.kTextView,
-            Map.of("min", 0),
-            m_moduleNumber,
-            2);
-    m_lastAngleOffset = m_angleOffset.get();
+    m_angleOffset = swerveModuleConstants.angleOffset;
 
     m_driveMotor.restoreFactoryDefaults();
     RevUtils.setDriveMotorConfig(m_driveMotor);
@@ -132,7 +121,7 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public void resetAngleToAbsolute() {
-    double angle = m_angleEncoder.getAbsolutePosition().getValueAsDouble() - m_angleOffset.get();
+    double angle = m_angleEncoder.getAbsolutePosition().getValue() - m_angleOffset;
     m_turnEncoder.setPosition(angle);
   }
 
@@ -208,11 +197,6 @@ public class SwerveModule extends SubsystemBase {
     m_turnController.setI(SwerveDrive.driveki.get());
     m_turnController.setD(SwerveDrive.drivekd.get());
     m_turnController.setFF(SwerveDrive.drivekff.get());
-
-    if (m_lastAngleOffset != m_angleOffset.get()) {
-      resetAngleToAbsolute();
-      m_lastAngleOffset = m_angleOffset.get();
-    }
   }
 
   public void infoInit() {
