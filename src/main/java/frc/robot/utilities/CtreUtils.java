@@ -42,7 +42,7 @@ public final class CtreUtils {
     motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     motorConfig.CurrentLimits.SupplyCurrentLimit = 60;
 
-    motorConfig.Feedback.SensorToMechanismRatio = (Math.PI * DriveConstants.kWheelDiameter) / (DriveConstants.kDriveGearRatio);
+    motorConfig.Feedback.SensorToMechanismRatio = DriveConstants.kDriveRevToMeters;
 
     return motorConfig;
   }
