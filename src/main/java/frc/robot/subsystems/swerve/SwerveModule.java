@@ -39,8 +39,7 @@ public class SwerveModule extends SubsystemBase {
   private double m_simDriveEncoderPosition;
   private double m_simDriveEncoderVelocity;
 
-  private LoggedShuffleboardTunableNumber m_angleOffset;
-  private double m_lastAngleOffset;
+  private double m_angleOffset;
 
   // private final SparkPIDController m_driveController;
   // private SparkPIDController m_turnController;
@@ -70,16 +69,8 @@ public class SwerveModule extends SubsystemBase {
             swerveModuleConstants.turningMotorChannel);
 
     m_angleEncoder = new CANcoder(swerveModuleConstants.cancoderID, "rio");
-    m_angleOffset =
-        new LoggedShuffleboardTunableNumber(
-            "Module " + m_moduleNumber + " Offset",
-            swerveModuleConstants.angleOffset,
-            RobotContainer.driveTuningTab,
-            BuiltInWidgets.kTextView,
-            Map.of("min", 0),
-            m_moduleNumber,
-            2);
-    m_lastAngleOffset = m_angleOffset.get();
+
+    m_angleOffset = swerveModuleConstants.angleOffset;
 
     m_driveMotor.getConfigurator().apply(new TalonFXConfiguration());
     m_driveMotor.setInverted(true); // MK4i drive motor is inverted
@@ -113,7 +104,7 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public void resetAngleToAbsolute() {
-    double angle = m_angleEncoder.getAbsolutePosition().getValueAsDouble() - m_angleOffset.get();
+    double angle = m_angleEncoder.getAbsolutePosition().getValue() - m_angleOffset;
     m_turningMotor.setPosition(angle);
   }
 
@@ -196,11 +187,6 @@ public class SwerveModule extends SubsystemBase {
             .withKI(SwerveDrive.turnki.get())
             .withKD(SwerveDrive.turnkd.get())
       );
-    }
-
-    if (m_lastAngleOffset != m_angleOffset.get()) {
-      resetAngleToAbsolute();
-      m_lastAngleOffset = m_angleOffset.get();
     }
   }
 
