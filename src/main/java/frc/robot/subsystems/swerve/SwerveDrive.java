@@ -419,24 +419,24 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void realPeriodic() {
-    if (poseEstimator
-            .getEstimatedPosition()
-            .getTranslation()
-            .getDistance(Limelight.getInstance().getLimelightPose().getTranslation())
-        <= 1.0) {
-      poseEstimator.addVisionMeasurement(
-          Limelight.getInstance().getLimelightPose(),
-          Timer.getFPGATimestamp() - (Limelight.getInstance().getBotPose()[6] / 1000.0),
-          VecBuilder.fill(
-              1
-                  - Math.pow(
-                      Limelight.getInstance().getA(),
-                      apriltagTrustMultiplier
-                          .get()), // Higher the multiplier the closer it has to be to the tag to
-              // trust it
-              1 - Math.pow(Limelight.getInstance().getA(), apriltagTrustMultiplier.get()),
-              0.9));
-    }
+    // if (poseEstimator
+    //         .getEstimatedPosition()
+    //         .getTranslation()
+    //         .getDistance(Limelight.getInstance().getLimelightPose().getTranslation())
+    //     <= 1.0) {
+    //   poseEstimator.addVisionMeasurement(
+    //       Limelight.getInstance().getLimelightPose(),
+    //       Timer.getFPGATimestamp() - (Limelight.getInstance().getBotPose()[6] / 1000.0),
+    //       VecBuilder.fill(
+    //           1
+    //               - Math.pow(
+    //                   Limelight.getInstance().getA(),
+    //                   apriltagTrustMultiplier
+    //                       .get()), // Higher the multiplier the closer it has to be to the tag to
+    //           // trust it
+    //           1 - Math.pow(Limelight.getInstance().getA(), apriltagTrustMultiplier.get()),
+    //           0.9));
+    // }
   }
 
   @Override

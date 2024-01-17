@@ -89,10 +89,10 @@ public final class Constants {
     public static final double kMaxMetersPerSecond =
         Units.feetToMeters(16.5); // Run drivebase at max speed on the ground to find top speed
 
-    public static final double kDriveGearRatio = 6.75; // MK4i L2 Neo, find on sds website
+    public static final double kDriveGearRatio = 2048 * 6.75; // MK4i L2 Neo, find on sds website
 
     public static final double kTurnGearRatio =
-        150.0 / 7.0; // MK4i turning ratio MK4i Neo, find on sds website
+        2048 * 150.0 / 7.0; // MK4i turning ratio MK4i Neo, find on sds website
 
     public static final double kWheelDiameter = Units.inchesToMeters(3.79); // Wheel diameter
 

@@ -61,7 +61,7 @@ public final class CtreUtils {
     motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     motorConfig.CurrentLimits.SupplyCurrentLimit = 40;
 
-    motorConfig.Feedback.SensorToMechanismRatio = DriveConstants.kTurnGearRatio;
+    motorConfig.Feedback.SensorToMechanismRatio = 360 / DriveConstants.kTurnGearRatio;
 
     return motorConfig;
   }
