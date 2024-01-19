@@ -50,7 +50,7 @@ public class Limelight extends SubsystemBase {
     m_tl = m_visionTable.getEntry("tl");
     m_cl = m_visionTable.getEntry("cl");
     m_tcornxy = m_visionTable.getEntry("m_tcornxy");
-    m_botpose = m_visionTable.getEntry("botpose");
+    m_botpose = m_visionTable.getEntry("botpose_wpiblue");
     m_targetpose_robotspace = m_visionTable.getEntry("targetpose_robotspace");
 
     camName = "limelight";
@@ -104,10 +104,10 @@ public class Limelight extends SubsystemBase {
     Logger.recordOutput("Limelight/Capture Latency", m_cl.getDouble(0));
     Logger.recordOutput(
         "Limelight/Corners/X",
-        GeometryUtils.AKitCorner(m_tcornxy.getDoubleArray(new double[2]))[0]);
+        GeometryUtils.AKitCorner(m_tcornxy.getDoubleArray(new double[32]))[0]);
     Logger.recordOutput(
         "Limelight/Corners/Y",
-        GeometryUtils.AKitCorner(m_tcornxy.getDoubleArray(new double[2]))[1]);
+        GeometryUtils.AKitCorner(m_tcornxy.getDoubleArray(new double[32]))[1]);
     Logger.recordOutput(
         "Limelight/AprilTag Pose",
         GeometryUtils.PoseSpaceToFieldSpace(getTargetPose(), RobotContainer.m_drivebase.getPose()));
