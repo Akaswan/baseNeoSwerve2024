@@ -65,7 +65,7 @@ public class Limelight extends SubsystemBase {
   }
 
   public double[] getBotPose() {
-    return m_botpose.getDoubleArray(new double[8]);
+    return m_botpose.getDoubleArray(new double[7]);
   }
 
   public Pose2d getLimelightPose() {
@@ -75,7 +75,7 @@ public class Limelight extends SubsystemBase {
   }
 
   public Pose3d getTargetPose() {
-    double[] targetpose = m_targetpose_robotspace.getDoubleArray(new double[8]);
+    double[] targetpose = m_targetpose_robotspace.getDoubleArray(new double[7]);
 
     return new Pose3d(
         targetpose[0],
