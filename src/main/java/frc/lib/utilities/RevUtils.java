@@ -1,4 +1,4 @@
-package frc.robot.utilities;
+package frc.lib.utilities;
 
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;

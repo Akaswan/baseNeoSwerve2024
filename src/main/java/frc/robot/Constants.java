@@ -22,7 +22,7 @@ import frc.robot.subsystems.templates.PositionSubsystem.PositionSubsystemType;
 import frc.robot.subsystems.templates.SubsystemConstants.PositionSubsystemConstants;
 import frc.robot.subsystems.templates.SubsystemConstants.SparkMaxConstants;
 import frc.robot.subsystems.templates.SubsystemConstants.VelocitySubsystemConstants;
-import frc.robot.utilities.SwerveModuleConstants;
+import frc.lib.utilities.SwerveModuleConstants;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean

@@ -22,9 +22,9 @@ import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
-import frc.robot.utilities.CtreUtils;
-import frc.robot.utilities.RevUtils;
-import frc.robot.utilities.SwerveModuleConstants;
+import frc.lib.utilities.CtreUtils;
+import frc.lib.utilities.RevUtils;
+import frc.lib.utilities.SwerveModuleConstants;
 import java.util.Map;
 
 public class SwerveModule extends SubsystemBase {

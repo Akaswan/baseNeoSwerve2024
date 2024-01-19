@@ -1,4 +1,4 @@
-package frc.robot.utilities;
+package frc.lib.utilities;
 
 public class SwerveModuleConstants {
 

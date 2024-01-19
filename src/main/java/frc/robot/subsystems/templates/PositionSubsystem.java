@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.templates.SubsystemConstants.PositionSubsystemConstants;
-import frc.robot.utilities.LoggedShuffleboardTunableNumber;
+import frc.lib.utilities.LoggedShuffleboardTunableNumber;
 import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 

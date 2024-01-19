@@ -15,7 +15,7 @@ import com.revrobotics.SparkPIDController.ArbFFUnits;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.templates.SubsystemConstants.VelocitySubsystemConstants;
-import frc.robot.utilities.LoggedShuffleboardTunableNumber;
+import frc.lib.utilities.LoggedShuffleboardTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public abstract class VelocitySubsystem extends SubsystemBase {

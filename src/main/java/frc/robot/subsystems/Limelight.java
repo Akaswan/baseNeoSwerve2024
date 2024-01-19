@@ -12,8 +12,9 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.utilities.GeometryUtils;
 import frc.robot.subsystems.swerve.SwerveDrive;
-import frc.robot.utilities.GeometryUtils;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Limelight extends SubsystemBase {

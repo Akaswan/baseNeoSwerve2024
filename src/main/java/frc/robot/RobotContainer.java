@@ -17,6 +17,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.utilities.Alert;
+import frc.lib.utilities.LoggedDashboardChooser;
+import frc.lib.utilities.Alert.AlertType;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.auto.CenterNoteAuto;
@@ -26,9 +29,6 @@ import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.launcher.LauncherSuperstructure;
 import frc.robot.subsystems.launcher.LauncherSuperstructure.LauncherSuperstructureState;
 import frc.robot.subsystems.swerve.SwerveDrive;
-import frc.robot.utilities.Alert;
-import frc.robot.utilities.Alert.AlertType;
-import frc.robot.utilities.LoggedDashboardChooser;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a

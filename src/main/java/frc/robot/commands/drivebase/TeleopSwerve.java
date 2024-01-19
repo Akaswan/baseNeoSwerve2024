@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
-import frc.robot.utilities.GeometryUtils;
+import frc.lib.utilities.GeometryUtils;
 
 /**
  *
