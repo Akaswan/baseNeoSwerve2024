@@ -12,6 +12,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.utilities.GeometryUtils;
 import org.littletonrobotics.junction.Logger;
 
@@ -64,7 +65,7 @@ public class Limelight extends SubsystemBase {
   }
 
   public double[] getBotPose() {
-    return m_botpose.getDoubleArray(new double[6]);
+    return m_botpose.getDoubleArray(new double[8]);
   }
 
   public Pose2d getLimelightPose() {
@@ -74,7 +75,7 @@ public class Limelight extends SubsystemBase {
   }
 
   public Pose3d getTargetPose() {
-    double[] targetpose = m_targetpose_robotspace.getDoubleArray(new double[6]);
+    double[] targetpose = m_targetpose_robotspace.getDoubleArray(new double[8]);
 
     return new Pose3d(
         targetpose[0],
@@ -107,8 +108,8 @@ public class Limelight extends SubsystemBase {
     Logger.recordOutput(
         "Limelight/Corners/Y",
         GeometryUtils.AKitCorner(m_tcornxy.getDoubleArray(new double[2]))[1]);
-    // Logger.recordOutput(
-    //     "Limelight/AprilTag Pose",
-    //     GeometryUtils.PoseSpaceToFieldSpace(getTargetPose(), SwerveDrive.getInstance().getPose()));
+    Logger.recordOutput(
+        "Limelight/AprilTag Pose",
+        GeometryUtils.PoseSpaceToFieldSpace(getTargetPose(), RobotContainer.m_drivebase.getPose()));
   }
 }
