@@ -35,6 +35,7 @@ public abstract class PositionSubsystem extends SubsystemBase {
   protected final RelativeEncoder m_encoder;
 
   protected TrapezoidProfile m_profile;
+  protected TrapezoidProfile m_unzeroedProfile;
   protected TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   protected TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
@@ -49,6 +50,9 @@ public abstract class PositionSubsystem extends SubsystemBase {
 
   protected PositionSubsystemState m_currentState = null;
   protected PositionSubsystemState m_desiredState = null;
+
+  protected boolean m_hasBeenZeroed = false;
+  protected boolean m_isZeroed = true;
 
   protected double m_profileStartTime = -1;
 
@@ -145,16 +149,29 @@ public abstract class PositionSubsystem extends SubsystemBase {
         new TrapezoidProfile(
             new TrapezoidProfile.Constraints(
                 m_constants.kMaxVelocity, m_constants.kMaxAcceleration));
+    m_unzeroedProfile =
+        new TrapezoidProfile(
+            new TrapezoidProfile.Constraints(
+                m_constants.kMaxVelocity * .01, m_constants.kMaxAcceleration * .01));
 
     setName(m_constants.kName);
   }
 
   public void runToSetpoint() {
-    m_setpoint =
-        m_profile.calculate(
-            Timer.getFPGATimestamp() - m_profileStartTime,
-            new TrapezoidProfile.State(m_profileStartPosition, m_profileStartVelocity),
-            new TrapezoidProfile.State(m_desiredState.getPosition(), 0));
+
+    if (m_hasBeenZeroed) {
+      m_setpoint =
+          m_profile.calculate(
+              Timer.getFPGATimestamp() - m_profileStartTime,
+              new TrapezoidProfile.State(m_profileStartPosition, m_profileStartVelocity),
+              new TrapezoidProfile.State(m_desiredState.getPosition(), 0));
+    } else {
+      m_setpoint =
+          m_unzeroedProfile.calculate(
+              Timer.getFPGATimestamp() - m_profileStartTime,
+              new TrapezoidProfile.State(m_profileStartPosition, m_profileStartVelocity),
+              new TrapezoidProfile.State(m_desiredState.getPosition(), 0));
+    }
 
     m_pidController.setReference(
         m_setpoint.position,
@@ -236,6 +253,10 @@ public abstract class PositionSubsystem extends SubsystemBase {
     m_arbFeedforward = feedforward;
   }
 
+  public void setZeroed(boolean zeroed) {
+    m_isZeroed = zeroed;
+  }
+
   public void setDesiredState(PositionSubsystemState desiredState) {
     m_desiredState = desiredState;
     m_profileStartTime = Timer.getFPGATimestamp();
@@ -261,6 +282,9 @@ public abstract class PositionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    if (m_isZeroed && !m_hasBeenZeroed) m_hasBeenZeroed = true;
+
     if (m_profileStartTime == -1) {
       holdPosition();
     } else {
