@@ -8,7 +8,6 @@ import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinder;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.subsystems.swerve.SwerveDrive;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -102,7 +101,6 @@ public class LocalADStarAK implements Pathfinder {
     public LocalADStar adStar = new LocalADStar();
     public boolean isNewPathAvailable = false;
     public List<PathPoint> currentPathPoints = Collections.emptyList();
-    public PathPlannerPath lastPath;
 
     @Override
     public void toLog(LogTable table) {
@@ -136,13 +134,6 @@ public class LocalADStarAK implements Pathfinder {
 
     public void updateIsNewPathAvailable() {
       isNewPathAvailable = adStar.isNewPathAvailable();
-
-      if (lastPath != null
-          && currentPathPoints
-                  .get(currentPathPoints.size() - 1)
-                  .position
-                  .getDistance(SwerveDrive.getInstance().getPose().getTranslation())
-              <= .1) {}
     }
 
     public void updateCurrentPathPoints(PathConstraints constraints, GoalEndState goalEndState) {
@@ -153,8 +144,6 @@ public class LocalADStarAK implements Pathfinder {
       } else {
         currentPathPoints = Collections.emptyList();
       }
-
-      lastPath = currentPath;
     }
   }
 }

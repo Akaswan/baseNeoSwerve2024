@@ -6,6 +6,9 @@ package frc.robot;
 
 import java.util.TreeMap;
 
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -15,14 +18,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.subsystems.launcher.LauncherFlywheel.LauncherFlywheelState;
-import frc.robot.subsystems.launcher.LauncherWrist.LauncherWristState;
-import frc.robot.subsystems.templates.VelocitySubsystem.VelocitySubsystemType;
-import frc.robot.subsystems.templates.PositionSubsystem.PositionSubsystemType;
-import frc.robot.subsystems.templates.SubsystemConstants.PositionSubsystemConstants;
-import frc.robot.subsystems.templates.SubsystemConstants.SparkMaxConstants;
-import frc.robot.subsystems.templates.SubsystemConstants.VelocitySubsystemConstants;
-import frc.robot.utilities.SwerveModuleConstants;
+import frc.lib.util.COTSTalonFXSwerveConstants;
+import frc.lib.util.SwerveModuleConstants;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -34,9 +31,11 @@ import frc.robot.utilities.SwerveModuleConstants;
  */
 public final class Constants {
 
+  public static final double stickDeadband = 0.1;
+
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : Mode.SIM;
 
-  public static final boolean kInfoMode = true;
+  public static final boolean kInfoMode = false;
 
   public static final boolean kTuningMode = false;
 
@@ -59,6 +58,120 @@ public final class Constants {
       new Translation2d(7.68, 0.78)
     };
   }
+
+   public static final class Swerve {
+        public static final int pigeonID = 0;
+
+        public static final COTSTalonFXSwerveConstants chosenModule =  //TODO: This must be tuned to specific robot
+        COTSTalonFXSwerveConstants.SDS.MK4i.Falcon500(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L2);
+
+        /* Drivetrain Constants */
+        public static final double trackWidth = Units.inchesToMeters(20.67); //TODO: This must be tuned to specific robot
+        public static final double wheelBase = Units.inchesToMeters(20.67); //TODO: This must be tuned to specific robot
+        public static final double wheelCircumference = chosenModule.wheelCircumference;
+
+        /* Swerve Kinematics 
+         * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
+         public static final SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
+            new Translation2d(wheelBase / 2.0, trackWidth / 2.0),
+            new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
+            new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
+            new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
+
+        /* Module Gear Ratios */
+        public static final double driveGearRatio = chosenModule.driveGearRatio;
+        public static final double angleGearRatio = chosenModule.angleGearRatio;
+
+        /* Motor Inverts */
+        public static final InvertedValue angleMotorInvert = chosenModule.angleMotorInvert;
+        public static final InvertedValue driveMotorInvert = chosenModule.driveMotorInvert;
+
+        /* Angle Encoder Invert */
+        public static final SensorDirectionValue cancoderInvert = chosenModule.cancoderInvert;
+
+        /* Swerve Current Limiting */
+        public static final int angleCurrentLimit = 25;
+        public static final int angleCurrentThreshold = 40;
+        public static final double angleCurrentThresholdTime = 0.1;
+        public static final boolean angleEnableCurrentLimit = true;
+
+        public static final int driveCurrentLimit = 35;
+        public static final int driveCurrentThreshold = 60;
+        public static final double driveCurrentThresholdTime = 0.1;
+        public static final boolean driveEnableCurrentLimit = true;
+
+        /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
+         * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc */
+        public static final double openLoopRamp = 0.25;
+        public static final double closedLoopRamp = 0.0;
+
+        /* Angle Motor PID Values */
+        public static final double angleKP = chosenModule.angleKP;
+        public static final double angleKI = chosenModule.angleKI;
+        public static final double angleKD = chosenModule.angleKD;
+
+        /* Drive Motor PID Values */
+        public static final double driveKP = 0.12; //TODO: This must be tuned to specific robot
+        public static final double driveKI = 0.0;
+        public static final double driveKD = 0.0;
+        public static final double driveKF = 0.0;
+
+        /* Drive Motor Characterization Values From SYSID */
+        public static final double driveKS = 0.32; //TODO: This must be tuned to specific robot
+        public static final double driveKV = 1.51;
+        public static final double driveKA = 0.27;
+
+        /* Swerve Profiling Values */
+        /** Meters per Second */
+        public static final double maxSpeed = 4.5; //TODO: This must be tuned to specific robot
+        /** Radians per Second */
+        public static final double maxAngularVelocity = 10.0; //TODO: This must be tuned to specific robot
+
+        /* Neutral Modes */
+        public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;
+        public static final NeutralModeValue driveNeutralMode = NeutralModeValue.Brake;
+
+        /* Module Specific Constants */
+        /* Front Left Module - Module 0 */
+        public static final class Mod0 { //TODO: This must be tuned to specific robot
+            public static final int driveMotorID = 12;
+            public static final int angleMotorID = 11;
+            public static final int canCoderID = 1;
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
+            public static final SwerveModuleConstants constants = 
+                new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
+        }
+
+        /* Front Right Module - Module 1 */
+        public static final class Mod1 { //TODO: This must be tuned to specific robot
+            public static final int driveMotorID = 18;
+            public static final int angleMotorID = 17;
+            public static final int canCoderID = 7;
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
+            public static final SwerveModuleConstants constants = 
+                new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
+        }
+        
+        /* Back Left Module - Module 2 */
+        public static final class Mod2 { //TODO: This must be tuned to specific robot
+            public static final int driveMotorID = 14;
+            public static final int angleMotorID = 13;
+            public static final int canCoderID = 3;
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
+            public static final SwerveModuleConstants constants = 
+                new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
+        }
+
+        /* Back Right Module - Module 3 */
+        public static final class Mod3 { //TODO: This must be tuned to specific robot
+            public static final int driveMotorID = 16;
+            public static final int angleMotorID = 15;
+            public static final int canCoderID = 5;
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
+            public static final SwerveModuleConstants constants = 
+                new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
+        }
+    }
 
   public static final class DriveConstants {
 
@@ -112,43 +225,43 @@ public final class Constants {
 
     public static final double kSlowSpeed = 0.4; // Slow speed multiplier of robot
 
-    public static final int kFrontLeftDriveMotor = 12;
-    public static final int kFrontLeftSteerMotor = 11;
-    public static final int kFrontLeftSteerEncoder = 1;
-    public static final double kFrontLeftOffset = 52.03;
-    public static final SwerveModuleConstants kFrontLeft =
-        new SwerveModuleConstants(
-            kFrontLeftDriveMotor, kFrontLeftSteerMotor, kFrontLeftSteerEncoder, kFrontLeftOffset);
+    // public static final int kFrontLeftDriveMotor = 12;
+    // public static final int kFrontLeftSteerMotor = 11;
+    // public static final int kFrontLeftSteerEncoder = 1;
+    // public static final double kFrontLeftOffset = 52.03;
+    // public static final SwerveModuleConstants kFrontLeft =
+    //     new SwerveModuleConstants(
+    //         kFrontLeftDriveMotor, kFrontLeftSteerMotor, kFrontLeftSteerEncoder, kFrontLeftOffset);
 
-    public static final int kFrontRightDriveMotor = 18;
-    public static final int kFrontRightSteerMotor = 17;
-    public static final int kFrontRightSteerEncoder = 7;
-    public static final double kFrontRightSteerOffset = 144.22;
-    public static final SwerveModuleConstants kFrontRight =
-        new SwerveModuleConstants(
-            kFrontRightDriveMotor,
-            kFrontRightSteerMotor,
-            kFrontRightSteerEncoder,
-            kFrontRightSteerOffset);
+    // public static final int kFrontRightDriveMotor = 18;
+    // public static final int kFrontRightSteerMotor = 17;
+    // public static final int kFrontRightSteerEncoder = 7;
+    // public static final double kFrontRightSteerOffset = 144.22;
+    // public static final SwerveModuleConstants kFrontRight =
+    //     new SwerveModuleConstants(
+    //         kFrontRightDriveMotor,
+    //         kFrontRightSteerMotor,
+    //         kFrontRightSteerEncoder,
+    //         kFrontRightSteerOffset);
 
-    public static final int kBackLeftDriveMotor = 14;
-    public static final int kBackLeftSteerMotor = 13;
-    public static final int kBackLeftSteerEncoder = 3;
-    public static final double kBackLeftSteerOffset = 45.25;
-    public static final SwerveModuleConstants kBackLeft =
-        new SwerveModuleConstants(
-            kBackLeftDriveMotor, kBackLeftSteerMotor, kBackLeftSteerEncoder, kBackLeftSteerOffset);
+    // public static final int kBackLeftDriveMotor = 14;
+    // public static final int kBackLeftSteerMotor = 13;
+    // public static final int kBackLeftSteerEncoder = 3;
+    // public static final double kBackLeftSteerOffset = 45.25;
+    // public static final SwerveModuleConstants kBackLeft =
+    //     new SwerveModuleConstants(
+    //         kBackLeftDriveMotor, kBackLeftSteerMotor, kBackLeftSteerEncoder, kBackLeftSteerOffset);
 
-    public static final int kBackRightDriveMotor = 16;
-    public static final int kBackRightSteerMotor = 15;
-    public static final int kBackRightSteerEncoder = 5;
-    public static final double kBackRightSteerOffset = 231.1;
-    public static final SwerveModuleConstants kBackRight =
-        new SwerveModuleConstants(
-            kBackRightDriveMotor,
-            kBackRightSteerMotor,
-            kBackRightSteerEncoder,
-            kBackRightSteerOffset);
+    // public static final int kBackRightDriveMotor = 16;
+    // public static final int kBackRightSteerMotor = 15;
+    // public static final int kBackRightSteerEncoder = 5;
+    // public static final double kBackRightSteerOffset = 231.1;
+    // public static final SwerveModuleConstants kBackRight =
+    //     new SwerveModuleConstants(
+    //         kBackRightDriveMotor,
+    //         kBackRightSteerMotor,
+    //         kBackRightSteerEncoder,
+    //         kBackRightSteerOffset);
 
     public static final double kDriveRevToMeters = ((kWheelDiameter * Math.PI) / kDriveGearRatio);
     public static final double kDriveRpmToMetersPerSecond = kDriveRevToMeters / 60.0;
@@ -176,135 +289,6 @@ public final class Constants {
 
     public static final Translation2d kBlueSpeakerPosition = new Translation2d(0, 5.56);
     public static final Translation2d kRedSpeakerPosition = new Translation2d(0, 2.65);
-  }
-
-  public static final class LauncherConstants {
-
-    // IN METERS
-    public static final TreeMap<Double, Double> kDistanceRPMMap = new TreeMap<>();
-    static {
-      kDistanceRPMMap.put(0.0, 1000.0);
-      kDistanceRPMMap.put(1.0, 2000.0);
-      kDistanceRPMMap.put(1.5, 2500.0);
-      kDistanceRPMMap.put(2.0, 3000.0);
-      kDistanceRPMMap.put(2.5, 3500.0);
-      kDistanceRPMMap.put(3.0, 4000.0);
-      kDistanceRPMMap.put(3.5, 4500.0);
-      kDistanceRPMMap.put(4.0, 5000.0);
-      kDistanceRPMMap.put(4.5, 5500.0);
-      kDistanceRPMMap.put(5.0, 6000.0);
-      kDistanceRPMMap.put(5.5, 6500.0);
-    }
-
-    // IN DEGREES
-    public static final TreeMap<Double, Double> kDistancePitchMap = new TreeMap<>();
-    static {
-      kDistancePitchMap.put(0.0, 90.0);
-      kDistancePitchMap.put(1.0, 60.0);
-      kDistancePitchMap.put(1.5, 55.0);
-      kDistancePitchMap.put(2.0, 50.0);
-      kDistancePitchMap.put(2.5, 45.0);
-      kDistancePitchMap.put(3.0, 40.0);
-      kDistancePitchMap.put(3.5, 35.0);
-      kDistancePitchMap.put(4.0, 30.0);
-      kDistancePitchMap.put(4.5, 25.0);
-      kDistancePitchMap.put(5.0, 20.0);
-      kDistancePitchMap.put(5.5, 15.0);
-      kDistancePitchMap.put(6.0, 10.0);
-    }
-
-    public static final SparkMaxConstants kLauncherFlywheelMasterConstants = new SparkMaxConstants();
-
-    static {
-      kLauncherFlywheelMasterConstants.kID = 34;
-      kLauncherFlywheelMasterConstants.kIdleMode = IdleMode.kBrake;
-      kLauncherFlywheelMasterConstants.kMotorType = MotorType.kBrushless;
-      kLauncherFlywheelMasterConstants.kCurrentLimit = 80;
-      kLauncherFlywheelMasterConstants.kInverted = false;
-    }
-
-    public static final SparkMaxConstants[] kLauncherFlywheelSlaveConstants = new SparkMaxConstants[0];
-
-    public static final VelocitySubsystemConstants kLauncherFlywheelConstants =
-        new VelocitySubsystemConstants();
-
-    static {
-      kLauncherFlywheelConstants.kName = "Launcher Flywheel";
-
-      kLauncherFlywheelConstants.kSubsystemType = VelocitySubsystemType.LAUNCHER_FLYWHEEL;
-
-      kLauncherFlywheelConstants.kMasterConstants = kLauncherFlywheelMasterConstants;
-      kLauncherFlywheelConstants.kSlaveConstants = kLauncherFlywheelSlaveConstants;
-
-      kLauncherFlywheelConstants.kVelocityConversionFactor = 3 / 60; // division by 60 to get rotations per second
-
-      kLauncherFlywheelConstants.kKp = 0.01;
-      kLauncherFlywheelConstants.kKi = 0.0;
-      kLauncherFlywheelConstants.kKd = 0.0;
-
-      kLauncherFlywheelConstants.kDefaultSlot = 0;
-
-      kLauncherFlywheelConstants.kKs = 0.0;
-      kLauncherFlywheelConstants.kKv = 0.0;
-      kLauncherFlywheelConstants.kKa = 0.0;
-
-      kLauncherFlywheelConstants.kInitialState = LauncherFlywheelState.OFF;
-      kLauncherFlywheelConstants.kTransitionState = LauncherFlywheelState.TRANSITION;
-    }
-
-  public static final SparkMaxConstants kLauncherWristMasterConstants = new SparkMaxConstants();
-
-    static {
-      kLauncherWristMasterConstants.kID = 7;
-      kLauncherWristMasterConstants.kIdleMode = IdleMode.kBrake;
-      kLauncherWristMasterConstants.kMotorType = MotorType.kBrushless;
-      kLauncherWristMasterConstants.kCurrentLimit = 80;
-      kLauncherWristMasterConstants.kInverted = false;
-    }
-
-    public static final SparkMaxConstants[] kWristSlaveConstants = new SparkMaxConstants[0];
-
-    public static final PositionSubsystemConstants kLauncherWristConstants =
-        new PositionSubsystemConstants();
-
-    static {
-      kLauncherWristConstants.kName = "Launcher Wrist";
-
-      kLauncherWristConstants.kSubsystemType = PositionSubsystemType.LAUNCHER_WRIST;
-
-      kLauncherWristConstants.kMasterConstants = kLauncherWristMasterConstants;
-      kLauncherWristConstants.kSlaveConstants = kWristSlaveConstants;
-
-      kLauncherWristConstants.kHomePosition = 155;
-      kLauncherWristConstants.kPositionConversionFactor = 360 / 100;
-
-      kLauncherWristConstants.kKp = 0.2;
-      kLauncherWristConstants.kKi = 0.0;
-      kLauncherWristConstants.kKd = 0.0;
-      kLauncherWristConstants.kSetpointTolerance = 0.1;
-      kLauncherWristConstants.kSmartMotionTolerance = 0.1;
-
-      kLauncherWristConstants.kDefaultSlot = 0;
-
-      kLauncherWristConstants.kMaxVelocity = 2000;
-      kLauncherWristConstants.kMaxAcceleration = 2000;
-
-      kLauncherWristConstants.kKs = 0.0;
-      kLauncherWristConstants.kKg = 0.0;
-      kLauncherWristConstants.kKv = 0.0;
-      kLauncherWristConstants.kKa = 0.0;
-
-      kLauncherWristConstants.kMaxPosition = 155;
-      kLauncherWristConstants.kMinPosition = -85;
-
-      kLauncherWristConstants.kManualControlMode = ManualControlMode.TRIGGERS;
-      kLauncherWristConstants.kManualMultiplier = 1;
-      kLauncherWristConstants.kManualDeadBand = .1;
-
-      kLauncherWristConstants.kInitialState = LauncherWristState.DOWN;
-      kLauncherWristConstants.kManualState = LauncherWristState.MANUAL;
-      kLauncherWristConstants.kTransitionState = LauncherWristState.TRANSITION;
-    }
   }
 
 
