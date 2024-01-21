@@ -122,7 +122,7 @@ public class SwerveModule extends SubsystemBase {
 
   public void resetAngleToAbsolute() {
     double angle = m_angleEncoder.getAbsolutePosition().getValue() - m_angleOffset;
-    m_turnEncoder.setPosition(angle);
+    m_turnEncoder.setPosition(angle * 360);
   }
 
   public double getHeadingDegrees() {
