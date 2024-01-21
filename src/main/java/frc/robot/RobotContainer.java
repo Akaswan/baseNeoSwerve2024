@@ -24,6 +24,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.auto.CenterNoteAuto;
 import frc.robot.commands.drivebase.TeleopSwerve;
+import frc.robot.commands.drivebase.TurnToAngle;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.launcher.LauncherSuperstructure;
@@ -78,8 +79,8 @@ public class RobotContainer {
     autoChooser =
         new LoggedDashboardChooser<>(
             "Auto Picker", AutoBuilder.buildAutoChooser(), mainTab, 0, 0, 2, 1);
-    autoChooser.addOption("Center Command", new SequentialCommandGroup(new InstantCommand(() -> m_drivebase.updateEstimatorWithPose(new Pose2d(2, 0.76, Rotation2d.fromDegrees(122.92)))), 
-    new CenterNoteAuto(m_drivebase)));
+    autoChooser.addOption("Center Command", new SequentialCommandGroup(new InstantCommand(() -> m_drivebase.updateEstimatorWithPose(new Pose2d(2, 0.76, Rotation2d.fromDegrees(0)))), 
+    new CenterNoteAuto()));
 
     // CONFIGURE DEFAULT COMMANDS \\
     m_drivebase.setDefaultCommand(
@@ -160,7 +161,7 @@ public class RobotContainer {
     //     .onTrue(new InstantCommand(() -> m_drivebase.setAngleToSnap(AngleToSnap.FORWARD)));
     // m_driverController.x().onTrue(new InstantCommand(m_drivebase::toggleXWheels));
 
-    // m_operatorController.a().onTrue(new TurnToAngle(m_drivebase));
+    m_operatorController.a().onTrue(new TurnToAngle(m_drivebase));
 
     m_operatorController.a().onTrue(m_launcherSuperstructure.setSuperstructureState(LauncherSuperstructureState.LAUNCH));
     // m_operatorController.b().onTrue(m_launcherSuperstructure.setSuperstructureState(LauncherSuperstructureState.IDLE));

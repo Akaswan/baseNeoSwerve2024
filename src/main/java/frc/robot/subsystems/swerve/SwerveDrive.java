@@ -232,7 +232,17 @@ public class SwerveDrive extends SubsystemBase {
             new ReplanningConfig() // Default path replanning config. See the API for the options
             // here
             ),
-        this::shouldFlip, // Not sure what this means, if its talking when to flip, or should it flip when red alliance. Needs testing
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+  
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                  return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+          },
         this // Reference to this subsystem to set requirements
         );
   }
@@ -308,6 +318,7 @@ public class SwerveDrive extends SubsystemBase {
     speeds = GeometryUtils.discretize(speeds); // I dont know if you want this here
     moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     setSwerveModuleStates(moduleStates, false);
+    robotRelativeChassisSpeeds = speeds;
   }
 
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
@@ -423,6 +434,7 @@ public class SwerveDrive extends SubsystemBase {
 
   @Override
   public void periodic() {
+    System.out.println(getYawDegrees());
     poseEstimator.update(getYaw(), getModulePositions());
 
     Logger.recordOutput(
@@ -442,6 +454,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void realPeriodic() {
+    
     if (poseEstimator
             .getEstimatedPosition()
             .getTranslation()
