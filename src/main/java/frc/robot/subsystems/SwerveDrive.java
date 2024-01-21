@@ -74,18 +74,21 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+        // double m_translation = isOpenLoop ? translation.getX() / 
+        
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
-                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
+            //     fieldRelative ? 
+                ChassisSpeeds.fromFieldRelativeSpeeds(
                                     translation.getX(), 
                                     translation.getY(), 
                                     rotation, 
-                                    getHeading()
+                                    getGyroYaw()
                                 )
-                                : new ChassisSpeeds(
-                                    translation.getX(), 
-                                    translation.getY(), 
-                                    rotation)
+                                // : new ChassisSpeeds(
+                                //     translation.getX(), 
+                                //     translation.getY(), 
+                                //     rotation)
                                 );
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 
@@ -101,9 +104,9 @@ public class SwerveDrive extends SubsystemBase {
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(robotRelativChassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 
-        for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
-        }
+        // for(SwerveModule mod : mSwerveMods){
+        //     mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
+        // }
     }
 
     public ChassisSpeeds getRobotRelativeChassisSpeeds() {
@@ -172,7 +175,7 @@ public class SwerveDrive extends SubsystemBase {
             .getEstimatedPosition()
             .getTranslation()
             .getDistance(Limelight.getInstance().getLimelightPose().getTranslation())
-        <= 2.5) {
+        <= 4 && Limelight.getInstance().getLimelightPose().getTranslation().getDistance(new Translation2d(0, 0)) > .5) {
       poseEstimator.addVisionMeasurement(
           Limelight.getInstance().getLimelightPose(),
           Timer.getFPGATimestamp() - (Limelight.getInstance().getBotPose()[6] / 1000.0),
@@ -190,7 +193,7 @@ public class SwerveDrive extends SubsystemBase {
 
          Logger.recordOutput(
         "Drivebase/Gyro Connected", !gyro.getFault_BootupGyroscope().getValue());
-        Logger.recordOutput("Drivebase/Gyro", getGyroYaw());
+        Logger.recordOutput("Drivebase/Gyro", getHeading().getDegrees());
         Logger.recordOutput("Drivebase/SwerveStates", getModuleStates());
         Logger.recordOutput("Drivebase/Pose", getPose());
 

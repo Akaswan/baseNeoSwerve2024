@@ -1,10 +1,12 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -38,7 +40,7 @@ public class SwerveModule {
         
         /* Angle Encoder Config */
         angleEncoder = new CANcoder(moduleConstants.cancoderID);
-        angleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCANcoderConfig);
+        // angleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCANcoderConfig);
 
         /* Angle Motor Config */
         mAngleMotor = new TalonFX(moduleConstants.angleMotorID);
@@ -47,7 +49,15 @@ public class SwerveModule {
 
         /* Drive Motor Config */
         mDriveMotor = new TalonFX(moduleConstants.driveMotorID);
-        mDriveMotor.getConfigurator().apply(Robot.ctreConfigs.swerveDriveFXConfig);
+        TalonFXConfiguration driveMotorConfigs = Robot.ctreConfigs.swerveDriveFXConfig;
+
+        // if (moduleConstants.cancoderID == 3 || moduleConstants.cancoderID == 1 || moduleConstants.cancoderID == 5) {
+        //     driveMotorConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        // } else {
+        //     driveMotorConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        // }
+
+        mDriveMotor.getConfigurator().apply(driveMotorConfigs);
         mDriveMotor.getConfigurator().setPosition(0.0);
     }
 

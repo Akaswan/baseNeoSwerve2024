@@ -78,7 +78,7 @@ public class RobotContainer {
                 m_drivebase, 
                 () -> -m_driverController.getRawAxis(translationAxis),
                 () -> -m_driverController.getRawAxis(strafeAxis), 
-                () -> -m_driverController.getRawAxis(rotationAxis),
+                () -> m_driverController.getRawAxis(rotationAxis),
                 () -> false
             )
         );

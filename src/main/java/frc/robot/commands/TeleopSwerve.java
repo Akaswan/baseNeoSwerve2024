@@ -42,20 +42,23 @@ public class TeleopSwerve extends Command {
     public void execute() {
         /* Get Values, Deadband*/
         double translationVal = 
-            translationLimiter.calculate(
-                MathUtil.applyDeadband(translationSup.getAsDouble() < 0 ? -Math.pow(translationSup.getAsDouble(), 2) : Math.pow(translationSup.getAsDouble(), 2), Constants.stickDeadband)); //square input math
+            // translationLimiter.calculate(
+                MathUtil.applyDeadband(translationSup.getAsDouble() < 0 ? -Math.pow(translationSup.getAsDouble(), 2) : Math.pow(translationSup.getAsDouble(), 2), Constants.stickDeadband) * .25;
+                // ); //square input math
         double strafeVal = 
-            strafeLimiter.calculate(
-                MathUtil.applyDeadband(strafeSup.getAsDouble() < 0 ? -Math.pow(strafeSup.getAsDouble(), 2) : Math.pow(strafeSup.getAsDouble(), 2), Constants.stickDeadband));
+            // strafeLimiter.calculate(
+                MathUtil.applyDeadband(strafeSup.getAsDouble() < 0 ? -Math.pow(strafeSup.getAsDouble(), 2) : Math.pow(strafeSup.getAsDouble(), 2), Constants.stickDeadband) * .25;
+                // );
         double rotationVal = 
-            rotationLimiter.calculate(
-                MathUtil.applyDeadband(rotationSup.getAsDouble() < 0 ? -Math.pow(rotationSup.getAsDouble(), 2) : Math.pow(rotationSup.getAsDouble(), 2), Constants.stickDeadband));
+            // rotationLimiter.calculate(
+                MathUtil.applyDeadband(rotationSup.getAsDouble() < 0 ? -Math.pow(rotationSup.getAsDouble(), 2) : Math.pow(rotationSup.getAsDouble(), 2), Constants.stickDeadband) * .25;
+                // );
 
         /* Drive */
         s_Swerve.drive(
             new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed), 
             rotationVal * Constants.Swerve.maxAngularVelocity, 
-            !robotCentricSup.getAsBoolean(), 
+            true, 
             true
         );
     }

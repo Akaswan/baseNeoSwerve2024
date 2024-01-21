@@ -53,7 +53,7 @@ public class Limelight extends SubsystemBase {
     m_botpose = m_visionTable.getEntry("botpose_wpiblue");
     m_targetpose_robotspace = m_visionTable.getEntry("targetpose_robotspace");
 
-    camName = "limelight";
+    camName = "limelight-launch";
   }
 
   public double getA() {

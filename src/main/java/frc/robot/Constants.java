@@ -62,8 +62,8 @@ public final class Constants {
         COTSTalonFXSwerveConstants.SDS.MK4i.Falcon500(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L2);
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(20.67); //TODO: This must be tuned to specific robot
-        public static final double wheelBase = Units.inchesToMeters(20.67); //TODO: This must be tuned to specific robot
+        public static final double trackWidth = Units.inchesToMeters(19); //TODO: This must be tuned to specific robot
+        public static final double wheelBase = Units.inchesToMeters(19); //TODO: This must be tuned to specific robot
         public static final double wheelCircumference = chosenModule.wheelCircumference;
 
         /* Swerve Kinematics 
@@ -98,7 +98,7 @@ public final class Constants {
 
         /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
          * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc */
-        public static final double openLoopRamp = 0.25;
+        public static final double openLoopRamp = 0.1;
         public static final double closedLoopRamp = 0.0;
 
         /* Angle Motor PID Values */
@@ -121,7 +121,7 @@ public final class Constants {
         /** Meters per Second */
         public static final double maxSpeed = 4.5; //TODO: This must be tuned to specific robot
         /** Radians per Second */
-        public static final double maxAngularVelocity = 10.0; //TODO: This must be tuned to specific robot
+        public static final double maxAngularVelocity = 6.8; //TODO: This must be tuned to specific robot
 
         /* Neutral Modes */
         public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;

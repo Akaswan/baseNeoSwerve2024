@@ -38,7 +38,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
-  public static CTREConfigs ctreConfigs;
+  public static CTREConfigs ctreConfigs = new CTREConfigs();
 
   private RobotContainer m_robotContainer;
 
@@ -97,8 +97,7 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     m_robotContainer = new RobotContainer();
-    ctreConfigs = new CTREConfigs();
-
+    
     if (Constants.kTuningMode) {
       m_robotContainer.tuningInit();
     }
