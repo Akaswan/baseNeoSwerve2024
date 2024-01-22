@@ -305,8 +305,8 @@ public class SwerveDrive extends SubsystemBase {
 
       Logger.recordOutput("Drivebase/SwerveStateSetpoints", moduleStates);
 
-      robotRelativeChassisSpeeds =
-          GeometryUtils.discretize(new ChassisSpeeds(throttle, strafe, rotation));
+      // robotRelativeChassisSpeeds =
+      //     GeometryUtils.discretize(new ChassisSpeeds(throttle, strafe, rotation));
 
     } else {
       setSwerveModuleStates(DriveConstants.kXWheels, isOpenLoop);
@@ -318,7 +318,7 @@ public class SwerveDrive extends SubsystemBase {
     speeds = GeometryUtils.discretize(speeds); // I dont know if you want this here
     moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     setSwerveModuleStates(moduleStates, false);
-    robotRelativeChassisSpeeds = speeds;
+    // robotRelativeChassisSpeeds = speeds;
   }
 
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
@@ -434,8 +434,10 @@ public class SwerveDrive extends SubsystemBase {
 
   @Override
   public void periodic() {
-    System.out.println(getYawDegrees());
+    // System.out.println(getYawDegrees());
     poseEstimator.update(getYaw(), getModulePositions());
+
+    robotRelativeChassisSpeeds = DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
 
     Logger.recordOutput(
         "Drivebase/Gyro Connected", !m_pigeon.getFault_BootupGyroscope().getValue());

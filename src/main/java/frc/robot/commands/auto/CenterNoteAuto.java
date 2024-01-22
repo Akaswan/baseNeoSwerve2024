@@ -24,7 +24,7 @@ import frc.robot.subsystems.swerve.SwerveDrive;
 
 public class CenterNoteAuto extends Command {
   /** Creates a new CenterNoteAuto. */
-  private boolean[] m_availableNotes = new boolean[] {true, false, true, true, false};
+  private boolean[] m_availableNotes = new boolean[] {false, true, true, false, true};
   private Command m_noteCommandRunning;
   private Command m_scoreCommandRunning;
   private Command m_sequentialCommandRunning;
