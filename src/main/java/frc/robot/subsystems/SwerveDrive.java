@@ -186,19 +186,17 @@ public class SwerveDrive extends SubsystemBase {
           Timer.getFPGATimestamp() - (Limelight.getInstance().getBotPose()[6] / 1000.0),
           VecBuilder.fill(
               1
-                  - Math.pow(
-                      Limelight.getInstance().getA(),
-                      1), // Higher the multiplier the closer it has to be to the tag to
+                  - Math.pow(Limelight.getInstance().getA(), 1), // Higher the multiplier the closer it has to be to the tag to
               // trust it
               1 - Math.pow(Limelight.getInstance().getA(), 1),
-              0.9));
+              0.9)); // TODO Fix
     }
         
         poseEstimator.update(getGyroYaw(), getModulePositions());
 
          Logger.recordOutput(
         "Drivebase/Gyro Connected", !gyro.getFault_BootupGyroscope().getValue());
-        Logger.recordOutput("Drivebase/Gyro", getHeading().getDegrees());
+        Logger.recordOutput("Drivebase/Gyro", getGyroYaw().getDegrees());
         Logger.recordOutput("Drivebase/SwerveStates", getModuleStates());
         Logger.recordOutput("Drivebase/Pose", getPose());
 
