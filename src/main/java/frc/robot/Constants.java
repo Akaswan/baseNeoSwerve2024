@@ -92,7 +92,7 @@ public final class Constants {
     public static final double kDriveGearRatio = 2048 * 6.75; // MK4i L2 Neo, find on sds website
 
     public static final double kTurnGearRatio =
-        2048 * 150.0 / 7.0; // MK4i turning ratio MK4i Neo, find on sds website
+        256 * (150.0 / 7.0); // MK4i turning ratio MK4i Neo, find on sds website
 
     public static final double kWheelDiameter = Units.inchesToMeters(3.79); // Wheel diameter
 
@@ -106,7 +106,7 @@ public final class Constants {
     public static final int kFrontLeftDriveMotor = 12;
     public static final int kFrontLeftSteerMotor = 11;
     public static final int kFrontLeftSteerEncoder = 1;
-    public static final double kFrontLeftOffset = 59.9;
+    public static final double kFrontLeftOffset = 0;
     public static final SwerveModuleConstants kFrontLeft =
         new SwerveModuleConstants(
             kFrontLeftDriveMotor, kFrontLeftSteerMotor, kFrontLeftSteerEncoder, kFrontLeftOffset);
@@ -114,7 +114,7 @@ public final class Constants {
     public static final int kFrontRightDriveMotor = 18;
     public static final int kFrontRightSteerMotor = 17;
     public static final int kFrontRightSteerEncoder = 7;
-    public static final double kFrontRightSteerOffset = 39.4;
+    public static final double kFrontRightSteerOffset = 0;
     public static final SwerveModuleConstants kFrontRight =
         new SwerveModuleConstants(
             kFrontRightDriveMotor,
@@ -125,7 +125,7 @@ public final class Constants {
     public static final int kBackLeftDriveMotor = 14;
     public static final int kBackLeftSteerMotor = 13;
     public static final int kBackLeftSteerEncoder = 3;
-    public static final double kBackLeftSteerOffset = 54.2;
+    public static final double kBackLeftSteerOffset = 0;
     public static final SwerveModuleConstants kBackLeft =
         new SwerveModuleConstants(
             kBackLeftDriveMotor, kBackLeftSteerMotor, kBackLeftSteerEncoder, kBackLeftSteerOffset);
@@ -133,7 +133,7 @@ public final class Constants {
     public static final int kBackRightDriveMotor = 16;
     public static final int kBackRightSteerMotor = 15;
     public static final int kBackRightSteerEncoder = 5;
-    public static final double kBackRightSteerOffset = 56.8;
+    public static final double kBackRightSteerOffset = 0;
     public static final SwerveModuleConstants kBackRight =
         new SwerveModuleConstants(
             kBackRightDriveMotor,
