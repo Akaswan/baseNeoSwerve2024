@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -43,6 +44,8 @@ public class SwerveDrive extends SubsystemBase {
             new SwerveModule(2, Constants.Swerve.Mod2.constants),
             new SwerveModule(3, Constants.Swerve.Mod3.constants)
         };
+
+        robotRelativeChassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
         poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions(), new Pose2d(), VecBuilder.fill(0.1, 0.1, 0.1), VecBuilder.fill(0.9, 0.9, 0.9));
     
@@ -92,7 +95,7 @@ public class SwerveDrive extends SubsystemBase {
                                 );
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 
-        robotRelativeChassisSpeeds = Constants.Swerve.swerveKinematics.toChassisSpeeds(swerveModuleStates);
+        // robotRelativeChassisSpeeds = Constants.Swerve.swerveKinematics.toChassisSpeeds(swerveModuleStates);
 
         for(SwerveModule mod : mSwerveMods){
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
@@ -104,9 +107,9 @@ public class SwerveDrive extends SubsystemBase {
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(robotRelativChassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 
-        // for(SwerveModule mod : mSwerveMods){
-        //     mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
-        // }
+        for(SwerveModule mod : mSwerveMods){
+            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
+        }
     }
 
     public ChassisSpeeds getRobotRelativeChassisSpeeds() {
@@ -170,6 +173,8 @@ public class SwerveDrive extends SubsystemBase {
 
     @Override
     public void periodic(){
+
+        robotRelativeChassisSpeeds = DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
 
     if (poseEstimator
             .getEstimatedPosition()
