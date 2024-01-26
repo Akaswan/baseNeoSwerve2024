@@ -29,7 +29,7 @@ public final class Constants {
 
   public static final double stickDeadband = 0.1;
 
-  public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : Mode.SIM;
+  public static final Mode currentMode = RobotBase.isSimulation() ? Mode.REAL : Mode.SIM;
 
   public static final boolean kInfoMode = false;
 

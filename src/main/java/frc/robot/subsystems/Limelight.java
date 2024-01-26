@@ -49,7 +49,7 @@ public class Limelight extends SubsystemBase {
     m_ta = m_visionTable.getEntry("ta");
     m_tl = m_visionTable.getEntry("tl");
     m_cl = m_visionTable.getEntry("cl");
-    m_tcornxy = m_visionTable.getEntry("m_tcornxy");
+    m_tcornxy = m_visionTable.getEntry("tcornxy"); //TODO Enable "send contours" in the "Output" tab to stream corner coordinates:
     m_botpose = m_visionTable.getEntry("botpose_wpiblue");
     m_targetpose_robotspace = m_visionTable.getEntry("targetpose_robotspace");
 

@@ -6,12 +6,17 @@ package frc.robot;
 
 import static frc.robot.Constants.*;
 
+import org.littletonrobotics.junction.Logger;
+
+import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.Limelight;
@@ -52,6 +57,8 @@ public class RobotContainer {
   // SENDABLE CHOOSER \\
   public static LoggedDashboardChooser<Command> autoChooser;
 
+  public static SysIdRoutine sysIdRoutine;
+
   // ALERTS \\
   private Alert infoAlert =
       new Alert("Info Mode Activated, expect decreased network performance.", AlertType.INFO);
@@ -82,6 +89,21 @@ public class RobotContainer {
                 () -> false
             )
         );
+
+    var config = new SysIdRoutine.Config(
+      null, null, null,
+      (state) -> SignalLogger.writeString("SysIdTestState", state.toString())
+    );
+
+    sysIdRoutine = new SysIdRoutine(
+      config,
+      new SysIdRoutine.Mechanism(
+      (voltage) -> m_drivebase.runVolts(voltage),
+      null, // No log consumer, since data is recorded by URCL
+      m_drivebase
+      )
+    );
+
 
     configureButtonBindings();
   }
@@ -154,6 +176,11 @@ public class RobotContainer {
     // m_operatorController.a().onTrue(m_launcherSuperstructure.setSuperstructureState(LauncherSuperstructureState.LAUNCH));
     // m_operatorController.b().onTrue(m_launcherSuperstructure.setSuperstructureState(LauncherSuperstructureState.IDLE));
     // m_operatorController.x().onTrue(m_launcherSuperstructure.setSuperstructureState(LauncherSuperstructureState.OFF));
+
+    m_operatorController.y().whileTrue(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward));
+    m_operatorController.a().whileTrue(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
+    m_operatorController.b().whileTrue(sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward));
+    m_operatorController.x().whileTrue(sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
   }
 
   public Command getAutonomousCommand() {

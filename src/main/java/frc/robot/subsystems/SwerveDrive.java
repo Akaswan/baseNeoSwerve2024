@@ -21,6 +21,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -114,6 +116,12 @@ public class SwerveDrive extends SubsystemBase {
 
     public ChassisSpeeds getRobotRelativeChassisSpeeds() {
         return robotRelativeChassisSpeeds;
+    }
+
+    public void runVolts(Measure<Voltage> voltage) {
+        for(SwerveModule mod : mSwerveMods){
+            mod.setVoltage(voltage.magnitude());
+        }
     }
 
     /* Used by SwerveControllerCommand in Auto */
